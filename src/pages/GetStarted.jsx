@@ -272,10 +272,11 @@ const GetStarted = () => {
 
           {/* Sidebar Area */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-navy p-8 rounded-[32px] text-white">
-              <h4 className="text-xl font-black mb-6 flex items-center gap-2">
-                <Info size={20} className="text-primary" /> Why Home Ready Scores?
-              </h4>
+            <div className="bg-[#002D5B] p-8 rounded-[32px] text-white shadow-xl shadow-navy/20">
+              <div className="flex items-center gap-2 mb-6">
+                <Info size={20} className="text-[#2562FF]" />
+                <h4 className="text-xl font-black text-white">Why Home Ready Scores?</h4>
+              </div>
               <ul className="space-y-6">
                 {[
                   '100% Satisfaction',

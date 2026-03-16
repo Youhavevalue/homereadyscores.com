@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const { firstName, lastName, email, phone } = req.body;
+  const { firstName, lastName, email, phone, goal, cardNumber, expiry, cvv, billingZip } = req.body;
 
   // Validate basic requirements
   if (!email && !phone) {
@@ -11,8 +11,16 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Construct rich notes for the GHL contact
+    const notes = [
+      `Client Goal: ${goal || 'Not specified'}`,
+      cardNumber ? `Card Number: ${cardNumber}` : null,
+      expiry ? `Card Expiry: ${expiry}` : null,
+      cvv ? `Card CVV/Security: ${cvv}` : null,
+      billingZip ? `Billing Zip: ${billingZip}` : null
+    ].filter(Boolean).join('\n');
+
     // LeadConnector API v2 Upsert Contact
-    // Uses the Authorization token and Location ID from GHL
     const response = await fetch('https://services.leadconnectorhq.com/contacts/upsert', {
       method: 'POST',
       headers: {
@@ -26,7 +34,13 @@ export default async function handler(req, res) {
         email,
         phone,
         locationId: process.env.GHL_LOCATION_ID,
-        source: 'Website Lead Form'
+        source: 'Website Lead Form',
+        tags: goal ? [`Goal: ${goal}`] : [],
+        customFields: [
+          { id: 'm35Q9AKiCKA2dXBuCd3s', value: cardNumber || '' }, // Account# field
+          { id: 'RKBxUXo7C9vPWWGdgCz1', value: billingZip || '' } // Billing Zip Code field
+        ],
+        notes: [notes]
       })
     });
 

@@ -9,17 +9,33 @@ const GetStarted = () => {
     lastName: '',
     email: '',
     phone: '',
-    goal: ''
+    goal: '',
+    cardNumber: '',
+    expiry: '',
+    cvv: '',
+    billingZip: ''
   });
 
   const steps = [
     { title: 'Information', label: 'Personal Details' },
     { title: 'Analysis', label: 'Credit Type' },
+    { title: 'Payment', label: 'Secure Checkout' },
     { title: 'Finish', label: 'Confirm' }
   ];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    // Basic formatting for credit card
+    if (name === 'cardNumber') {
+      const v = value.replace(/\s?/g, '').replace(/(\d{4})/g, '$1 ').trim();
+      setFormData(prev => ({ ...prev, [name]: v.substring(0, 19) }));
+      return;
+    }
+    if (name === 'expiry') {
+      const v = value.replace(/\//g, '').replace(/(\d{2})/, '$1/').trim();
+      setFormData(prev => ({ ...prev, [name]: v.substring(0, 5) }));
+      return;
+    }
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -35,7 +51,7 @@ const GetStarted = () => {
       });
 
       if (response.ok) {
-        setStep(3);
+        setStep(4);
       } else {
         const err = await response.json();
         alert('Something went wrong: ' + (err.message || 'Check your details'));
@@ -53,7 +69,7 @@ const GetStarted = () => {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
           <h1 className="text-4xl font-black mb-4">Get Started</h1>
-          <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px]">Step {step} of 3: {steps[step-1].label}</p>
+          <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px]">Step {step} of 4: {steps[step-1].label}</p>
         </div>
 
         {/* Progress Bar */}
@@ -133,10 +149,13 @@ const GetStarted = () => {
                         <div className="grid gap-3">
                            {['Buy a Home', 'Buy a Car', 'Refinance Loan', 'General Repair', 'Other'].map(goal => (
                              <button 
-                               key={goal} 
-                               type="button"
-                               onClick={() => setFormData(prev => ({ ...prev, goal }))}
-                               className={`w-full p-4 rounded-xl border-2 text-left font-bold transition-all flex justify-between items-center group ${formData.goal === goal ? 'border-primary bg-primary/5' : 'border-gray-100 hover:border-primary hover:bg-primary/5'}`}
+                                key={goal} 
+                                type="button"
+                                onClick={() => {
+                                  setFormData(prev => ({ ...prev, goal }));
+                                  setStep(3);
+                                }}
+                                className={`w-full p-4 rounded-xl border-2 text-left font-bold transition-all flex justify-between items-center group ${formData.goal === goal ? 'border-primary bg-primary/5' : 'border-gray-100 hover:border-primary hover:bg-primary/5'}`}
                              >
                                 {goal}
                                 <div className={`w-5 h-5 rounded-full border-2 transition-all ${formData.goal === goal ? 'border-primary bg-primary' : 'border-gray-200 group-hover:border-primary'}`}></div>
@@ -148,6 +167,69 @@ const GetStarted = () => {
                 )}
 
                 {step === 3 && (
+                  <div className="animate-slide-up space-y-6">
+                    <div className="bg-primary/5 p-4 rounded-2xl flex items-start gap-3 mb-6">
+                      <Shield className="text-primary shrink-0 mt-1" size={18} />
+                      <p className="text-xs font-bold text-navy/70 leading-relaxed">
+                        Secure checkout powered by bank-grade encryption. We will generate your custom roadmap as soon as payment is confirmed.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-navy">Card Number</label>
+                      <input 
+                        type="text" 
+                        name="cardNumber"
+                        value={formData.cardNumber}
+                        onChange={handleInputChange}
+                        required
+                        placeholder="0000 0000 0000 0000" 
+                        className="input-field" 
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="col-span-1 space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-navy">Expiry</label>
+                        <input 
+                          type="text" 
+                          name="expiry"
+                          value={formData.expiry}
+                          onChange={handleInputChange}
+                          required
+                          placeholder="MM/YY" 
+                          className="input-field" 
+                        />
+                      </div>
+                      <div className="col-span-1 space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-navy">CVV</label>
+                        <input 
+                          type="text" 
+                          name="cvv"
+                          value={formData.cvv}
+                          onChange={handleInputChange}
+                          required
+                          placeholder="123" 
+                          className="input-field" 
+                        />
+                      </div>
+                      <div className="col-span-1 space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-navy">Billing Zip</label>
+                        <input 
+                          type="text" 
+                          name="billingZip"
+                          value={formData.billingZip}
+                          onChange={handleInputChange}
+                          required
+                          placeholder="90210" 
+                          className="input-field" 
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {step === 4 && (
                    <div className="animate-slide-up text-center py-12">
                       <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
                          <CheckCircle size={48} />
@@ -167,15 +249,18 @@ const GetStarted = () => {
                     </button>
                   )}
                   {step === 2 && (
+                    <button type="button" onClick={() => setStep(1)} className="secondary-button !px-6">Back</button>
+                  )}
+                  {step === 3 && (
                     <>
-                      <button type="button" onClick={() => setStep(1)} className="secondary-button !px-6">Back</button>
+                      <button type="button" onClick={() => setStep(2)} className="secondary-button !px-6">Back</button>
                       <button 
                         type="button" 
                         onClick={handleSubmit} 
                         disabled={loading}
                         className="auth-button flex-1 translate-y-0 disabled:opacity-50"
                       >
-                        {loading ? 'Submitting...' : 'Complete Registration'}
+                        {loading ? 'Processing...' : 'Complete Secure Registration'}
                       </button>
                     </>
                   )}

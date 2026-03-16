@@ -59,19 +59,19 @@ const Home = () => {
               </motion.div>
               
               <motion.h1 variants={fadeInUp} className="text-6xl md:text-8xl font-black mb-8 leading-[0.9] text-navy tracking-tight">
-                Fix Your Credit.<br/>
-                <span className="text-gradient">Get Your</span><br/>
-                Dream Home.
+                Improve Your Credit.<br/>
+                <span className="text-gradient">Unlock Your</span><br/>
+                New Home.
               </motion.h1>
               
               <motion.p variants={fadeInUp} className="text-xl text-gray-600 mb-10 max-w-xl leading-relaxed">
-                Home Ready Scores uses powerful consumer protection laws to challenge bureaus and help you reclaim the financial future your family deserves. 
-                <span className="font-black text-navy ml-1 underline decoration-primary decoration-4 underline-offset-4">Most clients see results in 45 days.</span>
+                Home Ready Scores helps you use your legal rights to fix your credit report so you can finally get the keys to the home you've been waiting for. 
+                <span className="font-black text-navy ml-1 underline decoration-primary decoration-4 underline-offset-4">Most people see a real difference in just 45 days.</span>
               </motion.p>
               
               <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 mb-12">
                 <Link to="/get-started" className="auth-button group">
-                  Start Your Analysis
+                  Get Started
                   <ArrowRight className="group-hover:translate-x-2 transition-transform duration-300" />
                 </Link>
                 <Link to="/how-it-works" className="secondary-button">
@@ -176,29 +176,29 @@ const Home = () => {
       {/* THREE PILLARS */}
       <section className="py-32 px-6 md:px-12 max-w-7xl mx-auto">
         <div className="text-center mb-20">
-          <h2 className="text-4xl md:text-5xl font-black mb-6">Our Three Core <span className="text-gradient">Advocacy Pillars</span></h2>
+          <h2 className="text-4xl md:text-5xl font-black mb-6">Our Three Core <span className="text-gradient">Success Pillars</span></h2>
           <p className="text-gray-500 max-w-2xl mx-auto text-lg leading-relaxed font-medium">
-            We don't just repair credit; we architect a complete financial restoration specifically designed for the mortgage process.
+            We don't just fix numbers; we build a clear path so you're ready to buy a home of your own.
           </p>
         </div>
         <div className="grid lg:grid-cols-3 gap-10">
           {[
             { 
               icon: Shield, 
-              title: "Legal Advocacy", 
-              desc: "We leverage individual consumer rights through FCRA and FDCPA to force bureaus to prove or remove every negative item.",
+              title: "Cleaning Your Report", 
+              desc: "Our experts work directly with credit bureaus to ensure every detail on your report is accurate, fair, and working for you.",
               link: "/how-it-works"
             },
             { 
               icon: TrendingUp, 
-              title: "Score Engineering", 
-              desc: "Real-time Transunion FICO® score updates and personalized strategies to optimize your credit utilization ratio.",
+              title: "Boosting Your Score", 
+              desc: "Receive a simple, personalized roadmap designed to help you reach your credit goals with confidence and ease.",
               link: "/how-it-works"
             },
             { 
               icon: HomeIcon, 
-              title: "Mortgage Ready", 
-              desc: "We don't just fix scores; we prepare you for homeownership with mortgage-ready analysis and loan officer coordination.",
+              title: "Ready for a Home", 
+              desc: "We help you cross the finish line by making sure your credit is officially ready for the home of your dreams.",
               link: "/how-it-works"
             }
           ].map((pillar, idx) => (

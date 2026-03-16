@@ -1,5 +1,6 @@
 import React from 'react';
 import { Star, Quote, CheckCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Reviews = () => {
   const reviews = [
@@ -7,7 +8,7 @@ const Reviews = () => {
       name: 'Ralph E.',
       score: '+114 Pts',
       image: 'https://i.pravatar.cc/150?u=12',
-      content: 'Legacy Credits removed 7 negative items in just 45 days. I was finally able to qualify for my first home at a 4.2% interest rate. They changed my family\'s life.',
+      content: 'Home Ready Scores removed 7 negative items in just 45 days. I was finally able to qualify for my first home at a 4.2% interest rate. They changed my family\'s life.',
       type: 'Homeowner'
     },
     {
@@ -56,7 +57,7 @@ const Reviews = () => {
                 Client Success Stories
               </div>
               <h1 className="text-5xl md:text-7xl font-black mb-8 leading-tight text-navy">
-                Proof We Fix Your <span className="text-primary italic">Legacy.</span>
+                Proof You Can Reach Your <span className="text-primary italic">Home Goals.</span>
               </h1>
            </div>
            <div className="bg-white p-10 rounded-3xl shadow-xl shadow-navy/5 border border-gray-100 animate-fade-in">
@@ -109,9 +110,9 @@ const Reviews = () => {
          <div className="bg-navy rounded-[40px] p-12 text-center text-white relative overflow-hidden">
             <div className="absolute -top-20 -left-20 w-64 h-64 bg-primary/20 rounded-full blur-[80px]"></div>
             <h2 className="text-3xl md:text-4xl font-black mb-8 relative z-10 italic">Ready to be our next success?</h2>
-            <button className="auth-button min-w-[280px] mx-auto relative z-10 group">
-               Get Your Scoring Analysis 
-            </button>
+            <Link to="/get-started" className="auth-button min-w-[280px] mx-auto relative z-10 group inline-block">
+               Get Started
+            </Link>
          </div>
       </section>
     </div>

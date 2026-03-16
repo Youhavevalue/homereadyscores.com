@@ -7,26 +7,26 @@ const HowItWorks = () => {
     {
       icon: Search,
       title: 'Analyze',
-      description: 'We pull your 3-bureau credit report and perform a deep-dive audit to identify questionable negative items.',
-      details: ['Bankruptcy audit', 'Collection verification', 'Repossession review']
+      description: 'Our trained agents handle your credit repair by first analyzing exactly what the next steps are for your specific situation.',
+      details: ['Report review', 'Next steps plan', 'Account deep-dive']
     },
     {
       icon: FileText,
-      title: 'Challenge',
-      description: 'Our experts craft custom legal challenges based on federal consumer protection laws (FCRA & FDCPA).',
-      details: ['Custom challenge letters', 'Attorney-backed review', 'Certified mail delivery']
+      title: 'Action',
+      description: 'Our experts craft custom actions designed to address every negative mark on your credit history.',
+      details: ['Custom strategy', 'Expert review', 'Strong legal focus']
     },
     {
       icon: Send,
-      title: 'Submit',
-      description: 'We force the credit bureaus and creditors to provide proof for every negative item. Failure to prove means removal.',
-      details: ['45-day cycle tracking', 'Bureau correspondence', 'Creditor negotiation']
+      title: 'Verify',
+      description: 'We take strong action with the credit bureaus and creditors, requiring them to provide proof for all negative items.',
+      details: ['Mandatory proof', 'Bureau tracking', 'Result monitoring']
     },
     {
       icon: CheckCircle,
       title: 'Succeed',
-      description: 'Watch as items are removed and your score increases. Most clients see significant changes within 1-2 cycles.',
-      details: ['Score optimization', 'Credit building advice', 'Monthly progress reports']
+      description: 'Watch your score improve as we work through the cycles. Most people see significant changes in just 1-2 cycles.',
+      details: ['Score growth', 'Home ready progress', 'Cycle updates']
     }
   ];
 
@@ -41,7 +41,7 @@ const HowItWorks = () => {
           How We Build Your<br/><span className="text-primary italic">Success Story.</span>
         </h1>
         <p className="max-w-2xl mx-auto text-xl text-gray-500 leading-relaxed font-medium">
-          Our methodology is rooted in federal law. We don't just ask for removals; we demand legal proof from the credit bureaus.
+          Our process is built on proven strategies to protect your credit health. We work directly with the credit bureaus to make sure your report is accurate and fair.
         </p>
       </section>
 
@@ -98,7 +98,7 @@ const HowItWorks = () => {
                 <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary rounded-full opacity-10 blur-3xl"></div>
                 <h3 className="text-3xl font-black mb-8 text-navy italic">"The 45-Day Difference"</h3>
                 <p className="text-gray-600 leading-relaxed mb-8 font-medium">
-                  Under the Fair Credit Reporting Act (FCRA), credit bureaus have 30 days to investigate a dispute. We manage every step of this timeline, ensuring no technicality is missed.
+                  We handle the entire timeline with the credit bureaus for you, managing every step with precision to ensure your report reflects your true credit potential.
                 </p>
                 <Link to="/get-started" className="auth-button group">
                   Start Your 45-Day Cycle

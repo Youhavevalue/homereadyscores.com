@@ -3,6 +3,14 @@ import { Shield, CheckCircle, Info } from 'lucide-react';
 
 const GetStarted = () => {
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    goal: ''
+  });
 
   const steps = [
     { title: 'Information', label: 'Personal Details' },
@@ -10,11 +18,41 @@ const GetStarted = () => {
     { title: 'Finish', label: 'Confirm' }
   ];
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    if (e) e.preventDefault();
+    setLoading(true);
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        setStep(3);
+      } else {
+        const err = await response.json();
+        alert('Something went wrong: ' + (err.message || 'Check your details'));
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      alert('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen pt-32 pb-24 bg-surface px-6">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-black mb-4">Start Your Free Assessment</h1>
+          <h1 className="text-4xl font-black mb-4">Get Started</h1>
           <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px]">Step {step} of 3: {steps[step-1].label}</p>
         </div>
 
@@ -32,26 +70,58 @@ const GetStarted = () => {
           {/* Main Form Area */}
           <div className="lg:col-span-3">
             <div className="bg-white p-10 rounded-[32px] shadow-2xl shadow-navy/5 border border-gray-100">
-              <form onSubmit={(e) => e.preventDefault()} className="space-y-8">
+              <form onSubmit={handleSubmit} className="space-y-8">
                 {step === 1 && (
                   <div className="animate-slide-up space-y-6">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-navy">First Name</label>
-                        <input type="text" placeholder="John" className="input-field" />
+                        <input 
+                          type="text" 
+                          name="firstName"
+                          value={formData.firstName}
+                          onChange={handleInputChange}
+                          required
+                          placeholder="John" 
+                          className="input-field" 
+                        />
                       </div>
                       <div className="space-y-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-navy">Last Name</label>
-                        <input type="text" placeholder="Doe" className="input-field" />
+                        <input 
+                          type="text" 
+                          name="lastName"
+                          value={formData.lastName}
+                          onChange={handleInputChange}
+                          required
+                          placeholder="Doe" 
+                          className="input-field" 
+                        />
                       </div>
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] font-black uppercase tracking-widest text-navy">Email Address</label>
-                      <input type="email" placeholder="john@example.com" className="input-field" />
+                      <input 
+                        type="email" 
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        required
+                        placeholder="john@example.com" 
+                        className="input-field" 
+                      />
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] font-black uppercase tracking-widest text-navy">Phone Number</label>
-                      <input type="tel" placeholder="(555) 000-0000" className="input-field" />
+                      <input 
+                        type="tel" 
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        required
+                        placeholder="(555) 000-0000" 
+                        className="input-field" 
+                      />
                     </div>
                   </div>
                 )}
@@ -62,9 +132,14 @@ const GetStarted = () => {
                         <label className="text-[10px] font-black uppercase tracking-widest text-navy">What is your primary goal?</label>
                         <div className="grid gap-3">
                            {['Buy a Home', 'Buy a Car', 'Refinance Loan', 'General Repair', 'Other'].map(goal => (
-                             <button key={goal} className="w-full p-4 rounded-xl border-2 border-gray-100 hover:border-primary hover:bg-primary/5 text-left font-bold transition-all flex justify-between items-center group">
+                             <button 
+                               key={goal} 
+                               type="button"
+                               onClick={() => setFormData(prev => ({ ...prev, goal }))}
+                               className={`w-full p-4 rounded-xl border-2 text-left font-bold transition-all flex justify-between items-center group ${formData.goal === goal ? 'border-primary bg-primary/5' : 'border-gray-100 hover:border-primary hover:bg-primary/5'}`}
+                             >
                                 {goal}
-                                <div className="w-5 h-5 rounded-full border-2 border-gray-200 group-hover:border-primary"></div>
+                                <div className={`w-5 h-5 rounded-full border-2 transition-all ${formData.goal === goal ? 'border-primary bg-primary' : 'border-gray-200 group-hover:border-primary'}`}></div>
                              </button>
                            ))}
                         </div>
@@ -73,25 +148,37 @@ const GetStarted = () => {
                 )}
 
                 {step === 3 && (
-                   <div className="animate-slide-up text-center py-8">
-                      <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                         <CheckCircle size={40} />
+                   <div className="animate-slide-up text-center py-12">
+                      <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
+                         <CheckCircle size={48} />
                       </div>
-                      <h3 className="text-2xl font-black mb-4">Almost Done!</h3>
-                      <p className="text-gray-500 mb-8 max-w-xs mx-auto">Confirm your details and our lead expert will contact you within 24 hours.</p>
-                      <div className="flex items-center gap-2 justify-center text-xs text-gray-400">
-                        <Shield size={14} /> Encrypted & Secure
+                      <h3 className="text-3xl font-black mb-6">Success!</h3>
+                      <p className="text-gray-500 mb-8 max-w-xs mx-auto text-lg">Your custom roadmap is being prepared. Our team will reach out shortly.</p>
+                      <div className="flex items-center gap-2 justify-center text-xs text-gray-400 font-bold uppercase tracking-widest">
+                        <Shield size={14} className="text-primary" /> Encrypted & Secure
                       </div>
                    </div>
                 )}
 
                 <div className="pt-6 flex gap-4">
-                  {step > 1 && (
-                    <button type="button" onClick={() => setStep(step - 1)} className="secondary-button !px-6">Back</button>
+                  {step === 1 && (
+                    <button type="button" onClick={() => setStep(2)} className="auth-button flex-1 translate-y-0">
+                      Next Step
+                    </button>
                   )}
-                  <button type="button" onClick={() => setStep(step < 3 ? step + 1 : 1)} className="auth-button flex-1 translate-y-0">
-                    {step === 3 ? 'Submit Request' : 'Next Step'}
-                  </button>
+                  {step === 2 && (
+                    <>
+                      <button type="button" onClick={() => setStep(1)} className="secondary-button !px-6">Back</button>
+                      <button 
+                        type="button" 
+                        onClick={handleSubmit} 
+                        disabled={loading}
+                        className="auth-button flex-1 translate-y-0 disabled:opacity-50"
+                      >
+                        {loading ? 'Submitting...' : 'Complete Registration'}
+                      </button>
+                    </>
+                  )}
                 </div>
               </form>
             </div>
@@ -106,10 +193,10 @@ const GetStarted = () => {
               </h4>
               <ul className="space-y-6">
                 {[
-                  '100% Free Consultation',
-                  'Comprehensive 3-Bureau Report',
-                  'Custom Roadmap to 700+ Score',
-                  '45-Day Performance Guarantee'
+                  '100% Satisfaction',
+                  'Comprehensive Credit Report Analysis',
+                  'Custom Roadmap to Home Ownership',
+                  'Elite Financial Restoration'
                 ].map(item => (
                   <li key={item} className="flex items-start gap-3">
                     <CheckCircle className="text-primary mt-1 shrink-0" size={16} />

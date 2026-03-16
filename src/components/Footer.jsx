@@ -44,7 +44,7 @@ const Footer = () => {
           </div>
           
           <div className="col-span-1 md:col-span-2">
-            <h4 className="font-black uppercase tracking-[0.3em] text-[10px] mb-10 text-primary">Strategic Links</h4>
+            <h4 className="font-black uppercase tracking-[0.3em] text-[10px] mb-10 text-primary">Quick Links</h4>
             <ul className="space-y-5 text-blue-100/60 font-black uppercase tracking-[0.2em] text-[11px]">
               <li><Link to="/how-it-works" className="hover:text-primary transition-colors hover:translate-x-1 inline-block transition-transform">How It Works</Link></li>
               <li><Link to="/reviews" className="hover:text-primary transition-colors hover:translate-x-1 inline-block transition-transform">Client Results</Link></li>
@@ -90,7 +90,7 @@ const Footer = () => {
         
         <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
           <p className="text-[10px] text-blue-100/20 uppercase tracking-[4px] font-black text-center md:text-left">
-            © 2026 Home Ready Scores. Premium Credit Advocacy.
+            © 2026 Home Ready Scores. Helping You Get Home Ready.
           </p>
           <div className="flex gap-10 opacity-20 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-700">
              <div className="flex items-center gap-2">

@@ -14,7 +14,7 @@ const Footer = () => {
               <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
                 <ShieldCheck size={20} />
               </div>
-              <span className="text-xl font-black tracking-tighter uppercase">Legacy<span className="text-primary">Credits</span></span>
+              <span className="text-xl font-black tracking-tighter uppercase">Home Ready<span className="text-primary">Scores</span></span>
             </Link>
             <p className="text-blue-100/60 leading-relaxed max-w-xs mb-8">
               Empowering families to rebuild their financial future through expert credit advocacy and legal consumer protection.
@@ -60,7 +60,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-4 text-blue-100/60">
                 <Mail className="text-primary" size={20} />
-                <span className="text-sm font-medium">help@legacycredits.com</span>
+                <span className="text-sm font-medium">help@homereadyscores.com</span>
               </li>
             </ul>
           </div>
@@ -68,7 +68,7 @@ const Footer = () => {
         
         <div className="pt-12 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-[10px] text-blue-100/30 uppercase tracking-[4px] font-bold text-center md:text-left">
-            © 2026 Legacy Credits. Fully Functional Credit Advocacy.
+            © 2026 Home Ready Scores. Fully Functional Credit Advocacy.
           </p>
           <div className="flex gap-8 opacity-30 grayscale contrast-125">
              <span className="text-xs font-black">BBB ACCREDITED</span>

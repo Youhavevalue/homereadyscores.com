@@ -27,7 +27,7 @@ const Navbar = () => {
             <ShieldCheck size={24} />
           </div>
           <div className="text-2xl font-black tracking-tighter text-navy uppercase">
-            Legacy<span className="text-primary">Credits</span>
+            Home Ready<span className="text-primary">Scores</span>
           </div>
         </Link>
 

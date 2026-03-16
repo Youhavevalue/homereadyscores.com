@@ -24,7 +24,7 @@ const Home = () => {
                 Dream Home.
               </h1>
               <p className="text-xl text-gray-600 mb-10 max-w-xl leading-relaxed">
-                Legacy Credits uses powerful consumer protection laws to challenge bureaus and help you reclaim the financial future your family deserves. 
+                Home Ready Scores uses powerful consumer protection laws to challenge bureaus and help you reclaim the financial future your family deserves. 
                 <span className="font-black text-navy ml-1">Most clients see results in 45 days.</span>
               </p>
               
@@ -145,7 +145,7 @@ const Home = () => {
             <div className="w-16 h-16 bg-primary/10 flex items-center justify-center rounded-2xl mb-8 group-hover:bg-primary/20 transition-colors">
               <HomeIcon className="text-primary" size={32} />
             </div>
-            <h3 className="text-2xl font-black mb-4 group-hover:text-white">Legacy Planning</h3>
+            <h3 className="text-2xl font-black mb-4 group-hover:text-white">Home Ready Planning</h3>
             <p className="text-gray-500 group-hover:text-blue-100/60 leading-relaxed mb-8">
               We don't just fix scores; we prepare you for homeownership with mortgage-ready analysis and loan officer coordination.
             </p>
@@ -162,7 +162,7 @@ const Home = () => {
            <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 rounded-full blur-[100px]"></div>
            <div className="relative z-10 max-w-xl">
               <h2 className="text-4xl md:text-5xl font-black text-white mb-6 leading-tight">
-                Ready to Start the <span className="text-primary italic">Legacy Fight?</span>
+                Ready to Start the <span className="text-primary italic">Home Ready Journey?</span>
               </h2>
               <p className="text-blue-100/60 text-lg mb-0 font-medium">
                 Get your free analysis today and find out exactly what's holding your score back from its true potential.

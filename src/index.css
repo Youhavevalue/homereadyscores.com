@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Noto Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Noto Sans Display", sans-serif;
+  
+  --color-primary: #2562FF; /* Lexington Blue */
+  --color-navy: #002D5B; /* Legacy Navy */
+  --color-brand-blue: #0078C1; /* Legacy Brand Blue */
+  --color-surface: #F8F9FA;
+}
+
+:root {
+  --primary: #2562FF;
+  --navy: #002D5B;
+  --brand-blue: #0078C1;
+  --surface: #F8F9FA;
+}
+
+@layer base {
+  body {
+    @apply font-sans antialiased text-gray-900 bg-white selection:bg-primary/20;
+    margin: 0;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-black tracking-tight text-navy;
+  }
+}
+
+/* World Class UI Utilities */
+
+.glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.auth-button {
+  @apply bg-primary text-white px-8 py-4 rounded-lg font-black uppercase tracking-widest text-sm
+         shadow-[0_8px_30px_rgb(37,98,255,0.3)] hover:shadow-[0_12px_40px_rgb(37,98,255,0.4)]
+         hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 flex items-center justify-center gap-2;
+}
+
+.secondary-button {
+  @apply bg-white text-navy border-2 border-navy/10 px-8 py-4 rounded-lg font-black uppercase tracking-widest text-sm
+         hover:border-navy hover:bg-navy hover:text-white transition-all duration-300 flex items-center justify-center gap-2;
+}
+
+.input-field {
+  @apply w-full p-4 bg-white border border-gray-200 rounded-lg focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all text-lg;
+}
+
+.card {
+  @apply bg-white p-8 rounded-2xl border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] transition-all duration-500;
+}
+
+/* Animations */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 1s ease-out forwards;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  h1 { font-size: 2.5rem !important; line-height: 1.1 !important; }
+  h2 { font-size: 1.8rem !important; }
+  .auth-button { @apply w-full; }
+  section { 
+    @apply py-12 px-6; 
+    padding-top: 3rem !important; 
+    padding-bottom: 3rem !important;
+  }
+}

@@ -73,7 +73,7 @@ Home Ready Scores/
 ## 🔲 Outstanding / Next Steps
 
 ### High Priority
-- [ ] **Verify GHL Leads**: Confirm full end-to-end data flow once environment variables are set in Vercel.
+- [x] **Verify GHL Leads**: Environment variables (`GHL_API_KEY`, `GHL_LOCATION_ID`) configured in Vercel and redeployed.
 - [ ] **Custom Domain**: Point `homereadyscores.com` to Vercel (if purchased).
 
 ### Medium Priority

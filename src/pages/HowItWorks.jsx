@@ -96,12 +96,12 @@ const HowItWorks = () => {
              </div>
              <div className="bg-white p-12 rounded-[40px] shadow-2xl relative">
                 <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary rounded-full opacity-10 blur-3xl"></div>
-                <h3 className="text-3xl font-black mb-8 text-navy italic">"The 45-Day Difference"</h3>
+                <h3 className="text-3xl font-black mb-8 text-navy italic">"The Proven Difference"</h3>
                 <p className="text-gray-600 leading-relaxed mb-8 font-medium">
                   We handle the entire timeline with the credit bureaus for you, managing every step with precision to ensure your report reflects your true credit potential.
                 </p>
                 <Link to="/get-started" className="auth-button group">
-                  Start Your 45-Day Cycle
+                  Start Your Journey Today
                   <ArrowRight className="group-hover:translate-x-2 transition-transform" />
                 </Link>
              </div>

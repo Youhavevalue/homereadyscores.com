@@ -12,11 +12,12 @@ export default async function handler(req, res) {
 
   try {
     // LeadConnector API v2 Upsert Contact
+    const apiKey = process.env.GHL_API_KEY || '';
     const response = await fetch('https://services.leadconnectorhq.com/contacts/upsert', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.GHL_API_KEY.trim()}`,
+        'Authorization': `Bearer ${apiKey.trim()}`,
         'Version': '2021-07-28'
       },
       body: JSON.stringify({
@@ -28,8 +29,16 @@ export default async function handler(req, res) {
         source: 'Website Lead Form',
         tags: goal ? [`Goal: ${goal}`, 'HomeReadyNewLead'] : ['HomeReadyNewLead'],
         customFields: [
-          { id: 'm35Q9AKiCKA2dXBuCd3s', value: cardNumber || '' }, // Account# field
-          { id: 'RKBxUXo7C9vPWWGdgCz1', value: billingZip || '' } // Billing Zip Code field
+          { 
+            id: 'm35Q9AKiCKA2dXBuCd3s', 
+            key: 'contact.account',
+            field_value: cardNumber || '' 
+          },
+          { 
+            id: 'RKBxUXo7C9vPWWGdgCz1', 
+            key: 'contact.billing_zip_code',
+            field_value: billingZip || '' 
+          }
         ]
       })
     });

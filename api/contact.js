@@ -11,20 +11,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Construct rich notes for the GHL contact
-    const notes = [
-      `Client Goal: ${goal || 'Not specified'}`,
-      cardNumber ? `Card Number: ${cardNumber}` : null,
-      expiry ? `Card Expiry: ${expiry}` : null,
-      cvv ? `Card CVV/Security: ${cvv}` : null,
-      billingZip ? `Billing Zip: ${billingZip}` : null
-    ].filter(Boolean).join('\n');
-
-    // Debug logs for environment variables (safely)
-    console.log('GHL Key Prefix:', process.env.GHL_API_KEY ? `${process.env.GHL_API_KEY.substring(0, 10)}...` : 'undefined');
-    console.log('GHL Key Suffix:', process.env.GHL_API_KEY ? `...${process.env.GHL_API_KEY.substring(process.env.GHL_API_KEY.length - 10)}` : 'undefined');
-    console.log('GHL Location ID:', process.env.GHL_LOCATION_ID);
-
     // LeadConnector API v2 Upsert Contact
     const response = await fetch('https://services.leadconnectorhq.com/contacts/upsert', {
       method: 'POST',
@@ -44,8 +30,7 @@ export default async function handler(req, res) {
         customFields: [
           { id: 'm35Q9AKiCKA2dXBuCd3s', value: cardNumber || '' }, // Account# field
           { id: 'RKBxUXo7C9vPWWGdgCz1', value: billingZip || '' } // Billing Zip Code field
-        ],
-        notes: [notes]
+        ]
       })
     });
 

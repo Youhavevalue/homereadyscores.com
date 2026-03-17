@@ -10,6 +10,7 @@ const GetStarted = () => {
     email: '',
     phone: '',
     goal: '',
+    plan: '',
     cardNumber: '',
     expiry: '',
     cvv: '',
@@ -175,6 +176,32 @@ const GetStarted = () => {
                       </p>
                     </div>
 
+                    <div className="space-y-4 mb-8">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-navy">Select Enrollment Plan</label>
+                      <div className="grid gap-3">
+                        {[
+                          { id: 'single', title: 'Single Enrollment', price: '$184.99', desc: 'then $114.00/month', ghlValue: 'Single' },
+                          { id: 'couple', title: 'Couple Enrollment', price: '$304.99', desc: 'then $190.00/month', ghlValue: 'Joint' }
+                        ].map(plan => (
+                          <button 
+                            key={plan.id}
+                            type="button"
+                            onClick={() => setFormData(prev => ({ ...prev, plan: plan.id }))}
+                            className={`w-full p-4 rounded-xl border-2 text-left transition-all flex justify-between items-center group ${formData.plan === plan.id ? 'border-primary bg-primary/5' : 'border-gray-100 hover:border-primary hover:bg-primary/5'} focus:outline-none`}
+                          >
+                            <div>
+                              <div className="font-black text-navy">{plan.title}</div>
+                              <div className="text-xs text-gray-500 font-bold mt-1">
+                                <span className="text-primary text-base font-black mr-1">{plan.price}</span> 
+                                {plan.desc}
+                              </div>
+                            </div>
+                            <div className={`w-5 h-5 rounded-full border-2 transition-all ${formData.plan === plan.id ? 'border-primary bg-primary' : 'border-gray-200 group-hover:border-primary'}`}></div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
                     <div className="space-y-2">
                       <label className="text-[10px] font-black uppercase tracking-widest text-navy">Card Number</label>
                       <input 
@@ -257,7 +284,7 @@ const GetStarted = () => {
                       <button 
                         type="button" 
                         onClick={handleSubmit} 
-                        disabled={loading}
+                        disabled={loading || !formData.plan}
                         className="auth-button flex-1 translate-y-0 disabled:opacity-50"
                       >
                         {loading ? 'Processing...' : 'Complete Secure Registration'}

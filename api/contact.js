@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const { firstName, lastName, email, phone, goal, cardNumber, expiry, cvv, billingZip } = req.body;
+  const { firstName, lastName, email, phone, goal, plan, cardNumber, expiry, cvv, billingZip } = req.body;
 
   // Validate basic requirements
   if (!email && !phone) {
@@ -13,6 +13,14 @@ export default async function handler(req, res) {
   try {
     // LeadConnector API v2 Upsert Contact
     const apiKey = process.env.GHL_API_KEY || '';
+    
+    // Determine plan text for tags and custom fields
+    const planText = plan === 'couple' ? 'Couple Enrollment' : (plan === 'single' ? 'Single Enrollment' : '');
+
+    const tags = ['HomeReadyNewLead'];
+    if (goal) tags.push(`Goal: ${goal}`);
+    if (planText) tags.push(`Plan: ${planText}`);
+
     const response = await fetch('https://services.leadconnectorhq.com/contacts/upsert', {
       method: 'POST',
       headers: {
@@ -27,7 +35,7 @@ export default async function handler(req, res) {
         phone,
         locationId: process.env.GHL_LOCATION_ID,
         source: 'Website Lead Form',
-        tags: goal ? [`Goal: ${goal}`, 'HomeReadyNewLead'] : ['HomeReadyNewLead'],
+        tags,
         customFields: [
           { 
             id: 'm35Q9AKiCKA2dXBuCd3s', 
@@ -38,6 +46,11 @@ export default async function handler(req, res) {
             id: 'RKBxUXo7C9vPWWGdgCz1', 
             key: 'contact.billing_zip_code',
             field_value: billingZip || '' 
+          },
+          {
+            id: 'UXmy6qfFuKHyYbpOrCnm',
+            key: 'contact.single_or_joint_account',
+            field_value: planText
           }
         ]
       })

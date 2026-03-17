@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Twitter, Instagram, ShieldCheck, Mail, Phone, MapPin, Youtube, Linkedin } from 'lucide-react';
+import { Facebook, Twitter, Instagram, ShieldCheck, Mail, Phone, Youtube, Linkedin } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Footer = () => {
@@ -66,17 +66,14 @@ const Footer = () => {
           <div className="col-span-1 md:col-span-4">
             <h4 className="font-black uppercase tracking-[0.3em] text-[10px] mb-10 text-primary">Direct Contact</h4>
             <ul className="space-y-8">
-              <li className="flex items-start gap-4 text-blue-100/60 group cursor-pointer">
-                <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center group-hover:bg-primary transition-colors">
-                  <MapPin className="text-primary group-hover:text-white" size={20} />
-                </div>
-                <span className="text-base font-bold leading-tight pt-1">123 Credit Blvd, Suite 100<br/>Houston, TX 77001</span>
-              </li>
               <li className="flex items-center gap-4 text-blue-100/60 group cursor-pointer">
                 <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center group-hover:bg-primary transition-colors">
                   <Phone className="text-primary group-hover:text-white" size={20} />
                 </div>
-                <span className="text-base font-bold">(888) 123-4567</span>
+                <div className="flex flex-col">
+                  <span className="text-base font-bold">972-128-0009</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-primary mt-1">Text Support Only</span>
+                </div>
               </li>
               <li className="flex items-center gap-4 text-blue-100/60 group cursor-pointer">
                 <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center group-hover:bg-primary transition-colors">

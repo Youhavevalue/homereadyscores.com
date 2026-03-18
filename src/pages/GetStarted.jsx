@@ -393,7 +393,7 @@ const GetStarted = () => {
 
             <div className="bg-white p-8 rounded-[32px] border border-gray-100">
                <div className="flex items-center gap-4 mb-6">
-                  <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150&h=150" className="w-12 h-12 rounded-xl scale-110 object-cover" alt="Ralph" />
+                  <img src="https://images.unsplash.com/photo-1504257432389-523431e51d05?auto=format&fit=crop&q=80&w=150&h=150" className="w-12 h-12 rounded-xl scale-110 object-cover" alt="Ralph" />
                   <div>
                     <h5 className="font-black text-navy">Ralph E.</h5>
                     <p className="text-[10px] font-black uppercase tracking-widest text-primary">+114 Points</p>

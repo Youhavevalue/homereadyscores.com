@@ -38,7 +38,38 @@ const GetStarted = () => {
       setFormData(prev => ({ ...prev, [name]: v.substring(0, 5) }));
       return;
     }
+    if (name === 'phone') {
+      let v = value.replace(/\D/g, '');
+      if (v.length > 10) v = v.substring(0, 10);
+      let formatted = v;
+      if (v.length > 6) {
+        formatted = `(${v.substring(0,3)}) ${v.substring(3,6)}-${v.substring(6)}`;
+      } else if (v.length > 3) {
+        formatted = `(${v.substring(0,3)}) ${v.substring(3)}`;
+      }
+      setFormData(prev => ({ ...prev, [name]: formatted }));
+      return;
+    }
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleNextStep1 = () => {
+    const { firstName, lastName, email, phone } = formData;
+    if (!firstName.trim() || !lastName.trim()) {
+      alert("Please enter both your first and last name.");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+    const phoneDigits = phone.replace(/\D/g, '');
+    if (phoneDigits.length !== 10) {
+      alert("Please enter a valid 10-digit US phone number. Example: (555) 123-4567");
+      return;
+    }
+    setStep(2);
   };
 
   const handleSubmit = async (e) => {
@@ -299,7 +330,7 @@ const GetStarted = () => {
 
                 <div className="pt-6 flex gap-4">
                   {step === 1 && (
-                    <button type="button" onClick={() => setStep(2)} className="auth-button flex-1 translate-y-0">
+                    <button type="button" onClick={handleNextStep1} className="auth-button flex-1 translate-y-0">
                       Next Step
                     </button>
                   )}

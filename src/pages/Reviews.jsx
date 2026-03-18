@@ -7,7 +7,7 @@ const Reviews = () => {
     {
       name: 'Ralph E.',
       score: '+114 Pts',
-      image: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=150&h=150',
+      image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150&h=150',
       content: 'Home Ready Scores removed 7 negative items in as little as 45 days. I was finally able to qualify for my first home at a 4.2% interest rate. They changed my family\'s life.',
       type: 'Homeowner'
     },

@@ -42,7 +42,7 @@ const Reviews = () => {
     {
       name: 'Linda G.',
       score: '+103 Pts',
-      image: 'https://images.unsplash.com/photo-1554151228-14d9def656e4?auto=format&fit=crop&q=80&w=150&h=150',
+      image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=150&h=150',
       content: 'They were able to remove a bankruptcy from 5 years ago. I didn\'t think it was possible. Lifetime customer!',
       type: 'Post-Bankruptcy'
     }

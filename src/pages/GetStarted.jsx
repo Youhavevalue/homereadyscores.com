@@ -69,6 +69,20 @@ const GetStarted = () => {
       alert("Please enter a valid 10-digit US phone number. Example: (555) 123-4567");
       return;
     }
+
+    if (/^(.)\1{9}$/.test(phoneDigits)) {
+      alert("Please enter a real, working phone number instead of repeated digits.");
+      return;
+    }
+    if (phoneDigits[0] === '0' || phoneDigits[0] === '1') {
+      alert("A valid US area code cannot start with 0 or 1.");
+      return;
+    }
+    if (phoneDigits[3] === '0' || phoneDigits[3] === '1') {
+      alert("Please enter a valid working US phone number.");
+      return;
+    }
+
     setStep(2);
   };
 

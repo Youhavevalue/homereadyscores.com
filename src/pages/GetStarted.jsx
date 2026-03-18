@@ -212,8 +212,8 @@ const GetStarted = () => {
                       <label className="text-[10px] font-black uppercase tracking-widest text-navy">Select Enrollment Plan</label>
                       <div className="grid gap-3">
                         {[
-                          { id: 'single', title: 'Single Enrollment', price: '$184.99', desc: 'then $114.00/month', ghlValue: 'Single' },
-                          { id: 'couple', title: 'Couple Enrollment', price: '$304.99', desc: 'then $190.00/month', ghlValue: 'Joint' }
+                          { id: 'single', title: 'Single Enrollment', price: '$184.99', desc: 'due today, then $114.00/month', ghlValue: 'Single' },
+                          { id: 'couple', title: 'Couple Enrollment', price: '$304.99', desc: 'due today, then $190.00/month', ghlValue: 'Joint' }
                         ].map(plan => (
                           <button 
                             key={plan.id}
@@ -379,7 +379,7 @@ const GetStarted = () => {
 
             <div className="bg-white p-8 rounded-[32px] border border-gray-100">
                <div className="flex items-center gap-4 mb-6">
-                  <img src="https://i.pravatar.cc/100?u=ralph" className="w-12 h-12 rounded-xl" alt="Ralph" />
+                  <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150&h=150" className="w-12 h-12 rounded-xl scale-110 object-cover" alt="Ralph" />
                   <div>
                     <h5 className="font-black text-navy">Ralph E.</h5>
                     <p className="text-[10px] font-black uppercase tracking-widest text-primary">+114 Points</p>

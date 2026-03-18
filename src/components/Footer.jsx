@@ -44,10 +44,10 @@ const Footer = () => {
           <div className="col-span-1 md:col-span-2">
             <h4 className="font-black uppercase tracking-[0.3em] text-[10px] mb-10 text-primary">Compliance</h4>
             <ul className="space-y-5 text-blue-100/60 font-black uppercase tracking-[0.2em] text-[11px]">
-              <li><a href="#" className="hover:text-primary transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Terms of Service</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">FCRA Rights</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">CROA Disclosure</a></li>
+              <li><Link to="/privacy-policy" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/terms-of-service" className="hover:text-primary transition-colors">Terms of Service</Link></li>
+              <li><Link to="/fcra-rights" className="hover:text-primary transition-colors">FCRA Rights</Link></li>
+              <li><Link to="/croa-disclosure" className="hover:text-primary transition-colors">CROA Disclosure</Link></li>
             </ul>
           </div>
           

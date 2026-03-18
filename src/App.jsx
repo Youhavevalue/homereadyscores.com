@@ -8,6 +8,12 @@ import Reviews from './pages/Reviews';
 import GetStarted from './pages/GetStarted';
 import FAQ from './pages/FAQ';
 
+// Legal Imports
+import PrivacyPolicy from './pages/legal/PrivacyPolicy';
+import TermsOfService from './pages/legal/TermsOfService';
+import FCRARights from './pages/legal/FCRARights';
+import CROADisclosure from './pages/legal/CROADisclosure';
+
 // Portal imports
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -55,6 +61,12 @@ const App = () => {
             <Route path="/reviews" element={<Reviews />} />
             <Route path="/get-started" element={<GetStarted />} />
             <Route path="/faq" element={<FAQ />} />
+
+            {/* Legal routes */}
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/fcra-rights" element={<FCRARights />} />
+            <Route path="/croa-disclosure" element={<CROADisclosure />} />
 
             {/* Portal routes */}
             <Route path="/portal/login" element={<PortalLogin />} />

@@ -14,7 +14,8 @@ const GetStarted = () => {
     cardNumber: '',
     expiry: '',
     cvv: '',
-    billingZip: ''
+    billingZip: '',
+    creditReportAgreement: false
   });
 
   const steps = [
@@ -202,6 +203,33 @@ const GetStarted = () => {
                       </div>
                     </div>
 
+                    <div className="border border-gray-100 rounded-2xl overflow-hidden mb-8 shadow-sm">
+                      <div className="bg-navy text-white px-6 py-4">
+                        <h4 className="font-bold text-lg tracking-wide">Getting Your Credit Reports</h4>
+                      </div>
+                      <div className="p-6 bg-white">
+                        <p className="text-gray-700 text-[15px] mb-6 leading-relaxed">
+                          Upon signup we will assist you in getting your <strong>free credit reports</strong>. Credit reports are from third-party providers, and getting them will never harm your scores.
+                        </p>
+                        
+                        <div>
+                          <p className="text-xs font-bold text-red-600 mb-2 tracking-wide uppercase">Required</p>
+                          <div className="flex items-center gap-3">
+                            <input 
+                              type="checkbox" 
+                              id="creditReportAgreement"
+                              checked={formData.creditReportAgreement}
+                              onChange={(e) => setFormData(prev => ({ ...prev, creditReportAgreement: e.target.checked }))}
+                              className="w-5 h-5 cursor-pointer accent-primary rounded border-gray-300"
+                            />
+                            <label htmlFor="creditReportAgreement" className="text-sm font-medium text-gray-800 cursor-pointer select-none">
+                              Yes, I understand I am required to obtain my credit reports to begin the process.
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="space-y-2">
                       <label className="text-[10px] font-black uppercase tracking-widest text-navy">Card Number</label>
                       <input 
@@ -284,7 +312,7 @@ const GetStarted = () => {
                       <button 
                         type="button" 
                         onClick={handleSubmit} 
-                        disabled={loading || !formData.plan}
+                        disabled={loading || !formData.plan || !formData.creditReportAgreement}
                         className="auth-button flex-1 translate-y-0 disabled:opacity-50"
                       >
                         {loading ? 'Processing...' : 'Complete Secure Registration'}

@@ -37,7 +37,6 @@ const Footer = () => {
               <li><Link to="/how-it-works" className="hover:text-primary transition-colors hover:translate-x-1 inline-block transition-transform">How It Works</Link></li>
               <li><Link to="/reviews" className="hover:text-primary transition-colors hover:translate-x-1 inline-block transition-transform">Client Results</Link></li>
               <li><Link to="/faq" className="hover:text-primary transition-colors hover:translate-x-1 inline-block transition-transform">Expert FAQs</Link></li>
-              <li><Link to="/contact" className="hover:text-primary transition-colors hover:translate-x-1 inline-block transition-transform">Contact Us</Link></li>
             </ul>
           </div>
           

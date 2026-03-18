@@ -69,13 +69,12 @@ const Footer = () => {
                 <span className="text-base font-bold">help@homereadyscores.com</span>
               </li>
             </ul>
+            <p className="text-[10px] text-blue-100/40 mt-8 leading-relaxed font-medium">
+              By providing your phone number, you consent to receive SMS communications from Home Ready Scores regarding updates, reminders, and promotional offers. Message frequency may vary. Message and data rates may apply. Reply STOP to cancel or HELP for more information. Consent to receive text messages is not a condition of purchasing any goods or services. For further details, please review our <Link to="/privacy-policy" className="underline hover:text-white transition-colors">Privacy Policy</Link> and <Link to="/terms-of-service" className="underline hover:text-white transition-colors">Terms of Service</Link>.
+            </p>
           </div>
         </div>
         
-        <div className="text-center text-[10px] text-blue-100/40 max-w-4xl mx-auto mb-12 leading-relaxed px-6 font-medium">
-          By providing your phone number, you consent to receive SMS communications from Home Ready Scores regarding updates, reminders, and promotional offers. Message frequency may vary. Message and data rates may apply. Reply STOP to cancel or HELP for more information. Consent to receive text messages is not a condition of purchasing any goods or services. For further details, please review our <Link to="/privacy-policy" className="underline hover:text-white transition-colors">Privacy Policy</Link> and <Link to="/terms-of-service" className="underline hover:text-white transition-colors">Terms of Service</Link>.
-        </div>
-
         <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
           <p className="text-[10px] text-blue-100/20 uppercase tracking-[4px] font-black text-center md:text-left">
             © 2026 Home Ready Scores. Helping You Get Home Ready.

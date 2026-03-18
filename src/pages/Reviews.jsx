@@ -8,7 +8,7 @@ const Reviews = () => {
       name: 'Ralph E.',
       score: '+114 Pts',
       image: 'https://i.pravatar.cc/150?u=12',
-      content: 'Home Ready Scores removed 7 negative items in just 45 days. I was finally able to qualify for my first home at a 4.2% interest rate. They changed my family\'s life.',
+      content: 'Home Ready Scores removed 7 negative items in as little as 45 days. I was finally able to qualify for my first home at a 4.2% interest rate. They changed my family\'s life.',
       type: 'Homeowner'
     },
     {

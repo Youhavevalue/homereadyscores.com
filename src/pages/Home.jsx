@@ -66,7 +66,7 @@ const Home = () => {
               
               <motion.p variants={fadeInUp} className="text-xl text-gray-600 mb-10 max-w-xl leading-relaxed">
                 Home Ready Scores helps you use your legal rights to fix your credit report so you can finally get the keys to the home you've been waiting for. 
-                <span className="font-black text-navy ml-1 underline decoration-primary decoration-4 underline-offset-4">Most people see a real difference in just 45 days.</span>
+                <span className="font-black text-navy ml-1 underline decoration-primary decoration-4 underline-offset-4">Most people see a real difference in as little as 45 days.</span>
               </motion.p>
               
               <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 mb-12">
@@ -150,8 +150,8 @@ const Home = () => {
                     <Shield size={28} className="text-white" />
                  </div>
                  <div>
-                   <p className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-1">Guaranteed</p>
-                   <p className="text-xl font-black italic">45-Day Results</p>
+                   <p className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-1">Proven Results</p>
+                   <p className="text-lg font-black italic leading-tight">In As Little As<br/>45 Days</p>
                  </div>
                </motion.div>
             </motion.div>
@@ -238,18 +238,18 @@ const Home = () => {
                 Ready to Start Your <span className="text-gradient brightness-150">Home Ready Journey?</span>
               </h2>
               <p className="text-blue-100/60 text-xl mb-0 font-medium leading-relaxed">
-                Get your free analysis today and find out exactly what's holding your score back from its true potential.
+                Take the first step today and find out exactly what's holding your score back from its true potential.
               </p>
            </div>
            <div className="relative z-10 flex flex-col gap-6 items-center md:items-start whitespace-nowrap">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link to="/get-started" className="auth-button min-w-[280px] py-6 text-base">
-                  Get Free Assessment
+                  Get Started Today
                 </Link>
               </motion.div>
               <div className="flex items-center gap-3">
                 <CheckCircle size={14} className="text-primary fill-primary/20" />
-                <p className="text-[11px] font-black tracking-widest text-primary uppercase">No Credit Card Required</p>
+                <p className="text-[11px] font-black tracking-widest text-primary uppercase">100% Satisfaction Guaranteed</p>
               </div>
            </div>
         </motion.div>

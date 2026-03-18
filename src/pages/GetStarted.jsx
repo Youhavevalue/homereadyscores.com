@@ -327,7 +327,7 @@ const GetStarted = () => {
                   </div>
                </div>
                <p className="text-xs italic text-gray-500 leading-relaxed font-medium">
-                 "They removed 7 negative items in just 45 days. I was finally able to qualify for my first home!"
+                 "They removed 7 negative items in as little as 45 days. I was finally able to qualify for my first home!"
                </p>
             </div>
           </div>

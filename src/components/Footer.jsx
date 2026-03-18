@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Twitter, Instagram, ShieldCheck, Mail, Phone, Youtube, Linkedin } from 'lucide-react';
+import { ShieldCheck, Mail, Phone } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Footer = () => {
@@ -29,18 +29,6 @@ const Footer = () => {
             <p className="text-blue-100/50 leading-relaxed max-w-xs mb-10 text-lg font-medium italic">
               "Building the bridge between your current credit and your future house key."
             </p>
-            <div className="flex gap-4">
-              {[Facebook, Twitter, Instagram, Youtube, Linkedin].map((Icon, i) => (
-                <motion.a 
-                  whileHover={{ y: -5, backgroundColor: 'var(--primary)' }}
-                  key={i} 
-                  href="#" 
-                  className="w-12 h-12 border border-white/10 rounded-2xl flex items-center justify-center transition-all bg-white/5 backdrop-blur-sm"
-                >
-                  <Icon size={20} />
-                </motion.a>
-              ))}
-            </div>
           </div>
           
           <div className="col-span-1 md:col-span-2">

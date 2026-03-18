@@ -90,19 +90,19 @@ const FAQ = () => {
         </div>
       </section>
 
-      <section className="max-w-4xl mx-auto px-6">
-        <div className="bg-navy rounded-[40px] p-12 text-center text-white relative overflow-hidden flex flex-col items-center">
+      <section className="mt-8 max-w-3xl mx-auto px-6">
+        <div className="bg-navy rounded-[32px] py-10 px-8 text-center text-white relative overflow-hidden flex flex-col items-center">
           <div className="absolute -top-20 -left-20 w-64 h-64 bg-primary/20 rounded-full blur-[80px]"></div>
           <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px]"></div>
           
-          <div className="w-20 h-20 bg-white/10 rounded-3xl flex items-center justify-center backdrop-blur-md mb-8 border border-white/10 relative z-10">
-            <MessageCircleQuestion size={40} className="text-primary" />
+          <div className="w-16 h-16 bg-white/10 rounded-3xl flex items-center justify-center backdrop-blur-md mb-6 border border-white/10 relative z-10">
+            <MessageCircleQuestion size={32} className="text-primary" />
           </div>
-          <h2 className="text-3xl md:text-4xl font-black mb-6 relative z-10">Still have questions?</h2>
-          <p className="text-blue-100/60 text-lg mb-10 max-w-xl relative z-10">
+          <h2 className="text-3xl md:text-4xl font-black mb-4 relative z-10 text-white">Still have questions?</h2>
+          <p className="text-blue-100/60 text-base md:text-lg mb-8 max-w-xl relative z-10">
             Our credit specialists are ready to review your situation and explain exactly how we can help you get the keys to your new home.
           </p>
-          <Link to="/get-started" className="auth-button min-w-[280px] relative z-10">
+          <Link to="/get-started" className="auth-button min-w-[240px] relative z-10">
             Get Started Today
           </Link>
         </div>

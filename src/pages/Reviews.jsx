@@ -106,11 +106,11 @@ const Reviews = () => {
          </div>
       </section>
 
-      <section className="mt-24 max-w-4xl mx-auto px-6">
-         <div className="bg-navy rounded-[40px] p-12 text-center text-white relative overflow-hidden">
+      <section className="mt-16 max-w-3xl mx-auto px-6">
+         <div className="bg-navy rounded-[32px] py-10 px-8 md:px-12 text-center text-white relative overflow-hidden">
             <div className="absolute -top-20 -left-20 w-64 h-64 bg-primary/20 rounded-full blur-[80px]"></div>
-            <h2 className="text-3xl md:text-4xl font-black mb-8 relative z-10 italic">Ready to be our next success?</h2>
-            <Link to="/get-started" className="auth-button min-w-[280px] mx-auto relative z-10 group inline-block">
+            <h2 className="text-3xl md:text-4xl font-black mb-6 relative z-10 italic text-white">Ready to be our next success?</h2>
+            <Link to="/get-started" className="auth-button min-w-[240px] mx-auto relative z-10 group inline-block">
                Get Started
             </Link>
          </div>

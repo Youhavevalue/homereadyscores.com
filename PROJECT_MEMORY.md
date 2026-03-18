@@ -149,6 +149,13 @@ Home Ready Scores/
 - [x] **Vercel Env Vars**: All 9 environment variables set on Vercel production (GHL, Supabase, Clover).
 - [x] **Git Push to Main**: All code committed and pushed. Vercel auto-deploying.
 
+### Session 6 — March 18, 2026 (Compliance & Content Updates)
+- [x] **Copywriting Overhaul**: Removed all "free assessment" and strict "45-day guarantee" verbiage constraints, replacing with compliant "In as little as 45 days" and "100% Satisfaction."
+- [x] **Asset Upgrade**: Replaced generic AI "pravatar" placeholders with highly authentic, casual Unsplash lifestyle photos on the Home and Reviews pages.
+- [x] **FAQ Page Built**: Created `/faq` with fully-fleshed accordion answers addressing credit repair and home-buying common questions.
+- [x] **Legal Compliance Pages**: Built 4 standalone boilerplate legal pages (`PrivacyPolicy`, `TermsOfService`, `FCRARights`, `CROADisclosure`) designed to meet strict CROA and merchant processing requirements.
+- [x] **Footer Optimization**: Removed redundant "Contact Us" text link and social media placeholder icons to cleanly funnel users to the Direct Contact phone/text elements.
+
 ---
 
 ## 🔲 Outstanding / Next Steps
@@ -161,12 +168,12 @@ Home Ready Scores/
 - [ ] **Verify Vercel Deployment**: Confirm the new git push deploys successfully and mobile nav works on production.
 
 ### Medium Priority
-- [ ] **FAQ Page**: Create the FAQ page (linked in nav but doesn't exist yet).
+- [x] **FAQ Page**: Create the FAQ page (linked in nav but doesn't exist yet).
 - [ ] **Intake Tab**: Build out the intake form functionality in client profiles.
 - [ ] **Credit Reports Tab**: Build credit report upload/viewing functionality.
 - [ ] **Disputes Tab**: Build dispute letter generation and tracking.
 - [ ] **Documents Tab**: Build general document upload/management.
-- [ ] **Replace placeholder images**: Audit site for any remaining generic avatars or stock assets.
+- [x] **Replace placeholder images**: Audit site for any remaining generic avatars or stock assets.
 - [ ] **GHL Automation Workflows**: Set up automated email responses and lead nurturing sequences.
 - [ ] **Production Clover Credentials**: When ready for live payments, switch from sandbox to production Clover keys.
 

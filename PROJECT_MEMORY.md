@@ -68,13 +68,21 @@ Home Ready Scores/
 - [x] **Vercel Deployment**: Successfully deployed live to the new brand domain.
 - [x] **Agent Cluster Locked**: Formally assigned a strike team (Orchestrator, Designer, Engineer, SEO, Content) in `.agency-context.md`.
 
+### Session 3 — March 17, 2026 (Refinements & CRM Setup)
+- [x] **GoHighLevel API Fix**: Switched custom fields payload to V2 format (`key` and `field_value`). Handled missing `GHL_API_KEY` handling.
+- [x] **Pricing Selection**: Added a "Select Enrollment Plan" (Single vs. Couple) to step 3 of the `GetStarted.jsx` page. Mapped choice to GHL via custom field (`contact.single_or_joint_account`) and tag.
+- [x] **Footer Updates**: Removed physical address completely. Updated phone number to "972-128-0009" and prominently labeled "Text Support Only".
+- [x] **Copy Refinement**: Changed "45-Day" wording to "Proven Difference" and "Start Your Journey Today" on the `HowItWorks.jsx` page.
+- [x] **Google Workspace Setup**: Guided user through verifying DNS via Vercel TXT record pointing to Google Workspace.
+
 ---
 
 ## 🔲 Outstanding / Next Steps
 
 ### High Priority
-- [x] **Verify GHL Leads**: Environment variables (`GHL_API_KEY`, `GHL_LOCATION_ID`) configured in Vercel and redeployed.
-- [ ] **Custom Domain**: Point `homereadyscores.com` to Vercel (if purchased).
+- [x] **Verify GHL Leads**: Form submissions successfully create contacts in GHL. Used `pit-` (Private Integration Token) for auth and resolved the `422` error by removing the `notes` field from the root payload.
+- [x] **Custom Domain Verify**: Successfully identified nameservers on Vercel and guided Google Workspace TXT DNS verification.
+- [ ] **Vercel Production Variables**: Ensure `GHL_API_KEY` and `GHL_LOCATION_ID` are set inside the Vercel dashboard for production live leads.
 
 ### Medium Priority
 - [ ] **FAQ & Contact Pages**: Complete the content for these secondary pages.

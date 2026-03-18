@@ -35,7 +35,7 @@ const Reviews = () => {
     {
       name: 'James P.',
       score: '+76 Pts',
-      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=150&h=150',
+      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150&h=150',
       content: 'Cleaned up medical bills that were hurting my score. The process was hands-off and very well managed.',
       type: 'Medical Debt'
     },

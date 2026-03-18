@@ -7,42 +7,42 @@ const Reviews = () => {
     {
       name: 'Ralph E.',
       score: '+114 Pts',
-      image: 'https://i.pravatar.cc/150?u=12',
+      image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=150&h=150',
       content: 'Home Ready Scores removed 7 negative items in as little as 45 days. I was finally able to qualify for my first home at a 4.2% interest rate. They changed my family\'s life.',
       type: 'Homeowner'
     },
     {
       name: 'Sarah M.',
       score: '+82 Pts',
-      image: 'https://i.pravatar.cc/150?u=15',
+      image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=150&h=150',
       content: 'I had identity theft issues that stayed on my report for years. They cleared them up in two months. Highly professional team.',
       type: 'Car Loan'
     },
     {
       name: 'David K.',
       score: '+95 Pts',
-      image: 'https://i.pravatar.cc/150?u=18',
+      image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=150&h=150',
       content: 'The tracking app they provide is amazing. I could see exactly what letters were being sent and when removals happened.',
       type: 'Refinance'
     },
     {
       name: 'Maria L.',
       score: '+127 Pts',
-      image: 'https://i.pravatar.cc/150?u=22',
+      image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=150&h=150',
       content: 'Best investment I ever made. My score went from 540 to 667 in less than three months. Now I have a business line of credit.',
       type: 'Entrepreneur'
     },
     {
       name: 'James P.',
       score: '+76 Pts',
-      image: 'https://i.pravatar.cc/150?u=33',
+      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=150&h=150',
       content: 'Cleaned up medical bills that were hurting my score. The process was hands-off and very well managed.',
       type: 'Medical Debt'
     },
     {
       name: 'Linda G.',
       score: '+103 Pts',
-      image: 'https://i.pravatar.cc/150?u=44',
+      image: 'https://images.unsplash.com/photo-1531123897727-8f129e1bbaa1?auto=format&fit=crop&q=80&w=150&h=150',
       content: 'They were able to remove a bankruptcy from 5 years ago. I didn\'t think it was possible. Lifetime customer!',
       type: 'Post-Bankruptcy'
     }

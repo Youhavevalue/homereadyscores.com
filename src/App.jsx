@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import HowItWorks from './pages/HowItWorks';
 import Reviews from './pages/Reviews';
 import GetStarted from './pages/GetStarted';
+import FAQ from './pages/FAQ';
 
 // Portal imports
 import { AuthProvider } from './context/AuthContext';
@@ -53,6 +54,7 @@ const App = () => {
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/reviews" element={<Reviews />} />
             <Route path="/get-started" element={<GetStarted />} />
+            <Route path="/faq" element={<FAQ />} />
 
             {/* Portal routes */}
             <Route path="/portal/login" element={<PortalLogin />} />

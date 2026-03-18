@@ -81,11 +81,16 @@ const Home = () => {
 
               <motion.div variants={fadeInUp} className="flex items-center gap-6">
                 <div className="flex -space-x-3">
-                  {[1,2,3,4].map(i => (
+                  {[
+                    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100&h=100",
+                    "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=100&h=100",
+                    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100&h=100",
+                    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=100&h=100"
+                  ].map((url, i) => (
                     <motion.img 
                       whileHover={{ y: -5, scale: 1.1 }}
                       key={i} 
-                      src={`https://i.pravatar.cc/100?u=${i+10}`} 
+                      src={url} 
                       className="w-12 h-12 rounded-full border-4 border-white shadow-xl cursor-pointer" 
                       alt="client" 
                     />

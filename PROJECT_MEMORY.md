@@ -11,14 +11,14 @@
 | **Project** | Home Ready Scores — Credit Repair Website + Client Portal |
 | **Owner** | Dr. Marcus Boudreaux |
 | **Live Domain** | [homereadyscores.com](https://homereadyscores.com) |
-| **Project Path** | `/Users/mac/Dropbox/DrMarcusb Full Folder/00_Master/GitHub/Home Ready Scores` |
+| **Project Path** | `/Users/ashleyboudreaux/Library/CloudStorage/Dropbox/DrMarcusb Full Folder/00_Master/GitHub/Home Ready Scores` |
 | **Tech Stack** | Vite 5, React 19, Tailwind CSS 4, Supabase, Vercel Serverless |
 | **Payments** | Clover (Sandbox) — iframe tokenization, PCI compliant |
 | **Database** | Supabase (PostgreSQL) — `holsabbvljsnegatqqsy` |
 | **CRM** | GoHighLevel (MCP connected) |
 | **Design Inspiration** | Lexington Law (typography/authority), homereadyscores.com |
 | **Created** | March 16, 2026 |
-| **Last Updated** | March 17, 2026 @ 9:16 PM CST |
+| **Last Updated** | March 31, 2026 @ 8:10 PM CST |
 
 ---
 
@@ -28,27 +28,29 @@
 Home Ready Scores/
 ├── Home Ready Scores Agency Agents/   # Permanent expert personas & memory
 ├── dist/                              # Production build
+├── docs/
+│   └── EMPLOYEE_SOP.md               # Employee training & procedures
 ├── sql/
-│   └── clover_migration.sql           # DB migration for Clover columns
+│   ├── clover_migration.sql           # DB migration for Clover columns
+│   └── portal_completion_migration.sql # Intake, Documents, Disputes tables
 ├── api/
-│   ├── contact.js                     # GHL lead form handler
+│   ├── contact.js                     # Enrollment → GHL + Supabase client + intake
 │   ├── auth/
 │   │   ├── login.js                   # Portal authentication
 │   │   └── setup.js                   # Initial admin setup
 │   ├── clients/
+│   │   ├── push-to-ghl.js            # Push portal clients to GHL CRM
 │   │   └── sync-ghl.js               # GHL ↔ Supabase client sync
-│   └── clover/
-│       ├── config.js                  # Public Clover keys for frontend
-│       ├── create-customer.js         # Creates Clover customer + card-on-file
-│       ├── charge.js                  # One-time charges (setup fees)
-│       ├── create-plan.js             # Recurring billing plans
-│       ├── create-subscription.js     # Customer ↔ Plan subscriptions
-│       └── process-payment.js         # Full orchestration endpoint
+│   ├── clover/                        # 6 payment endpoints
+│   └── documents/
+│       ├── upload-url.js              # Signed upload URLs for Storage
+│       └── delete-document.js         # Storage + DB cleanup
 ├── src/
 │   ├── components/
 │   │   ├── Navbar.jsx                 # Fixed mobile hamburger + Portal link
 │   │   ├── Footer.jsx                 # "Helping You Get Home Ready"
 │   │   ├── CloverPaymentForm.jsx      # Clover iframe card form modal
+│   │   ├── DisputeLetterModal.jsx     # FCRA-compliant letter generator
 │   │   └── ProtectedRoute.jsx         # Auth guard for portal routes
 │   ├── context/
 │   │   └── AuthContext.jsx            # Supabase session management
@@ -59,15 +61,18 @@ Home Ready Scores/
 │   │   ├── HowItWorks.jsx            # "Analyze-Action-Verify-Succeed"
 │   │   ├── Reviews.jsx               # Social proof
 │   │   ├── GetStarted.jsx            # GHL-integrated lead form
+│   │   ├── FAQ.jsx                    # Accordion FAQ
+│   │   ├── legal/                     # PrivacyPolicy, Terms, FCRA, CROA
 │   │   └── portal/
 │   │       ├── PortalLogin.jsx        # Admin login page
 │   │       ├── PortalDashboard.jsx    # Dashboard with stats
 │   │       ├── ClientDirectory.jsx    # Searchable client list
-│   │       ├── ClientProfile.jsx      # Tabbed profile (Payments, Intake, Credit, Disputes, Docs)
-│   │       └── AddClient.jsx          # New client form
+│   │       ├── ClientProfile.jsx      # ALL 5 tabs functional
+│   │       └── AddClient.jsx          # New client form + GHL push
 │   └── index.css                      # Rebranding and UI utilities
 ├── vercel.json                        # API rewrites + SPA fallback
-└── package.json
+├── PROJECT_MEMORY.md                  # Decisions & session history
+└── README.md                          # Project overview & setup
 ```
 
 ---
@@ -156,6 +161,21 @@ Home Ready Scores/
 - [x] **Legal Compliance Pages**: Built 4 standalone boilerplate legal pages (`PrivacyPolicy`, `TermsOfService`, `FCRARights`, `CROADisclosure`) designed to meet strict CROA and merchant processing requirements.
 - [x] **Footer Optimization**: Removed redundant "Contact Us" text link and social media placeholder icons to cleanly funnel users to the Direct Contact phone/text elements.
 
+### Session 7 — March 31, 2026 (Portal Completion + Enrollment Bridge)
+- [x] **Portal Completion Audit**: Mapped entire codebase, identified 4 placeholder tabs in ClientProfile.
+- [x] **SQL Migration**: Created `portal_completion_migration.sql` — `intake_forms`, `documents`, `dispute_letters` tables + `client-documents` Storage bucket.
+- [x] **Intake Tab**: Built functional form (DOB, SSN last 4, address, employer, income, goal pills, notes) with edit/view toggle.
+- [x] **Documents Tab**: Upload/download/delete via Supabase Storage (PDF/JPG/PNG, 10MB limit) with type tagging.
+- [x] **Credit Reports Tab**: Filtered document view for credit_report type uploads.
+- [x] **Disputes Tab**: Full dispute tracking — add disputes, status pipeline (draft→sent→responded→resolved), round tracking.
+- [x] **Dispute Letter Generator**: `DisputeLetterModal.jsx` — FCRA Section 611 compliant templates for 7 dispute reasons, editable, copy, print.
+- [x] **GHL Push API**: `push-to-ghl.js` — auto-pushes portal clients to GoHighLevel CRM.
+- [x] **AddClient GHL Sync**: Updated `AddClient.jsx` to auto-push to GHL on client creation.
+- [x] **Enrollment-to-Portal Bridge**: Updated `api/contact.js` — website signup now creates Supabase client + intake_forms record (was only pushing to GHL before).
+- [x] **Supabase Migration Executed**: All 16 SQL statements ran successfully, 8 tables confirmed.
+- [x] **Documentation Overhaul**: Updated README.md, PROJECT_MEMORY.md, created `docs/EMPLOYEE_SOP.md`, created end-of-conversation workflow.
+- [x] **Deployed**: Two git pushes to main, Vercel auto-deployed.
+
 ---
 
 ## 🔲 Outstanding / Next Steps
@@ -165,22 +185,23 @@ Home Ready Scores/
 - [ ] **Test End-to-End Payment**: Once multi-pay tokens are enabled, test with Clover sandbox test cards.
 - [ ] **Connect GHL Email Service**: Set up `help@homereadyscores.com` as sending email in GHL dashboard.
 - [ ] **DKIM Setup**: Complete DKIM authentication in Google Workspace for email deliverability.
-- [ ] **Verify Vercel Deployment**: Confirm the new git push deploys successfully and mobile nav works on production.
+- [ ] **Production Smoke Test**: Full end-to-end test of enrollment → portal → disputes → payments.
 
 ### Medium Priority
-- [x] **FAQ Page**: Create the FAQ page (linked in nav but doesn't exist yet).
-- [ ] **Intake Tab**: Build out the intake form functionality in client profiles.
-- [ ] **Credit Reports Tab**: Build credit report upload/viewing functionality.
-- [ ] **Disputes Tab**: Build dispute letter generation and tracking.
-- [ ] **Documents Tab**: Build general document upload/management.
-- [x] **Replace placeholder images**: Audit site for any remaining generic avatars or stock assets.
+- [x] **FAQ Page**: ✅ Done
+- [x] **Intake Tab**: ✅ Done (Session 7)
+- [x] **Credit Reports Tab**: ✅ Done (Session 7)
+- [x] **Disputes Tab**: ✅ Done (Session 7)
+- [x] **Documents Tab**: ✅ Done (Session 7)
+- [x] **Enrollment-to-Portal Bridge**: ✅ Done (Session 7)
 - [ ] **GHL Automation Workflows**: Set up automated email responses and lead nurturing sequences.
 - [ ] **Production Clover Credentials**: When ready for live payments, switch from sandbox to production Clover keys.
 
 ### Low Priority
-- [ ] **Code Splitting**: Vite build warns about large chunks (643KB). Consider dynamic imports.
+- [ ] **Code Splitting**: Vite build warns about large chunks (686KB). Consider dynamic imports.
 - [ ] **Enable RLS**: Re-enable Row Level Security on Supabase tables with proper policies for production.
 - [ ] **Clover Webhooks**: Set up webhooks for payment status updates (failed recurring, refunds).
+- [ ] **Client-Facing Login**: Deferred — most clients never log in. Admin-only portal for now.
 
 ---
 
@@ -196,6 +217,10 @@ Home Ready Scores/
 8. **Clover PCI Compliance**: Card data never touches our server. Clover's iframe handles tokenization directly. Only the token is sent to our API.
 9. **Payment Flow**: Frontend tokenizes → `process-payment` API creates Clover customer → charges setup fee → creates plan → creates subscription → updates Supabase.
 10. **Dark Portal Theme**: Portal uses dark glassmorphism aesthetic to differentiate from the public-facing light marketing site.
+11. **Admin-Only Portal**: Client-facing login deferred — most clients never log in. Focus on admin efficiency.
+12. **Templates over AI**: Dispute letters use pre-built FCRA Section 611 templates instead of AI API — more reliable, free, and legally sound.
+13. **Enrollment-to-Portal Bridge**: Website enrollments auto-create a Supabase client + intake form, not just a GHL contact.
+14. **Documentation System**: README, PROJECT_MEMORY, and Employee SOP are maintained as living docs. End-of-conversation workflow generates handoff prompts.
 
 ---
 
@@ -203,7 +228,7 @@ Home Ready Scores/
 
 | What | Where |
 |---|---|
-| Main Project | `/Users/mac/Dropbox/DrMarcusb Full Folder/00_Master/GitHub/Home Ready Scores` |
+| Main Project | `/Users/ashleyboudreaux/Library/CloudStorage/Dropbox/DrMarcusb Full Folder/00_Master/GitHub/Home Ready Scores` |
 | Agency Memory | `./Home Ready Scores Agency Agents/.agency-context.md` |
 | GHL API Logic | `./api/contact.js` |
 | Auth API | `./api/auth/login.js`, `./api/auth/setup.js` |

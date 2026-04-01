@@ -1,3 +1,10 @@
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
@@ -11,7 +18,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    // LeadConnector API v2 Upsert Contact
+    // ──────────────────────────────────────────────
+    // 1. Push lead to GoHighLevel CRM
+    // ──────────────────────────────────────────────
     const apiKey = process.env.GHL_API_KEY || '';
     
     // Determine plan text for tags and custom fields
@@ -21,7 +30,9 @@ export default async function handler(req, res) {
     if (goal) tags.push(`Goal: ${goal}`);
     if (planText) tags.push(`Plan: ${planText}`);
 
-    const response = await fetch('https://services.leadconnectorhq.com/contacts/upsert', {
+    let ghlContactId = null;
+
+    const ghlResponse = await fetch('https://services.leadconnectorhq.com/contacts/upsert', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -56,14 +67,74 @@ export default async function handler(req, res) {
       })
     });
 
-    const data = await response.json();
+    const ghlData = await ghlResponse.json();
 
-    if (!response.ok) {
-      console.error('GHL Error:', data);
-      return res.status(response.status).json(data);
+    if (!ghlResponse.ok) {
+      console.error('GHL Error:', ghlData);
+      return res.status(ghlResponse.status).json(ghlData);
     }
 
-    return res.status(200).json({ success: true, contact: data.contact });
+    ghlContactId = ghlData.contact?.id || null;
+
+    // ──────────────────────────────────────────────
+    // 2. Create client record in Supabase portal
+    // ──────────────────────────────────────────────
+    const { data: existingClient } = await supabase
+      .from('clients')
+      .select('id')
+      .eq('email', email)
+      .maybeSingle();
+
+    let clientId = existingClient?.id;
+
+    if (!existingClient) {
+      // Create new client in the portal
+      const { data: newClient, error: insertError } = await supabase
+        .from('clients')
+        .insert({
+          first_name: firstName,
+          last_name: lastName,
+          email: email || null,
+          phone: phone || null,
+          status: 'active',
+          ghl_contact_id: ghlContactId,
+        })
+        .select('id')
+        .single();
+
+      if (insertError) {
+        console.error('Supabase insert error:', insertError);
+        // Don't fail the whole request — GHL already succeeded
+      } else {
+        clientId = newClient.id;
+      }
+    } else {
+      // Update existing client with GHL ID if missing
+      if (ghlContactId) {
+        await supabase
+          .from('clients')
+          .update({ ghl_contact_id: ghlContactId })
+          .eq('id', existingClient.id);
+      }
+    }
+
+    // ──────────────────────────────────────────────
+    // 3. Create intake form with enrollment info
+    // ──────────────────────────────────────────────
+    if (clientId) {
+      const goals = [];
+      if (goal) goals.push(goal);
+
+      await supabase
+        .from('intake_forms')
+        .upsert({
+          client_id: clientId,
+          goals,
+          notes: planText ? `Enrolled via website — ${planText}` : 'Enrolled via website',
+        }, { onConflict: 'client_id' });
+    }
+
+    return res.status(200).json({ success: true, contact: ghlData.contact });
   } catch (error) {
     console.error('Server Error:', error);
     return res.status(500).json({ error: 'Internal Server Error' });

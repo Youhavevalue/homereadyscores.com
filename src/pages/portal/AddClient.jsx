@@ -29,6 +29,17 @@ const AddClient = () => {
       return;
     }
 
+    // Push to GoHighLevel CRM in the background
+    try {
+      await fetch('/api/clients/push-to-ghl', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId: data.id }),
+      });
+    } catch (err) {
+      console.warn('GHL sync skipped:', err.message);
+    }
+
     navigate(`/portal/clients/${data.id}`);
   };
 

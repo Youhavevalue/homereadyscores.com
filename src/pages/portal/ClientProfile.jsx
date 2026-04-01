@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
 import CloverPaymentForm from '../../components/CloverPaymentForm';
+import DisputeLetterModal from '../../components/DisputeLetterModal';
 
 const ClientProfile = () => {
   const { id } = useParams();
@@ -85,7 +86,6 @@ const ClientProfile = () => {
       </header>
 
       <main style={s.main}>
-        {/* Back Button + Client Header */}
         <button style={s.backLink} onClick={() => navigate('/portal/clients')}>← Back to Directory</button>
 
         <div style={s.clientHeader}>
@@ -130,9 +130,9 @@ const ClientProfile = () => {
         <div style={s.tabContent}>
           {activeTab === 'payments' && <PaymentsTab payment={payment} history={paymentHistory} clientId={id} client={client} onReload={loadClient} />}
           {activeTab === 'intake' && <IntakeTab intake={intake} clientId={id} onReload={loadClient} />}
-          {activeTab === 'credit' && <CreditTab documents={documents.filter(d => d.type === 'credit_report')} clientId={id} onReload={loadClient} />}
-          {activeTab === 'disputes' && <DisputesTab disputes={disputes} clientId={id} onReload={loadClient} />}
-          {activeTab === 'documents' && <DocumentsTab documents={documents} clientId={id} onReload={loadClient} />}
+          {activeTab === 'credit' && <DocumentUploadTab documents={documents.filter(d => d.type === 'credit_report')} clientId={id} docType="credit_report" title="Credit Reports" icon="📊" onReload={loadClient} />}
+          {activeTab === 'disputes' && <DisputesTab disputes={disputes} clientId={id} client={client} onReload={loadClient} />}
+          {activeTab === 'documents' && <DocumentUploadTab documents={documents} clientId={id} docType={null} title="All Documents" icon="📁" onReload={loadClient} />}
         </div>
       </main>
     </div>
@@ -160,7 +160,6 @@ const PaymentsTab = ({ payment, history, clientId, client, onReload }) => {
       monthly_amount: parseInt(form.monthly_amount) || 0,
       monthly_start_date: form.monthly_start_date || null,
     };
-
     if (payment) {
       await supabase.from('payments').update(payload).eq('id', payment.id);
     } else {
@@ -171,19 +170,11 @@ const PaymentsTab = ({ payment, history, clientId, client, onReload }) => {
     onReload();
   };
 
-  const handlePaymentSuccess = (result) => {
-    console.log('Payment processed successfully:', result);
-    onReload();
-  };
-
-  const formatCents = (cents) => {
-    if (!cents) return '$0.00';
-    return `$${(cents / 100).toFixed(2)}`;
-  };
+  const handlePaymentSuccess = () => onReload();
+  const formatCents = (cents) => cents ? `$${(cents / 100).toFixed(2)}` : '$0.00';
 
   return (
     <div>
-      {/* Clover Payment Modal */}
       {showPaymentForm && client && (
         <CloverPaymentForm
           client={client}
@@ -192,18 +183,12 @@ const PaymentsTab = ({ payment, history, clientId, client, onReload }) => {
         />
       )}
 
-      {/* Payment Config Card */}
       <div style={s.card}>
         <div style={s.cardHeader}>
           <h3 style={s.cardTitle}>Payment Configuration</h3>
           <div style={{ display: 'flex', gap: '8px' }}>
             {(!payment || !payment.clover_customer_id) && (
-              <button
-                style={s.chargeBtn}
-                onClick={() => setShowPaymentForm(true)}
-              >
-                💳 Set Up Payment
-              </button>
+              <button style={s.chargeBtn} onClick={() => setShowPaymentForm(true)}>💳 Set Up Payment</button>
             )}
             {payment && !editMode && (
               <button style={s.editBtn} onClick={() => setEditMode(true)}>Edit</button>
@@ -211,7 +196,6 @@ const PaymentsTab = ({ payment, history, clientId, client, onReload }) => {
           </div>
         </div>
 
-        {/* Clover Status Badge */}
         {payment?.clover_customer_id && (
           <div style={s.cloverBadge}>
             <span style={s.cloverDot}>●</span>
@@ -223,48 +207,24 @@ const PaymentsTab = ({ payment, history, clientId, client, onReload }) => {
           <div style={s.formGrid}>
             <div style={s.formGroup}>
               <label style={s.formLabel}>Setup Fee (cents)</label>
-              <input
-                style={s.formInput}
-                type="number"
-                placeholder="e.g. 25000 for $250"
-                value={form.setup_fee_amount}
-                onChange={(e) => setForm({ ...form, setup_fee_amount: e.target.value })}
-              />
+              <input style={s.formInput} type="number" placeholder="e.g. 25000 for $250" value={form.setup_fee_amount} onChange={(e) => setForm({ ...form, setup_fee_amount: e.target.value })} />
             </div>
             <div style={s.formGroup}>
               <label style={s.formLabel}>Setup Fee Date</label>
-              <input
-                style={s.formInput}
-                type="date"
-                value={form.setup_fee_date}
-                onChange={(e) => setForm({ ...form, setup_fee_date: e.target.value })}
-              />
+              <input style={s.formInput} type="date" value={form.setup_fee_date} onChange={(e) => setForm({ ...form, setup_fee_date: e.target.value })} />
               <small style={s.formHint}>Leave empty or pick today for immediate charge</small>
             </div>
             <div style={s.formGroup}>
               <label style={s.formLabel}>Monthly Amount (cents)</label>
-              <input
-                style={s.formInput}
-                type="number"
-                placeholder="e.g. 9900 for $99"
-                value={form.monthly_amount}
-                onChange={(e) => setForm({ ...form, monthly_amount: e.target.value })}
-              />
+              <input style={s.formInput} type="number" placeholder="e.g. 9900 for $99" value={form.monthly_amount} onChange={(e) => setForm({ ...form, monthly_amount: e.target.value })} />
             </div>
             <div style={s.formGroup}>
               <label style={s.formLabel}>Monthly Start Date</label>
-              <input
-                style={s.formInput}
-                type="date"
-                value={form.monthly_start_date}
-                onChange={(e) => setForm({ ...form, monthly_start_date: e.target.value })}
-              />
+              <input style={s.formInput} type="date" value={form.monthly_start_date} onChange={(e) => setForm({ ...form, monthly_start_date: e.target.value })} />
             </div>
             <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
               {payment && <button style={s.cancelBtn} onClick={() => setEditMode(false)}>Cancel</button>}
-              <button style={s.saveBtn} onClick={handleSave} disabled={saving}>
-                {saving ? 'Saving...' : 'Save Payment Config'}
-              </button>
+              <button style={s.saveBtn} onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save Payment Config'}</button>
             </div>
           </div>
         ) : payment ? (
@@ -272,16 +232,12 @@ const PaymentsTab = ({ payment, history, clientId, client, onReload }) => {
             <div style={s.paymentItem}>
               <div style={s.paymentLabel}>Setup Fee</div>
               <div style={s.paymentValue}>{formatCents(payment.setup_fee_amount)}</div>
-              <div style={s.paymentSub}>
-                Date: {payment.setup_fee_date || 'Immediate'} • Status: <span style={{ color: payment.setup_fee_status === 'paid' ? '#10b981' : '#f59e0b', textTransform: 'capitalize' }}>{payment.setup_fee_status}</span>
-              </div>
+              <div style={s.paymentSub}>Date: {payment.setup_fee_date || 'Immediate'} • Status: <span style={{ color: payment.setup_fee_status === 'paid' ? '#10b981' : '#f59e0b', textTransform: 'capitalize' }}>{payment.setup_fee_status}</span></div>
             </div>
             <div style={s.paymentItem}>
               <div style={s.paymentLabel}>Monthly Recurring</div>
               <div style={s.paymentValue}>{formatCents(payment.monthly_amount)}/mo</div>
-              <div style={s.paymentSub}>
-                Start: {payment.monthly_start_date || 'Not set'} • Status: <span style={{ color: payment.monthly_status === 'active' ? '#10b981' : '#f59e0b', textTransform: 'capitalize' }}>{payment.monthly_status}</span>
-              </div>
+              <div style={s.paymentSub}>Start: {payment.monthly_start_date || 'Not set'} • Status: <span style={{ color: payment.monthly_status === 'active' ? '#10b981' : '#f59e0b', textTransform: 'capitalize' }}>{payment.monthly_status}</span></div>
             </div>
             {payment.card_last_four && (
               <div style={s.paymentItem}>
@@ -294,11 +250,8 @@ const PaymentsTab = ({ payment, history, clientId, client, onReload }) => {
         ) : null}
       </div>
 
-      {/* Payment History */}
       <div style={{ ...s.card, marginTop: '16px' }}>
-        <div style={s.cardHeader}>
-          <h3 style={s.cardTitle}>Payment History</h3>
-        </div>
+        <div style={s.cardHeader}><h3 style={s.cardTitle}>Payment History</h3></div>
         {history.length === 0 ? (
           <div style={s.emptyTab}>No payment history yet.</div>
         ) : (
@@ -312,17 +265,10 @@ const PaymentsTab = ({ payment, history, clientId, client, onReload }) => {
               </div>
               <div style={{ fontSize: '0.95rem', fontWeight: '600' }}>{formatCents(h.amount)}</div>
               <span style={{
-                padding: '4px 10px',
-                borderRadius: '20px',
-                fontSize: '0.7rem',
-                fontWeight: '600',
+                padding: '4px 10px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: '600',
                 background: h.status === 'succeeded' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
-                color: h.status === 'succeeded' ? '#10b981' : '#ef4444',
-                marginLeft: '12px',
-                textTransform: 'capitalize',
-              }}>
-                {h.status}
-              </span>
+                color: h.status === 'succeeded' ? '#10b981' : '#ef4444', marginLeft: '12px', textTransform: 'capitalize',
+              }}>{h.status}</span>
             </div>
           ))
         )}
@@ -331,112 +277,526 @@ const PaymentsTab = ({ payment, history, clientId, client, onReload }) => {
   );
 };
 
-const formatCentsG = (cents) => {
-  if (!cents) return '$0.00';
-  return `$${(cents / 100).toFixed(2)}`;
+/* ─── Intake Tab ─── */
+const GOAL_OPTIONS = [
+  'Buy a home',
+  'Lower interest rates',
+  'Remove collections',
+  'Improve credit score',
+  'Qualify for auto loan',
+  'Other',
+];
+
+const IntakeTab = ({ intake, clientId, onReload }) => {
+  const [editMode, setEditMode] = useState(!intake);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({
+    dob: intake?.dob || '',
+    ssn_last4: intake?.ssn_last4 || '',
+    current_address: intake?.current_address || '',
+    previous_addresses: intake?.previous_addresses || '',
+    employer: intake?.employer || '',
+    income: intake?.income || '',
+    goals: intake?.goals || [],
+    notes: intake?.notes || '',
+  });
+
+  const handleChange = (field) => (e) => setForm({ ...form, [field]: e.target.value });
+
+  const toggleGoal = (goal) => {
+    setForm(prev => ({
+      ...prev,
+      goals: prev.goals.includes(goal)
+        ? prev.goals.filter(g => g !== goal)
+        : [...prev.goals, goal],
+    }));
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    const payload = { client_id: clientId, ...form };
+    if (intake) {
+      await supabase.from('intake_forms').update(payload).eq('id', intake.id);
+    } else {
+      await supabase.from('intake_forms').insert(payload);
+    }
+    setSaving(false);
+    setEditMode(false);
+    onReload();
+  };
+
+  return (
+    <div style={s.card}>
+      <div style={s.cardHeader}>
+        <h3 style={s.cardTitle}>Client Intake Form</h3>
+        {intake && !editMode && (
+          <button style={s.editBtn} onClick={() => setEditMode(true)}>Edit</button>
+        )}
+      </div>
+
+      {editMode ? (
+        <div style={{ padding: '24px' }}>
+          <div style={s.formGrid}>
+            <div style={s.formGroup}>
+              <label style={s.formLabel}>Date of Birth</label>
+              <input style={s.formInput} type="date" value={form.dob} onChange={handleChange('dob')} />
+            </div>
+            <div style={s.formGroup}>
+              <label style={s.formLabel}>SSN (Last 4)</label>
+              <input style={s.formInput} type="text" maxLength="4" placeholder="1234" value={form.ssn_last4} onChange={handleChange('ssn_last4')} />
+            </div>
+            <div style={{ ...s.formGroup, gridColumn: '1 / -1' }}>
+              <label style={s.formLabel}>Current Address</label>
+              <input style={s.formInput} type="text" placeholder="123 Main St, Dallas, TX 75001" value={form.current_address} onChange={handleChange('current_address')} />
+            </div>
+            <div style={{ ...s.formGroup, gridColumn: '1 / -1' }}>
+              <label style={s.formLabel}>Previous Address(es)</label>
+              <input style={s.formInput} type="text" placeholder="Optional" value={form.previous_addresses} onChange={handleChange('previous_addresses')} />
+            </div>
+            <div style={s.formGroup}>
+              <label style={s.formLabel}>Employer</label>
+              <input style={s.formInput} type="text" placeholder="Current employer" value={form.employer} onChange={handleChange('employer')} />
+            </div>
+            <div style={s.formGroup}>
+              <label style={s.formLabel}>Annual Income</label>
+              <input style={s.formInput} type="text" placeholder="e.g. $55,000" value={form.income} onChange={handleChange('income')} />
+            </div>
+          </div>
+
+          <div style={{ marginTop: '20px' }}>
+            <label style={s.formLabel}>Credit Goals</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+              {GOAL_OPTIONS.map(goal => (
+                <button
+                  key={goal}
+                  type="button"
+                  onClick={() => toggleGoal(goal)}
+                  style={{
+                    padding: '8px 16px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '500',
+                    cursor: 'pointer', transition: 'all 0.15s ease',
+                    background: form.goals.includes(goal) ? 'rgba(59,130,246,0.15)' : 'rgba(255,255,255,0.04)',
+                    border: `1px solid ${form.goals.includes(goal) ? 'rgba(59,130,246,0.4)' : 'rgba(255,255,255,0.08)'}`,
+                    color: form.goals.includes(goal) ? '#3b82f6' : 'rgba(255,255,255,0.5)',
+                  }}
+                >
+                  {form.goals.includes(goal) ? '✓ ' : ''}{goal}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ marginTop: '20px' }}>
+            <label style={s.formLabel}>Notes</label>
+            <textarea
+              style={{ ...s.formInput, minHeight: '80px', resize: 'vertical', marginTop: '6px', width: '100%', boxSizing: 'border-box' }}
+              value={form.notes}
+              onChange={handleChange('notes')}
+              placeholder="Any additional notes about this client..."
+            />
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '24px' }}>
+            {intake && <button style={s.cancelBtn} onClick={() => setEditMode(false)}>Cancel</button>}
+            <button style={s.saveBtn} onClick={handleSave} disabled={saving}>
+              {saving ? 'Saving...' : 'Save Intake'}
+            </button>
+          </div>
+        </div>
+      ) : intake ? (
+        <div style={{ padding: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+            <InfoField label="Date of Birth" value={intake.dob ? new Date(intake.dob).toLocaleDateString() : '—'} />
+            <InfoField label="SSN Last 4" value={intake.ssn_last4 ? `••••${intake.ssn_last4}` : '—'} />
+            <InfoField label="Current Address" value={intake.current_address || '—'} full />
+            <InfoField label="Previous Address" value={intake.previous_addresses || '—'} full />
+            <InfoField label="Employer" value={intake.employer || '—'} />
+            <InfoField label="Annual Income" value={intake.income || '—'} />
+            <div style={{ gridColumn: '1 / -1' }}>
+              <div style={s.infoLabel}>Credit Goals</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '4px' }}>
+                {(intake.goals || []).length > 0 ? intake.goals.map(g => (
+                  <span key={g} style={{ padding: '4px 12px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '500', background: 'rgba(59,130,246,0.1)', color: '#3b82f6' }}>{g}</span>
+                )) : <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.85rem' }}>No goals set</span>}
+              </div>
+            </div>
+            {intake.notes && <InfoField label="Notes" value={intake.notes} full />}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
 };
 
-/* ─── Intake Tab ─── */
-const IntakeTab = ({ intake, clientId, onReload }) => (
-  <div style={s.card}>
-    <div style={s.cardHeader}>
-      <h3 style={s.cardTitle}>Client Intake Form</h3>
-    </div>
-    <div style={s.emptyTab}>
-      <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📝</div>
-      <p>Intake forms coming soon.</p>
-      <small style={{ color: 'rgba(255,255,255,0.3)' }}>This feature will allow you to capture client information digitally.</small>
-    </div>
+const InfoField = ({ label, value, full }) => (
+  <div style={full ? { gridColumn: '1 / -1' } : {}}>
+    <div style={s.infoLabel}>{label}</div>
+    <div style={s.infoValue}>{value}</div>
   </div>
 );
 
-/* ─── Credit Reports Tab ─── */
-const CreditTab = ({ documents, clientId, onReload }) => (
-  <div style={s.card}>
-    <div style={s.cardHeader}>
-      <h3 style={s.cardTitle}>Credit Reports</h3>
-    </div>
-    {documents.length === 0 ? (
-      <div style={s.emptyTab}>
-        <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📊</div>
-        <p>No credit reports uploaded yet.</p>
-        <small style={{ color: 'rgba(255,255,255,0.3)' }}>Upload and track credit reports for this client.</small>
+/* ─── Document Upload Tab (used for both Documents and Credit Reports) ─── */
+const DOC_TYPE_OPTIONS = [
+  { value: 'credit_report', label: 'Credit Report' },
+  { value: 'id_doc', label: 'ID Document' },
+  { value: 'utility_bill', label: 'Utility Bill' },
+  { value: 'other', label: 'Other' },
+];
+
+const DocumentUploadTab = ({ documents, clientId, docType, title, icon, onReload }) => {
+  const [uploading, setUploading] = useState(false);
+  const [deleting, setDeleting] = useState(null);
+  const [selectedType, setSelectedType] = useState(docType || 'other');
+
+  const handleUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File must be under 10MB');
+      return;
+    }
+    const allowed = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+    if (!allowed.includes(file.type)) {
+      alert('Only PDF, JPG, and PNG files are accepted');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      // 1. Get signed upload URL from server
+      const urlRes = await fetch('/api/documents/upload-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId, fileName: file.name, fileType: file.type, docType: selectedType }),
+      });
+
+      const contentType = urlRes.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        // Dev mode fallback: upload directly via Supabase client
+        await directUpload(file);
+        return;
+      }
+
+      const urlData = await urlRes.json();
+      if (!urlRes.ok) throw new Error(urlData.error);
+
+      // 2. Upload file to signed URL
+      const uploadRes = await fetch(urlData.signedUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type },
+        body: file,
+      });
+
+      if (!uploadRes.ok) throw new Error('Upload failed');
+
+      // 3. Get public URL
+      const { data: urlObj } = supabase.storage.from('client-documents').getPublicUrl(urlData.filePath);
+
+      // 4. Save document record
+      await supabase.from('documents').insert({
+        client_id: clientId,
+        name: file.name,
+        type: selectedType,
+        file_url: urlObj.publicUrl,
+        file_path: urlData.filePath,
+        file_size: file.size,
+      });
+
+      onReload();
+    } catch (err) {
+      console.error('Upload error:', err);
+      await directUpload(file);
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  // Fallback for dev mode (no serverless functions)
+  const directUpload = async (file) => {
+    try {
+      const timestamp = Date.now();
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const filePath = `${clientId}/${timestamp}_${safeName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('client-documents')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        alert('Upload failed: ' + uploadError.message);
+        setUploading(false);
+        return;
+      }
+
+      const { data: urlObj } = supabase.storage.from('client-documents').getPublicUrl(filePath);
+
+      await supabase.from('documents').insert({
+        client_id: clientId,
+        name: file.name,
+        type: selectedType,
+        file_url: urlObj.publicUrl,
+        file_path: filePath,
+        file_size: file.size,
+      });
+
+      onReload();
+    } catch (err) {
+      alert('Upload error: ' + err.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDelete = async (docId) => {
+    if (!confirm('Delete this document?')) return;
+    setDeleting(docId);
+    try {
+      const res = await fetch('/api/documents/delete-document', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ documentId: docId }),
+      });
+      const contentType = res.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        // Dev fallback
+        const doc = documents.find(d => d.id === docId);
+        if (doc?.file_path) {
+          await supabase.storage.from('client-documents').remove([doc.file_path]);
+        }
+        await supabase.from('documents').delete().eq('id', docId);
+      }
+      onReload();
+    } catch {
+      await supabase.from('documents').delete().eq('id', docId);
+      onReload();
+    }
+    setDeleting(null);
+  };
+
+  const formatSize = (bytes) => {
+    if (!bytes) return '';
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  };
+
+  return (
+    <div style={s.card}>
+      <div style={s.cardHeader}>
+        <h3 style={s.cardTitle}>{title}</h3>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          {!docType && (
+            <select
+              value={selectedType}
+              onChange={(e) => setSelectedType(e.target.value)}
+              style={{ ...s.formInput, padding: '6px 10px', fontSize: '0.8rem', borderRadius: '8px' }}
+            >
+              {DOC_TYPE_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          )}
+          <label style={s.uploadBtn}>
+            {uploading ? '⏳ Uploading...' : `📎 Upload ${docType === 'credit_report' ? 'Report' : 'File'}`}
+            <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={handleUpload} style={{ display: 'none' }} disabled={uploading} />
+          </label>
+        </div>
       </div>
-    ) : (
-      documents.map((d) => (
-        <div key={d.id} style={s.historyRow}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{d.name}</div>
-            <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.8rem', marginTop: '2px' }}>
-              Uploaded {new Date(d.created_at).toLocaleDateString()}
+
+      {documents.length === 0 ? (
+        <div style={s.emptyTab}>
+          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>{icon}</div>
+          <p>No {title.toLowerCase()} uploaded yet.</p>
+          <small style={{ color: 'rgba(255,255,255,0.3)' }}>Upload PDF, JPG, or PNG files up to 10MB.</small>
+        </div>
+      ) : (
+        documents.map((d) => (
+          <div key={d.id} style={s.historyRow}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{d.name}</div>
+              <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.8rem', marginTop: '2px' }}>
+                {d.type && <span style={{ textTransform: 'capitalize' }}>{d.type.replace(/_/g, ' ')} • </span>}
+                {formatSize(d.file_size)} • Uploaded {new Date(d.created_at).toLocaleDateString()}
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              {d.file_url && (
+                <a href={d.file_url} target="_blank" rel="noopener noreferrer" style={s.downloadBtn}>↓ Download</a>
+              )}
+              <button
+                style={s.deleteBtn}
+                onClick={() => handleDelete(d.id)}
+                disabled={deleting === d.id}
+              >
+                {deleting === d.id ? '...' : '✕'}
+              </button>
             </div>
           </div>
-        </div>
-      ))
-    )}
-  </div>
-);
+        ))
+      )}
+    </div>
+  );
+};
 
 /* ─── Disputes Tab ─── */
-const DisputesTab = ({ disputes, clientId, onReload }) => (
-  <div style={s.card}>
-    <div style={s.cardHeader}>
-      <h3 style={s.cardTitle}>Dispute Letters</h3>
-    </div>
-    {disputes.length === 0 ? (
-      <div style={s.emptyTab}>
-        <div style={{ fontSize: '2rem', marginBottom: '8px' }}>✉️</div>
-        <p>No dispute letters yet.</p>
-        <small style={{ color: 'rgba(255,255,255,0.3)' }}>Create and track dispute letters for credit bureaus.</small>
-      </div>
-    ) : (
-      disputes.map((d) => (
-        <div key={d.id} style={s.historyRow}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{d.bureau} — {d.account_name || 'General'}</div>
-            <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.8rem', marginTop: '2px' }}>
-              {d.dispute_reason} • Created {new Date(d.created_at).toLocaleDateString()}
-            </div>
-          </div>
-          <span style={{
-            padding: '4px 10px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: '600',
-            background: d.status === 'sent' ? 'rgba(59,130,246,0.1)' : d.status === 'resolved' ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)',
-            color: d.status === 'sent' ? '#3b82f6' : d.status === 'resolved' ? '#10b981' : '#f59e0b',
-            textTransform: 'capitalize',
-          }}>
-            {d.status}
-          </span>
-        </div>
-      ))
-    )}
-  </div>
-);
+const DISPUTE_REASONS = ['Not mine', 'Inaccurate balance', 'Paid/settled', 'Outdated', 'Duplicate', 'Identity theft', 'Other'];
+const STATUS_FLOW = ['draft', 'sent', 'responded', 'resolved'];
 
-/* ─── Documents Tab ─── */
-const DocumentsTab = ({ documents, clientId, onReload }) => (
-  <div style={s.card}>
-    <div style={s.cardHeader}>
-      <h3 style={s.cardTitle}>All Documents</h3>
-    </div>
-    {documents.length === 0 ? (
-      <div style={s.emptyTab}>
-        <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📁</div>
-        <p>No documents uploaded yet.</p>
-      </div>
-    ) : (
-      documents.map((d) => (
-        <div key={d.id} style={s.historyRow}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{d.name}</div>
-            <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.8rem', marginTop: '2px' }}>
-              Type: {d.type} • Uploaded {new Date(d.created_at).toLocaleDateString()}
+const DisputesTab = ({ disputes, clientId, client, onReload }) => {
+  const [showForm, setShowForm] = useState(false);
+  const [letterDispute, setLetterDispute] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({
+    bureau: 'Experian',
+    account_name: '',
+    account_number_last4: '',
+    dispute_reason: 'Not mine',
+    notes: '',
+  });
+
+  const handleChange = (field) => (e) => setForm({ ...form, [field]: e.target.value });
+
+  const handleAdd = async () => {
+    if (!form.account_name) return alert('Account name is required');
+    setSaving(true);
+    const maxRound = disputes.filter(d => d.bureau === form.bureau && d.account_name === form.account_name).length;
+    await supabase.from('dispute_letters').insert({
+      client_id: clientId,
+      ...form,
+      round_number: maxRound + 1,
+      status: 'draft',
+    });
+    setSaving(false);
+    setShowForm(false);
+    setForm({ bureau: 'Experian', account_name: '', account_number_last4: '', dispute_reason: 'Not mine', notes: '' });
+    onReload();
+  };
+
+  const advanceStatus = async (dispute) => {
+    const idx = STATUS_FLOW.indexOf(dispute.status);
+    if (idx < STATUS_FLOW.length - 1) {
+      const newStatus = STATUS_FLOW[idx + 1];
+      const updates = { status: newStatus };
+      if (newStatus === 'sent') updates.sent_date = new Date().toISOString().split('T')[0];
+      if (newStatus === 'responded') updates.response_date = new Date().toISOString().split('T')[0];
+      await supabase.from('dispute_letters').update(updates).eq('id', dispute.id);
+      onReload();
+    }
+  };
+
+  const handleSaveLetter = async (letterText) => {
+    await supabase.from('dispute_letters').update({ letter_text: letterText }).eq('id', letterDispute.id);
+    setLetterDispute(null);
+    onReload();
+  };
+
+  const statusColor = (status) => {
+    const map = { draft: '#f59e0b', sent: '#3b82f6', responded: '#8b5cf6', resolved: '#10b981' };
+    return map[status] || '#6b7280';
+  };
+
+  return (
+    <div>
+      {letterDispute && (
+        <DisputeLetterModal
+          dispute={letterDispute}
+          client={client}
+          onSave={handleSaveLetter}
+          onClose={() => setLetterDispute(null)}
+        />
+      )}
+
+      <div style={s.card}>
+        <div style={s.cardHeader}>
+          <h3 style={s.cardTitle}>Dispute Letters</h3>
+          <button style={s.addDisputeBtn} onClick={() => setShowForm(!showForm)}>
+            {showForm ? '✕ Cancel' : '+ New Dispute'}
+          </button>
+        </div>
+
+        {/* New Dispute Form */}
+        {showForm && (
+          <div style={{ padding: '24px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={s.formGrid}>
+              <div style={s.formGroup}>
+                <label style={s.formLabel}>Bureau</label>
+                <select style={s.formInput} value={form.bureau} onChange={handleChange('bureau')}>
+                  <option>Experian</option>
+                  <option>Equifax</option>
+                  <option>TransUnion</option>
+                </select>
+              </div>
+              <div style={s.formGroup}>
+                <label style={s.formLabel}>Dispute Reason</label>
+                <select style={s.formInput} value={form.dispute_reason} onChange={handleChange('dispute_reason')}>
+                  {DISPUTE_REASONS.map(r => <option key={r}>{r}</option>)}
+                </select>
+              </div>
+              <div style={s.formGroup}>
+                <label style={s.formLabel}>Account Name</label>
+                <input style={s.formInput} placeholder="e.g. Capital One, Midland Credit" value={form.account_name} onChange={handleChange('account_name')} />
+              </div>
+              <div style={s.formGroup}>
+                <label style={s.formLabel}>Account # (Last 4)</label>
+                <input style={s.formInput} maxLength="4" placeholder="1234" value={form.account_number_last4} onChange={handleChange('account_number_last4')} />
+              </div>
+              <div style={{ ...s.formGroup, gridColumn: '1 / -1' }}>
+                <label style={s.formLabel}>Notes</label>
+                <input style={s.formInput} placeholder="Optional notes" value={form.notes} onChange={handleChange('notes')} />
+              </div>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '16px' }}>
+              <button style={s.cancelBtn} onClick={() => setShowForm(false)}>Cancel</button>
+              <button style={s.saveBtn} onClick={handleAdd} disabled={saving}>{saving ? 'Adding...' : 'Add Dispute'}</button>
             </div>
           </div>
-        </div>
-      ))
-    )}
-  </div>
-);
+        )}
+
+        {/* Dispute List */}
+        {disputes.length === 0 && !showForm ? (
+          <div style={s.emptyTab}>
+            <div style={{ fontSize: '2rem', marginBottom: '8px' }}>✉️</div>
+            <p>No dispute letters yet.</p>
+            <small style={{ color: 'rgba(255,255,255,0.3)' }}>Create and track dispute letters for credit bureaus.</small>
+          </div>
+        ) : (
+          disputes.map((d) => (
+            <div key={d.id} style={s.historyRow}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{d.bureau} — {d.account_name || 'General'}</div>
+                <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.8rem', marginTop: '2px' }}>
+                  {d.dispute_reason} • Round {d.round_number || 1} • {new Date(d.created_at).toLocaleDateString()}
+                  {d.sent_date && ` • Sent ${new Date(d.sent_date).toLocaleDateString()}`}
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                <button style={s.genLetterBtn} onClick={() => setLetterDispute(d)}>
+                  {d.letter_text ? '📄 View Letter' : '✉️ Generate Letter'}
+                </button>
+                <button
+                  onClick={() => advanceStatus(d)}
+                  disabled={d.status === 'resolved'}
+                  style={{
+                    padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '600',
+                    background: `${statusColor(d.status)}18`, color: statusColor(d.status),
+                    border: `1px solid ${statusColor(d.status)}30`, cursor: d.status === 'resolved' ? 'default' : 'pointer',
+                    textTransform: 'capitalize', transition: 'all 0.15s ease',
+                  }}
+                  title={d.status !== 'resolved' ? `Click to advance to "${STATUS_FLOW[STATUS_FLOW.indexOf(d.status) + 1]}"` : 'Completed'}
+                >
+                  {d.status}
+                  {d.status !== 'resolved' && ' →'}
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+};
 
 /* ─── Styles ─── */
 const s = {
@@ -468,14 +828,14 @@ const s = {
   cardHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)' },
   cardTitle: { fontSize: '1rem', fontWeight: '600', margin: 0 },
   editBtn: { background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.2)', borderRadius: '8px', color: '#3b82f6', padding: '6px 14px', fontSize: '0.8rem', fontWeight: '500', cursor: 'pointer' },
-  formGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', padding: '24px' },
+  formGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' },
   formGroup: { display: 'flex', flexDirection: 'column', gap: '6px' },
   formLabel: { fontSize: '0.8rem', fontWeight: '500', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.06em' },
-  formInput: { padding: '12px 14px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: '#fff', fontSize: '0.9rem', outline: 'none' },
+  formInput: { padding: '12px 14px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: '#fff', fontSize: '0.9rem', outline: 'none', fontFamily: 'inherit' },
   formHint: { fontSize: '0.75rem', color: 'rgba(255,255,255,0.3)' },
   cancelBtn: { padding: '10px 18px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem', cursor: 'pointer' },
   saveBtn: { padding: '10px 20px', background: 'linear-gradient(135deg, #3b82f6, #6366f1)', border: 'none', borderRadius: '10px', color: '#fff', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer', boxShadow: '0 4px 12px rgba(59,130,246,0.25)' },
-  paymentSummary: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0', },
+  paymentSummary: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0' },
   paymentItem: { padding: '24px', borderRight: '1px solid rgba(255,255,255,0.04)', borderBottom: '1px solid rgba(255,255,255,0.04)' },
   paymentLabel: { fontSize: '0.75rem', fontWeight: '600', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' },
   paymentValue: { fontSize: '1.5rem', fontWeight: '700', marginBottom: '4px' },
@@ -485,6 +845,13 @@ const s = {
   chargeBtn: { padding: '8px 16px', background: 'linear-gradient(135deg, #10b981, #059669)', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer', boxShadow: '0 2px 8px rgba(16,185,129,0.25)', display: 'flex', alignItems: 'center', gap: '4px' },
   cloverBadge: { display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 24px', background: 'rgba(16,185,129,0.05)', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' },
   cloverDot: { color: '#10b981', fontSize: '0.6rem' },
+  infoLabel: { fontSize: '0.75rem', fontWeight: '600', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' },
+  infoValue: { fontSize: '0.9rem', color: '#fff' },
+  uploadBtn: { padding: '8px 16px', background: 'linear-gradient(135deg, #3b82f6, #6366f1)', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', boxShadow: '0 2px 8px rgba(59,130,246,0.25)' },
+  downloadBtn: { padding: '4px 10px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#3b82f6', fontSize: '0.75rem', fontWeight: '500', textDecoration: 'none', cursor: 'pointer' },
+  deleteBtn: { width: '28px', height: '28px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '8px', color: '#ef4444', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  addDisputeBtn: { padding: '8px 16px', background: 'linear-gradient(135deg, #3b82f6, #6366f1)', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer', boxShadow: '0 2px 8px rgba(59,130,246,0.25)' },
+  genLetterBtn: { padding: '4px 12px', background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '8px', color: '#8b5cf6', fontSize: '0.75rem', fontWeight: '500', cursor: 'pointer' },
 };
 
 export default ClientProfile;

@@ -1,6 +1,6 @@
 # Home Ready Scores
 
-> Credit Repair Website + Admin Client Portal
+> Credit Repair Website + Admin Portal + Client Portal
 
 **Live Site**: [homereadyscores.com](https://homereadyscores.com)
 
@@ -66,8 +66,13 @@ npm run build
 
 ## Portal Access
 
+### Admin Portal
 - **URL**: `homereadyscores.com/portal/login`
 - **Admin**: `admin@homereadyscores.com` / `admin123`
+
+### Client Portal (Coming — Session 9)
+- **URL**: `homereadyscores.com/client/login`
+- **Default Password**: `HomeReady2026!` (auto-created on enrollment)
 
 ---
 
@@ -90,13 +95,17 @@ Portal Add Client → Supabase insert + api/clients/push-to-ghl.js
 
 | Table | Purpose |
 |---|---|
-| `team_members` | Admin login credentials (bcrypt) |
+| `team_users` | Admin login credentials (bcrypt) |
 | `clients` | Client directory |
+| `client_users` | Client login credentials (planned) |
 | `payments` | Payment config per client |
 | `payment_history` | Transaction log |
 | `intake_forms` | Client intake data |
 | `documents` | File uploads (Supabase Storage) |
 | `dispute_letters` | Dispute tracking + FCRA letter templates |
+| `messages` | Client ↔ Admin messaging (planned) |
+| `notifications` | Admin notification system (planned) |
+| `activity_log` | Audit trail for all actions (planned) |
 | `scheduled_charges` | Future-dated charges |
 
 ---
@@ -125,6 +134,7 @@ Set in Vercel Dashboard → Settings → Environment Variables:
 |---|---|---|
 | Project Memory | `PROJECT_MEMORY.md` | All decisions, sessions, and architecture context |
 | Employee SOP | `docs/EMPLOYEE_SOP.md` | Step-by-step training for portal operations |
+| Implementation Plan | Session 8 artifact | 15-phase build plan for client portal + automation |
 | SQL Migrations | `sql/` | Database schema changes |
 
 ---

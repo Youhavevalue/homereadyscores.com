@@ -18,7 +18,7 @@
 | **CRM** | GoHighLevel (MCP connected) |
 | **Design Inspiration** | Lexington Law (typography/authority), homereadyscores.com |
 | **Created** | March 16, 2026 |
-| **Last Updated** | March 31, 2026 @ 8:10 PM CST |
+| **Last Updated** | March 31, 2026 @ 8:40 PM CST |
 
 ---
 
@@ -176,32 +176,45 @@ Home Ready Scores/
 - [x] **Documentation Overhaul**: Updated README.md, PROJECT_MEMORY.md, created `docs/EMPLOYEE_SOP.md`, created end-of-conversation workflow.
 - [x] **Deployed**: Two git pushes to main, Vercel auto-deployed.
 
+### Session 8 — March 31, 2026 (Planning & Architecture — No Code)
+- [x] **Industry Research**: Analyzed Credit Repair Cloud, DisputeBee, and DisputeFox to identify standard feature sets for client portals, admin dashboards, payment management, and automation.
+- [x] **GHL Audit via MCP**: Queried all 13 GHL pipelines, 28+ custom fields, and existing contacts. Mapped every GHL custom field ID to portal fields.
+- [x] **15-Phase Implementation Plan**: Created comprehensive plan covering client auth, client portal (7 pages), admin notifications, activity log, payment management, GHL bi-directional sync, GHL email automation triggers, Clover activation, admin dashboard upgrade, routing, RLS security, code splitting, and end-to-end testing.
+- [x] **GHL Field Mapping Table**: Documented exact field IDs for all 28 GHL custom fields (Status, Setup Fee, Monthly Fee, Monthly Due Date, Enrollment Date, Enrollment Payment Date, Payment Method, Counselor, Sales Rep, Deletion %s per bureau, etc.).
+- [x] **Clover Multi-Pay Token Activation Guide**: Wrote exact email template for Dr. Marcus to send to `developer-relations@devrel.clover.com` with Merchant ID `3G36H3NENST21` and App ID `S3J1DCCJ91V1T`.
+- [x] **SQL Migration Designed**: 4 new tables planned: `client_users`, `messages`, `notifications`, `activity_log`. Plus `status` column on `clients` table.
+- [x] **Client Portal Architecture**: 7 new pages designed: ClientLogin, ClientDashboard, ClientDocuments, ClientDisputes, ClientMessages, ClientBilling, ClientSettings.
+- [x] **Automation Strategy**: Decided to use GHL workflows triggered by tag/field updates from portal (not build custom email system). Portal sets tags → GHL sends welcome, payment receipt, payment failed, dispute updates, cancellation emails.
+
 ---
 
 ## 🔲 Outstanding / Next Steps
 
-### High Priority
-- [ ] **Clover Multi-Pay Token Activation**: Contact Clover Developer Relations to enable multi-pay tokens on sandbox merchant. Required for card-on-file (COF) to work. Email: `developer-relations@devrel.clover.com`.
-- [ ] **Test End-to-End Payment**: Once multi-pay tokens are enabled, test with Clover sandbox test cards.
-- [ ] **Connect GHL Email Service**: Set up `help@homereadyscores.com` as sending email in GHL dashboard.
-- [ ] **DKIM Setup**: Complete DKIM authentication in Google Workspace for email deliverability.
-- [ ] **Production Smoke Test**: Full end-to-end test of enrollment → portal → disputes → payments.
+> Full implementation plan with all details: see `implementation_plan.md` artifact.
 
-### Medium Priority
-- [x] **FAQ Page**: ✅ Done
-- [x] **Intake Tab**: ✅ Done (Session 7)
-- [x] **Credit Reports Tab**: ✅ Done (Session 7)
-- [x] **Disputes Tab**: ✅ Done (Session 7)
-- [x] **Documents Tab**: ✅ Done (Session 7)
-- [x] **Enrollment-to-Portal Bridge**: ✅ Done (Session 7)
-- [ ] **GHL Automation Workflows**: Set up automated email responses and lead nurturing sequences.
-- [ ] **Production Clover Credentials**: When ready for live payments, switch from sandbox to production Clover keys.
+### 🔴 Critical (Blocks Launch)
+- [ ] **Phase 1: Client Auth System** — `client_users` table, `client-login.js` API, `ClientAuthContext.jsx`, `ClientProtectedRoute.jsx`, `ClientLogin.jsx` page. Auto-create client login on enrollment (default password `HomeReady2026!`).
+- [ ] **Phase 2: Client Dashboard** — Progress tracker (enrolled→analyzing→disputing→monitoring→complete), bureau summary cards (3 bureaus), recent activity feed, next payment card.
+- [ ] **Phase 3: Client Documents/Disputes/Messages** — Client doc upload with admin notifications, read-only dispute view, messaging thread between client and admin.
+- [ ] **Phase 12: Routing** — Add all `/client/*` routes to `App.jsx`, wrap in `ClientProtectedRoute`.
+- [ ] **Phase 10: Clover Multi-Pay Token** — ⚠️ **DR. MARCUS MUST SEND EMAIL** to `developer-relations@devrel.clover.com` (template in implementation plan). 1-3 business day turnaround. Blocks all payment testing.
+- [ ] **Phase 15: End-to-End Testing** — Full smoke test of enrollment → portal → disputes → payments → GHL sync.
 
-### Low Priority
-- [ ] **Code Splitting**: Vite build warns about large chunks (686KB). Consider dynamic imports.
-- [ ] **Enable RLS**: Re-enable Row Level Security on Supabase tables with proper policies for production.
+### 🟡 High Priority
+- [ ] **Phase 4: Client Billing View** — Payment history, next due date, plan details (read-only for clients).
+- [ ] **Phase 5: Admin Notifications** — `notifications` table, bell icon with badge in admin navbar, auto-triggers on client actions.
+- [ ] **Phase 6: Activity Log** — `activity_log` table, audit trail for all client/admin/system actions, timeline view in admin ClientProfile.
+- [ ] **Phase 7: Admin Payment Management** — Change amounts, reschedule charges, pause/cancel subscriptions, manual one-time charges, failed payment handling.
+- [ ] **Phase 8: GHL Bi-Directional Sync** — Sync all 28 mapped fields portal→GHL on every client change. Status updates, deletion %, payment info, enrollment dates.
+- [ ] **Phase 9: GHL Email Automation Triggers** — Welcome email, payment confirmation, payment failed, dispute sent, progress update, cancellation. All via GHL workflow triggers (tags + custom field updates).
+- [ ] **Phase 13: Supabase RLS** — Enable Row Level Security on all 12+ tables with service role bypass for API endpoints.
+
+### 🟢 Medium/Low Priority
+- [ ] **Phase 11: Admin Dashboard Upgrade** — KPI cards (revenue, past due, new this month), notification panel, activity feed, client status pie chart, payment calendar.
+- [ ] **Phase 14: Code Splitting** — React.lazy() for portal pages, Vite manual chunks config. Fix 686KB warning.
+- [ ] **Production Clover Credentials**: Switch from sandbox to production Clover keys when ready for live payments.
 - [ ] **Clover Webhooks**: Set up webhooks for payment status updates (failed recurring, refunds).
-- [ ] **Client-Facing Login**: Deferred — most clients never log in. Admin-only portal for now.
+- [ ] **GHL Workflow Creation (Manual)**: Create actual automation workflows in GHL dashboard based on trigger documentation from Phase 9.
 
 ---
 
@@ -216,11 +229,17 @@ Home Ready Scores/
 7. **Portal Auth**: Custom auth (not Supabase Auth) using `team_users` table with bcrypt. Session stored in localStorage.
 8. **Clover PCI Compliance**: Card data never touches our server. Clover's iframe handles tokenization directly. Only the token is sent to our API.
 9. **Payment Flow**: Frontend tokenizes → `process-payment` API creates Clover customer → charges setup fee → creates plan → creates subscription → updates Supabase.
-10. **Dark Portal Theme**: Portal uses dark glassmorphism aesthetic to differentiate from the public-facing light marketing site.
-11. **Admin-Only Portal**: Client-facing login deferred — most clients never log in. Focus on admin efficiency.
+10. **Dark Portal Theme**: Admin portal uses dark glassmorphism aesthetic. Client portal uses light blue/white theme matching the public site.
+11. **Client Portal IS Happening**: Client-facing login is now part of the plan (reversed from Session 5 decision). Clients get auto-generated accounts with default password `HomeReady2026!`.
 12. **Templates over AI**: Dispute letters use pre-built FCRA Section 611 templates instead of AI API — more reliable, free, and legally sound.
 13. **Enrollment-to-Portal Bridge**: Website enrollments auto-create a Supabase client + intake form, not just a GHL contact.
 14. **Documentation System**: README, PROJECT_MEMORY, and Employee SOP are maintained as living docs. End-of-conversation workflow generates handoff prompts.
+15. **No Stripe**: Company cannot use Stripe. Clover is the only payment processor. Non-negotiable.
+16. **Automation-First**: The company should run itself. All notifications, emails, status updates, and client onboarding are automated. No manual email sending or password delivery.
+17. **GHL for Email Automation**: Instead of building a custom email system, portal triggers GHL workflows via tags and custom field updates. GHL handles all email sends (welcome, payment receipt, payment failed, dispute updates, cancellation).
+18. **Industry Standard Feature Parity**: Features match Credit Repair Cloud, DisputeBee, and DisputeFox standards. No reinventing the wheel.
+19. **GHL Field Sync**: 28 GHL custom fields mapped with exact IDs. Portal auto-syncs to GHL on every client profile change. Includes deletion percentages per bureau, payment info, enrollment dates, status.
+20. **Client Portal Scope**: Clients see: progress tracker, bureau dispute cards, documents (upload + view), disputes (read-only), messages (send + receive), billing (read-only), settings (change password). Clients CANNOT create disputes, change payment methods, or access admin features.
 
 ---
 
@@ -252,7 +271,8 @@ Home Ready Scores/
 | **Clover Merchant ID** | `3G36H3NENST21` |
 | **Clover App ID** | `S3J1DCCJ91V1T` |
 | **Clover Sandbox** | `sandbox.dev.clover.com` |
-| **Portal Login** | `admin@homereadyscores.com` / `admin123` |
+| **Admin Portal Login** | `admin@homereadyscores.com` / `admin123` |
+| **Client Default Password** | `HomeReady2026!` (auto-created on enrollment) |
 | **Support Email** | `help@homereadyscores.com` |
 | **Domain Registrar** | Vercel |
 | **Email Provider** | Google Workspace |

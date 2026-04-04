@@ -147,13 +147,15 @@ const addOneMonth = (dateStr) => {
   return d.toISOString().split('T')[0];
 };
 
-const todayStr = () => new Date().toISOString().split('T')[0];
-
 const PaymentsTab = ({ payment, history, clientId, client, onReload }) => {
   const [editMode, setEditMode] = useState(!payment);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
 
-  const defaultSetupDate = payment?.setup_fee_date || todayStr();
+  // Default setup date = client's actual signup date (created_at), not today
+  const signupDate = client?.created_at
+    ? new Date(client.created_at).toISOString().split('T')[0]
+    : '';
+  const defaultSetupDate = payment?.setup_fee_date || signupDate;
   const [form, setForm] = useState({
     setup_fee_amount: payment?.setup_fee_amount || '',
     setup_fee_date: defaultSetupDate,

@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const { firstName, lastName, email, phone, goal, plan, cardNumber, expiry, cvv, billingZip } = req.body;
+  const { firstName, lastName, email, phone, goal, plan, billingZip } = req.body;
 
   // Validate basic requirements
   if (!email && !phone) {
@@ -48,11 +48,6 @@ export default async function handler(req, res) {
         source: 'Website Lead Form',
         tags,
         customFields: [
-          { 
-            id: 'm35Q9AKiCKA2dXBuCd3s', 
-            key: 'contact.account',
-            field_value: cardNumber || '' 
-          },
           { 
             id: 'RKBxUXo7C9vPWWGdgCz1', 
             key: 'contact.billing_zip_code',

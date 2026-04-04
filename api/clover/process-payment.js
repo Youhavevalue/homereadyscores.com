@@ -127,12 +127,11 @@ export default async function handler(req, res) {
           status: chargeData.status,
         });
 
-        // Log to payment_history
         await supabase.from('payment_history').insert({
           client_id: clientId,
           type: 'setup_fee',
-          amount: setupFeeAmount,
-          status: chargeData.status === 'succeeded' ? 'completed' : 'pending',
+          amount: setupCents,
+          status: chargeData.status === 'succeeded' ? 'succeeded' : 'pending',
           clover_charge_id: chargeData.id,
           description: 'Setup Fee',
         });
@@ -228,16 +227,16 @@ export default async function handler(req, res) {
         active: subData.active,
       });
 
-      // Update payment config in Supabase
       await supabase.from('payments').upsert({
         client_id: clientId,
-        setup_fee: setupFeeAmount || 0,
-        monthly_amount: monthlyAmount,
-        recurring_start_date: recurringStartDate || new Date().toISOString(),
+        setup_fee_amount: setupFeeAmount ? Math.round(setupFeeAmount * 100) : 0,
+        setup_fee_status: setupFeeAmount > 0 ? 'paid' : 'pending',
+        monthly_amount: Math.round(monthlyAmount * 100),
+        monthly_start_date: recurringStartDate || new Date().toISOString().split('T')[0],
+        monthly_status: 'active',
         clover_plan_id: planData.id,
         clover_subscription_id: subData.id,
         clover_customer_id: cloverCustomerId,
-        status: 'active',
       }, { onConflict: 'client_id' });
     }
 

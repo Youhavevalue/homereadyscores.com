@@ -11,33 +11,19 @@ const GetStarted = () => {
     phone: '',
     goal: '',
     plan: '',
-    cardNumber: '',
-    expiry: '',
-    cvv: '',
     billingZip: '',
     creditReportAgreement: false
   });
 
   const steps = [
     { title: 'Information', label: 'Personal Details' },
-    { title: 'Analysis', label: 'Credit Type' },
-    { title: 'Payment', label: 'Secure Checkout' },
+    { title: 'Analysis', label: 'Credit Goal' },
+    { title: 'Enrollment', label: 'Select Plan' },
     { title: 'Finish', label: 'Confirm' }
   ];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    // Basic formatting for credit card
-    if (name === 'cardNumber') {
-      const v = value.replace(/\s?/g, '').replace(/(\d{4})/g, '$1 ').trim();
-      setFormData(prev => ({ ...prev, [name]: v.substring(0, 19) }));
-      return;
-    }
-    if (name === 'expiry') {
-      const v = value.replace(/\//g, '').replace(/(\d{2})/, '$1/').trim();
-      setFormData(prev => ({ ...prev, [name]: v.substring(0, 5) }));
-      return;
-    }
     if (name === 'phone') {
       let v = value.replace(/\D/g, '');
       if (v.length > 10) v = v.substring(0, 10);
@@ -48,6 +34,11 @@ const GetStarted = () => {
         formatted = `(${v.substring(0,3)}) ${v.substring(3)}`;
       }
       setFormData(prev => ({ ...prev, [name]: formatted }));
+      return;
+    }
+    if (name === 'billingZip') {
+      const v = value.replace(/\D/g, '').substring(0, 5);
+      setFormData(prev => ({ ...prev, [name]: v }));
       return;
     }
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -218,7 +209,7 @@ const GetStarted = () => {
                     <div className="bg-primary/5 p-4 rounded-2xl flex items-start gap-3 mb-6">
                       <Shield className="text-primary shrink-0 mt-1" size={18} />
                       <p className="text-xs font-bold text-navy/70 leading-relaxed">
-                        Secure checkout powered by bank-grade encryption. We will generate your custom roadmap as soon as payment is confirmed.
+                        Select your plan below. After enrollment, our team will securely set up your billing through our PCI-compliant payment system.
                       </p>
                     </div>
 
@@ -226,8 +217,8 @@ const GetStarted = () => {
                       <label className="text-[10px] font-black uppercase tracking-widest text-navy">Select Enrollment Plan</label>
                       <div className="grid gap-3">
                         {[
-                          { id: 'single', title: 'Single Enrollment', price: '$184.99', desc: 'due today, then $114.00/month', ghlValue: 'Single' },
-                          { id: 'couple', title: 'Couple Enrollment', price: '$304.99', desc: 'due today, then $190.00/month', ghlValue: 'Joint' }
+                          { id: 'single', title: 'Single Enrollment', price: '$184.99', desc: 'due today, then $114.00/month' },
+                          { id: 'couple', title: 'Couple Enrollment', price: '$304.99', desc: 'due today, then $190.00/month' }
                         ].map(plan => (
                           <button 
                             key={plan.id}
@@ -248,7 +239,20 @@ const GetStarted = () => {
                       </div>
                     </div>
 
-                    <div className="border border-gray-100 rounded-2xl overflow-hidden mb-8 shadow-sm">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-navy">Billing Zip Code</label>
+                      <input 
+                        type="text" 
+                        name="billingZip"
+                        value={formData.billingZip}
+                        onChange={handleInputChange}
+                        required
+                        placeholder="90210" 
+                        className="input-field" 
+                      />
+                    </div>
+
+                    <div className="border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
                       <div className="bg-navy text-white px-6 py-4">
                         <h4 className="font-bold text-lg tracking-wide">Getting Your Credit Reports</h4>
                       </div>
@@ -274,58 +278,6 @@ const GetStarted = () => {
                         </div>
                       </div>
                     </div>
-
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-navy">Card Number</label>
-                      <input 
-                        type="text" 
-                        name="cardNumber"
-                        value={formData.cardNumber}
-                        onChange={handleInputChange}
-                        required
-                        placeholder="0000 0000 0000 0000" 
-                        className="input-field" 
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="col-span-1 space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-navy">Expiry</label>
-                        <input 
-                          type="text" 
-                          name="expiry"
-                          value={formData.expiry}
-                          onChange={handleInputChange}
-                          required
-                          placeholder="MM/YY" 
-                          className="input-field" 
-                        />
-                      </div>
-                      <div className="col-span-1 space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-navy">CVV</label>
-                        <input 
-                          type="text" 
-                          name="cvv"
-                          value={formData.cvv}
-                          onChange={handleInputChange}
-                          required
-                          placeholder="123" 
-                          className="input-field" 
-                        />
-                      </div>
-                      <div className="col-span-1 space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-navy">Billing Zip</label>
-                        <input 
-                          type="text" 
-                          name="billingZip"
-                          value={formData.billingZip}
-                          onChange={handleInputChange}
-                          required
-                          placeholder="90210" 
-                          className="input-field" 
-                        />
-                      </div>
-                    </div>
                   </div>
                 )}
 
@@ -334,10 +286,11 @@ const GetStarted = () => {
                       <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
                          <CheckCircle size={48} />
                       </div>
-                      <h3 className="text-3xl font-black mb-6">Success!</h3>
-                      <p className="text-gray-500 mb-8 max-w-xs mx-auto text-lg">Your custom roadmap is being prepared. Our team will reach out shortly.</p>
+                      <h3 className="text-3xl font-black mb-6">You're Enrolled!</h3>
+                      <p className="text-gray-500 mb-4 max-w-sm mx-auto text-lg">Your custom credit roadmap is being prepared. Our team will reach out within 24 hours to complete your setup.</p>
+                      <p className="text-gray-400 mb-8 max-w-sm mx-auto text-sm">Check your email and phone for next steps.</p>
                       <div className="flex items-center gap-2 justify-center text-xs text-gray-400 font-bold uppercase tracking-widest">
-                        <Shield size={14} className="text-primary" /> Encrypted & Secure
+                        <Shield size={14} className="text-primary" /> Your information is secure
                       </div>
                    </div>
                 )}

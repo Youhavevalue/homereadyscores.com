@@ -1,142 +1,153 @@
 # Home Ready Scores
 
-> Credit Repair Website + Admin Portal + Client Portal
+> Credit repair marketing site, team portal (client CRM), and serverless integrations.
 
-**Live Site**: [homereadyscores.com](https://homereadyscores.com)
+**Production**: [homereadyscores.com](https://homereadyscores.com)
 
 ---
 
-## Tech Stack
+## Tech stack
 
 | Layer | Technology |
-|---|---|
+|--------|------------|
 | Frontend | React 19, Vite 5, Tailwind CSS 4 |
-| Backend | Vercel Serverless Functions (Node.js) |
-| Database | Supabase (PostgreSQL) |
-| Payments | Clover (Sandbox — PCI-compliant iframe tokenization) |
-| CRM | GoHighLevel (REST API + MCP) |
-| Hosting | Vercel (auto-deploys from `main`) |
-| Email | Google Workspace (`help@homereadyscores.com`) |
+| API | Vercel Serverless Functions (`/api/*`) |
+| Database & auth data | Supabase (PostgreSQL) |
+| Payments | Clover (tokenized checkout) |
+| CRM | GoHighLevel |
+| Hosting | Vercel (deploy from `main`) |
 
 ---
 
-## Project Structure
+## Repository layout
 
 ```
-├── api/                          # Vercel Serverless Functions
-│   ├── contact.js                # Enrollment form → GHL + Supabase
-│   ├── auth/                     # Portal login (bcrypt)
-│   ├── clients/
-│   │   ├── push-to-ghl.js       # Push portal clients to GHL
-│   │   └── sync-ghl.js          # GHL ↔ Supabase sync
-│   ├── clover/                   # 6 payment endpoints
-│   └── documents/
-│       ├── upload-url.js         # Signed upload URLs
-│       └── delete-document.js    # Storage + DB cleanup
+├── api/                    # Vercel serverless handlers
+│   ├── contact.js          # Get Started → GHL + Supabase
+│   ├── auth/               # Portal login (bcrypt, service role)
+│   ├── clients/            # GHL sync / push
+│   ├── clover/             # Payments
+│   └── documents/          # Upload URLs, deletes
 ├── src/
-│   ├── components/               # Navbar, Footer, CloverPaymentForm, DisputeLetterModal
-│   ├── context/AuthContext.jsx   # Custom auth (bcrypt + localStorage)
-│   ├── lib/supabase.js           # Supabase client
-│   └── pages/
-│       ├── Home, HowItWorks, Reviews, GetStarted, FAQ
-│       ├── legal/                # PrivacyPolicy, TermsOfService, FCRARights, CROADisclosure
-│       └── portal/              # PortalLogin, Dashboard, ClientDirectory, ClientProfile, AddClient
-├── sql/                          # Database migrations
-├── docs/
-│   └── EMPLOYEE_SOP.md           # Employee training & standard procedures
-└── PROJECT_MEMORY.md             # All decisions, context, and session history
+│   ├── context/AuthContext.jsx   # Portal session (API login + Supabase fallback)
+│   ├── lib/supabase.js           # Browser Supabase client
+│   └── pages/portal/             # Team portal UI
+├── sql/                    # Schema / RLS reference migrations
+├── .env.example            # Required env var names (no secrets)
+└── vercel.json             # SPA rewrites + API routes
 ```
 
 ---
 
-## Quick Start
+## Quick start
 
 ```bash
-# Install dependencies
 npm install
+cp .env.example .env.local
+# Edit .env.local: Supabase URL + anon key (and server keys if you run APIs locally)
+```
 
-# Run locally
+### Option A — Frontend only (no `/api`)
+
+```bash
 npm run dev
+```
 
-# Build for production
-npm run build
+Opens Vite at `http://localhost:5173`. Calls to `/api/*` will **not** hit Vercel unless you add a proxy (Option B).
+
+### Option B — **Recommended** for full-stack local UI
+
+Point Vite at your **deployed** Vercel API so `/api/*` works while you edit React:
+
+1. In `.env.local` set:
+
+   `VITE_API_PROXY=https://homereadyscores.com`
+
+   (Use your real Vercel production or preview URL.)
+
+2. Run:
+
+   ```bash
+   npm run dev
+   ```
+
+Vite proxies `http://localhost:5173/api/...` → your Vercel deployment. **You are still using production APIs** — use for smoke tests, not load tests or destructive actions.
+
+### Option C — Vercel dev (API runs on your machine)
+
+Requires [Vercel CLI](https://vercel.com/docs/cli) and linked project:
+
+```bash
+npm run dev:vercel
+```
+
+Uses the same env as Vercel (pull with `vercel env pull` if needed).
+
+### Build
+
+```bash
+npm run build    # production bundle → dist/
+npm run preview  # serve dist locally
 ```
 
 ---
 
-## Portal Access
+## Team portal (admin)
 
-### Admin Portal
-- **URL**: `homereadyscores.com/portal/login`
-- **Admin**: `admin@homereadyscores.com` / `admin123`
+- **Production URL**: [homereadyscores.com/portal/login](https://homereadyscores.com/portal/login)
+- **Routes**: `/portal/login` → dashboard (`/portal`), client directory (`/portal/clients`), client profiles.
+- **Auth**: `POST /api/auth/login` validates against `team_members` (bcrypt). Local `vite` without `VITE_API_PROXY` falls back to direct Supabase for login.
 
-### Client Portal (Coming — Session 9)
-- **URL**: `homereadyscores.com/client/login`
-- **Default Password**: `HomeReady2026!` (auto-created on enrollment)
+**Team login (keep this repo private):**
 
----
-
-## Data Flow
-
-```
-Website Enrollment (GetStarted) → api/contact.js
-  ├── 1. Upserts contact in GoHighLevel CRM
-  ├── 2. Creates client in Supabase (clients table)
-  └── 3. Creates intake form with goals + plan info
-
-Portal Add Client → Supabase insert + api/clients/push-to-ghl.js
-  ├── 1. Creates client in Supabase
-  └── 2. Pushes to GoHighLevel CRM
-```
+| Role | Email | Password |
+|------|--------|----------|
+| Admin | `admin@homereadyscores.com` | `admin123` |
 
 ---
 
-## Database Tables (Supabase)
+## Environment variables
 
-| Table | Purpose |
-|---|---|
-| `team_users` | Admin login credentials (bcrypt) |
-| `clients` | Client directory |
-| `client_users` | Client login credentials (planned) |
-| `payments` | Payment config per client |
-| `payment_history` | Transaction log |
-| `intake_forms` | Client intake data |
-| `documents` | File uploads (Supabase Storage) |
-| `dispute_letters` | Dispute tracking + FCRA letter templates |
-| `messages` | Client ↔ Admin messaging (planned) |
-| `notifications` | Admin notification system (planned) |
-| `activity_log` | Audit trail for all actions (planned) |
-| `scheduled_charges` | Future-dated charges |
+| Variable | Where | Purpose |
+|----------|--------|---------|
+| `VITE_SUPABASE_URL` | Vercel + `.env.local` | Supabase project URL |
+| `VITE_SUPABASE_ANON_KEY` | Vercel + `.env.local` | Browser client |
+| `SUPABASE_SERVICE_ROLE_KEY` | Vercel only (server) | API routes bypass RLS |
+| `GHL_API_KEY`, `GHL_LOCATION_ID` | Vercel | GoHighLevel |
+| `CLOVER_*` | Vercel | Clover billing |
+| `VITE_API_PROXY` | **Local only** | Optional Vite proxy target for `/api` (see Option B) |
+
+Set production values in **Vercel → Project → Settings → Environment Variables**.
 
 ---
 
-## Environment Variables
+## Data flow (high level)
 
-Set in Vercel Dashboard → Settings → Environment Variables:
-
-| Variable | Purpose |
-|---|---|
-| `GHL_API_KEY` | GoHighLevel API access |
-| `GHL_LOCATION_ID` | GHL sub-account ID |
-| `VITE_SUPABASE_URL` | Supabase project URL |
-| `VITE_SUPABASE_ANON_KEY` | Supabase public key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase admin key (server-side only) |
-| `CLOVER_MERCHANT_ID` | Clover merchant |
-| `CLOVER_API_ACCESS_KEY` | Clover API key |
-| `CLOVER_ACCESS_TOKEN` | Clover auth token |
-| `CLOVER_APP_SECRET` | Clover app secret |
+1. **Get Started** (`/get-started`) → `POST /api/contact` → GHL + `clients` / `intake_forms` in Supabase.
+2. **Portal** → `POST /api/auth/login` → validates `team_members`.
+3. **Clients in portal** → Supabase from the browser (with RLS as configured) + server routes for GHL/Clover as needed.
 
 ---
 
-## Key Documentation
+## Database (Supabase)
 
-| Document | Path | Purpose |
-|---|---|---|
-| Project Memory | `PROJECT_MEMORY.md` | All decisions, sessions, and architecture context |
-| Employee SOP | `docs/EMPLOYEE_SOP.md` | Step-by-step training for portal operations |
-| Implementation Plan | Session 8 artifact | 15-phase build plan for client portal + automation |
-| SQL Migrations | `sql/` | Database schema changes |
+See `sql/` for base tables and RLS. Typical tables include `team_members`, `clients`, `payments`, `intake_forms`, `documents`, etc.
 
 ---
 
-*Maintained by the Home Ready Scores team.*
+## Lint & CI notes
+
+`npm run lint` may report issues in `api/` (`process` in Node globals) and some React hook rules — align `eslint.config` with Node + React 19 as you tighten CI.
+
+---
+
+## Docs elsewhere
+
+| Doc | Purpose |
+|-----|---------|
+| `docs/EMPLOYEE_SOP.md` | Internal procedures |
+| `PROJECT_MEMORY.md` | Project history / decisions (if present) |
+
+---
+
+*Home Ready Scores engineering*

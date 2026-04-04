@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { supabase } from '../../lib/supabase';
+import { supabase, portalFetch } from '../../lib/supabase';
 
 const ClientDirectory = () => {
   const { user, logout } = useAuth();
@@ -30,7 +30,7 @@ const ClientDirectory = () => {
   const syncFromGHL = async () => {
     setSyncing(true);
     try {
-      const res = await fetch('/api/clients/sync-ghl', { method: 'POST' });
+      const res = await portalFetch('/api/clients/sync-ghl', { method: 'POST' });
       const data = await res.json();
       if (res.ok) {
         await loadClients();

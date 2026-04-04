@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { supabase } from '../../lib/supabase';
+import { supabase, portalFetch } from '../../lib/supabase';
 
 const AddClient = () => {
   const navigate = useNavigate();
@@ -31,9 +31,8 @@ const AddClient = () => {
 
     // Push to GoHighLevel CRM in the background
     try {
-      await fetch('/api/clients/push-to-ghl', {
+      await portalFetch('/api/clients/push-to-ghl', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ clientId: data.id }),
       });
     } catch (err) {

@@ -14,57 +14,70 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Fetch contacts from GoHighLevel
-    const ghlRes = await fetch(
-      `https://services.leadconnectorhq.com/contacts/?locationId=${GHL_LOCATION_ID}&limit=100`,
-      {
+    let synced = 0;
+    let skipped = 0;
+    let totalFetched = 0;
+    let nextPageUrl = `https://services.leadconnectorhq.com/contacts/?locationId=${GHL_LOCATION_ID}&limit=100`;
+
+    while (nextPageUrl) {
+      const ghlRes = await fetch(nextPageUrl, {
         headers: {
           'Authorization': `Bearer ${GHL_API_KEY}`,
           'Version': '2021-07-28',
           'Accept': 'application/json',
         },
+      });
+
+      if (!ghlRes.ok) {
+        const errText = await ghlRes.text();
+        console.error('GHL API error:', errText);
+        if (totalFetched === 0) {
+          return res.status(500).json({ error: 'Failed to fetch from GoHighLevel', details: errText });
+        }
+        break;
       }
-    );
 
-    if (!ghlRes.ok) {
-      const errText = await ghlRes.text();
-      console.error('GHL API error:', errText);
-      return res.status(500).json({ error: 'Failed to fetch from GoHighLevel', details: errText });
-    }
+      const ghlData = await ghlRes.json();
+      const contacts = ghlData.contacts || [];
+      totalFetched += contacts.length;
 
-    const ghlData = await ghlRes.json();
-    const contacts = ghlData.contacts || [];
+      for (const contact of contacts) {
+        const clientData = {
+          ghl_contact_id: contact.id,
+          first_name: contact.firstName || contact.name?.split(' ')[0] || 'Unknown',
+          last_name: contact.lastName || contact.name?.split(' ').slice(1).join(' ') || '',
+          email: contact.email || null,
+          phone: contact.phone || null,
+          address: contact.address1 || null,
+          city: contact.city || null,
+          state: contact.state || null,
+          zip: contact.postalCode || null,
+          status: 'active',
+          updated_at: new Date().toISOString(),
+        };
 
-    let synced = 0;
-    let skipped = 0;
+        const { error } = await supabase
+          .from('clients')
+          .upsert(clientData, {
+            onConflict: 'ghl_contact_id',
+            ignoreDuplicates: false,
+          });
 
-    for (const contact of contacts) {
-      const clientData = {
-        ghl_contact_id: contact.id,
-        first_name: contact.firstName || contact.name?.split(' ')[0] || 'Unknown',
-        last_name: contact.lastName || contact.name?.split(' ').slice(1).join(' ') || '',
-        email: contact.email || null,
-        phone: contact.phone || null,
-        address: contact.address1 || null,
-        city: contact.city || null,
-        state: contact.state || null,
-        zip: contact.postalCode || null,
-        status: 'active',
-        updated_at: new Date().toISOString(),
-      };
+        if (error) {
+          console.error('Upsert error for', contact.id, error);
+          skipped++;
+        } else {
+          synced++;
+        }
+      }
 
-      const { error } = await supabase
-        .from('clients')
-        .upsert(clientData, {
-          onConflict: 'ghl_contact_id',
-          ignoreDuplicates: false,
-        });
-
-      if (error) {
-        console.error('Upsert error for', contact.id, error);
-        skipped++;
+      const nextPage = ghlData.meta?.nextPageUrl || ghlData.meta?.nextPage;
+      if (nextPage && contacts.length === 100) {
+        nextPageUrl = nextPage.startsWith('http')
+          ? nextPage
+          : `https://services.leadconnectorhq.com/contacts/?locationId=${GHL_LOCATION_ID}&limit=100&startAfterId=${contacts[contacts.length - 1].id}`;
       } else {
-        synced++;
+        nextPageUrl = null;
       }
     }
 
@@ -72,7 +85,7 @@ export default async function handler(req, res) {
       success: true,
       synced,
       skipped,
-      total: contacts.length,
+      total: totalFetched,
     });
   } catch (err) {
     console.error('Sync error:', err);

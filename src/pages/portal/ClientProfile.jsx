@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { supabase } from '../../lib/supabase';
+import { supabase, portalFetch } from '../../lib/supabase';
 import CloverPaymentForm from '../../components/CloverPaymentForm';
 import DisputeLetterModal from '../../components/DisputeLetterModal';
 
@@ -140,14 +140,25 @@ const ClientProfile = () => {
 };
 
 /* ─── Payments Tab ─── */
+const addOneMonth = (dateStr) => {
+  if (!dateStr) return '';
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setMonth(d.getMonth() + 1);
+  return d.toISOString().split('T')[0];
+};
+
+const todayStr = () => new Date().toISOString().split('T')[0];
+
 const PaymentsTab = ({ payment, history, clientId, client, onReload }) => {
   const [editMode, setEditMode] = useState(!payment);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
+
+  const defaultSetupDate = payment?.setup_fee_date || todayStr();
   const [form, setForm] = useState({
     setup_fee_amount: payment?.setup_fee_amount || '',
-    setup_fee_date: payment?.setup_fee_date || '',
+    setup_fee_date: defaultSetupDate,
     monthly_amount: payment?.monthly_amount || '',
-    monthly_start_date: payment?.monthly_start_date || '',
+    monthly_start_date: payment?.monthly_start_date || addOneMonth(defaultSetupDate),
   });
   const [saving, setSaving] = useState(false);
 
@@ -211,7 +222,15 @@ const PaymentsTab = ({ payment, history, clientId, client, onReload }) => {
             </div>
             <div style={s.formGroup}>
               <label style={s.formLabel}>Setup Fee Date</label>
-              <input style={s.formInput} type="date" value={form.setup_fee_date} onChange={(e) => setForm({ ...form, setup_fee_date: e.target.value })} />
+              <input
+                style={s.formInput}
+                type="date"
+                value={form.setup_fee_date}
+                onChange={(e) => {
+                  const newSetupDate = e.target.value;
+                  setForm({ ...form, setup_fee_date: newSetupDate, monthly_start_date: addOneMonth(newSetupDate) });
+                }}
+              />
               <small style={s.formHint}>Leave empty or pick today for immediate charge</small>
             </div>
             <div style={s.formGroup}>
@@ -220,7 +239,13 @@ const PaymentsTab = ({ payment, history, clientId, client, onReload }) => {
             </div>
             <div style={s.formGroup}>
               <label style={s.formLabel}>Monthly Start Date</label>
-              <input style={s.formInput} type="date" value={form.monthly_start_date} onChange={(e) => setForm({ ...form, monthly_start_date: e.target.value })} />
+              <input
+                style={{ ...s.formInput, opacity: 0.7, cursor: 'not-allowed' }}
+                type="date"
+                value={form.monthly_start_date}
+                readOnly
+              />
+              <small style={s.formHint}>Auto-set to 1 month after setup date</small>
             </div>
             <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
               {payment && <button style={s.cancelBtn} onClick={() => setEditMode(false)}>Cancel</button>}
@@ -465,9 +490,8 @@ const DocumentUploadTab = ({ documents, clientId, docType, title, icon, onReload
     setUploading(true);
     try {
       // 1. Get signed upload URL from server
-      const urlRes = await fetch('/api/documents/upload-url', {
+      const urlRes = await portalFetch('/api/documents/upload-url', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ clientId, fileName: file.name, fileType: file.type, docType: selectedType }),
       });
 
@@ -553,9 +577,8 @@ const DocumentUploadTab = ({ documents, clientId, docType, title, icon, onReload
     if (!confirm('Delete this document?')) return;
     setDeleting(docId);
     try {
-      const res = await fetch('/api/documents/delete-document', {
+      const res = await portalFetch('/api/documents/delete-document', {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ documentId: docId }),
       });
       const contentType = res.headers.get('content-type');

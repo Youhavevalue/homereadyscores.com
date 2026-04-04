@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { portalFetch } from '../lib/supabase';
 
 /**
  * CloverPaymentForm — Embeds the Clover iframe for secure card tokenization
@@ -29,19 +30,20 @@ const CloverPaymentForm = ({ client, onPaymentSuccess, onClose }) => {
           const data = await res.json();
           setCloverConfig(data);
         } else {
-          // Fallback for local dev — use env vars directly
-          setCloverConfig({
-            apiAccessKey: import.meta.env.VITE_CLOVER_API_ACCESS_KEY || 'S3J1DCCJ91V1T',
-            merchantId: import.meta.env.VITE_CLOVER_MERCHANT_ID || '3G36H3NENST21',
-            sdkUrl: 'https://checkout.sandbox.dev.clover.com/sdk.js',
-          });
+          const envKey = import.meta.env.VITE_CLOVER_API_ACCESS_KEY;
+          const envMerchant = import.meta.env.VITE_CLOVER_MERCHANT_ID;
+          if (envKey && envMerchant) {
+            setCloverConfig({
+              apiAccessKey: envKey,
+              merchantId: envMerchant,
+              sdkUrl: 'https://checkout.sandbox.dev.clover.com/sdk.js',
+            });
+          } else {
+            setError('Payment configuration unavailable. Please contact support.');
+          }
         }
       } catch {
-        setCloverConfig({
-          apiAccessKey: 'S3J1DCCJ91V1T',
-          merchantId: '3G36H3NENST21',
-          sdkUrl: 'https://checkout.sandbox.dev.clover.com/sdk.js',
-        });
+        setError('Unable to load payment form. Please check your connection and try again.');
       }
     }
     fetchConfig();
@@ -132,9 +134,8 @@ const CloverPaymentForm = ({ client, onPaymentSuccess, onClose }) => {
       }
 
       // Step 2: Send to our process-payment API
-      const paymentRes = await fetch('/api/clover/process-payment', {
+      const paymentRes = await portalFetch('/api/clover/process-payment', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           clientId: client.id,
           email: client.email,

@@ -1,10 +1,14 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { supabase, portalFetch } from '../../lib/supabase';
+import { usePortalBase } from '../../hooks/usePortalBase';
 
 const AddClient = () => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const base = usePortalBase();
+  const isAdmin = pathname.startsWith('/admin');
   const { user, logout } = useAuth();
   const [form, setForm] = useState({
     first_name: '', last_name: '', email: '', phone: '',
@@ -39,7 +43,7 @@ const AddClient = () => {
       console.warn('GHL sync skipped:', err.message);
     }
 
-    navigate(`/portal/clients/${data.id}`);
+    navigate(`${base}/clients/${data.id}`);
   };
 
   const fields = [
@@ -62,24 +66,26 @@ const AddClient = () => {
   ];
 
   return (
-    <div style={s.page}>
-      <header style={s.header}>
-        <div style={s.headerLeft}>
-          <div style={s.logoMark}>HRS</div>
-          <span style={s.headerTitle}>Client Portal</span>
-        </div>
-        <nav style={s.nav}>
-          <button style={s.navBtn} onClick={() => navigate('/portal')}>Dashboard</button>
-          <button style={s.navBtn} onClick={() => navigate('/portal/clients')}>Clients</button>
-        </nav>
-        <div style={s.headerRight}>
-          <span style={s.userName}>{user?.name || user?.email}</span>
-          <button style={s.logoutBtn} onClick={() => { logout(); navigate('/portal/login'); }}>Sign Out</button>
-        </div>
-      </header>
+    <div style={isAdmin ? { ...s.page, minHeight: 'auto', background: 'transparent' } : s.page}>
+      {!isAdmin && (
+        <header style={s.header}>
+          <div style={s.headerLeft}>
+            <div style={s.logoMark}>HRS</div>
+            <span style={s.headerTitle}>Client Portal</span>
+          </div>
+          <nav style={s.nav}>
+            <button style={s.navBtn} onClick={() => navigate(`${base}`)}>Dashboard</button>
+            <button style={s.navBtn} onClick={() => navigate(`${base}/clients`)}>Clients</button>
+          </nav>
+          <div style={s.headerRight}>
+            <span style={s.userName}>{user?.name || user?.email}</span>
+            <button style={s.logoutBtn} onClick={() => { logout(); navigate('/portal/login'); }}>Sign Out</button>
+          </div>
+        </header>
+      )}
 
-      <main style={s.main}>
-        <button style={s.backLink} onClick={() => navigate('/portal/clients')}>← Back to Directory</button>
+      <main style={isAdmin ? { ...s.main, maxWidth: '720px', margin: 0, padding: 0 } : s.main}>
+        <button style={s.backLink} onClick={() => navigate(`${base}/clients`)}>← Back to Directory</button>
         <h1 style={s.pageTitle}>Add New Client</h1>
 
         <form onSubmit={handleSubmit} style={s.card}>
@@ -114,7 +120,7 @@ const AddClient = () => {
           </div>
 
           <div style={s.formActions}>
-            <button type="button" style={s.cancelBtn} onClick={() => navigate('/portal/clients')}>Cancel</button>
+            <button type="button" style={s.cancelBtn} onClick={() => navigate(`${base}/clients`)}>Cancel</button>
             <button type="submit" style={s.saveBtn} disabled={saving}>
               {saving ? 'Saving...' : 'Add Client'}
             </button>

@@ -17,7 +17,7 @@ const PortalLogin = () => {
     const result = await login(email, password);
     setLoading(false);
     if (result.success) {
-      navigate('/portal');
+      navigate('/admin');
     } else {
       setError(result.error);
     }

@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, portalFetch } from '../../lib/supabase';
+import { useAdminToast } from '../context/AdminToastContext';
 import AdminSimplePage from './AdminSimplePage';
 import { AdminCard } from '../components/AdminCard';
 
 export default function AdminJointClient() {
   const navigate = useNavigate();
+  const { showToast } = useAdminToast();
   const [a, setA] = useState({ first_name: '', last_name: '', email: '' });
   const [b, setB] = useState({ first_name: '', last_name: '', email: '' });
   const [saving, setSaving] = useState(false);
@@ -23,7 +25,7 @@ export default function AdminJointClient() {
       .select()
       .single();
     if (e1) {
-      alert(e1.message);
+      showToast(e1.message, 'error');
       setSaving(false);
       return;
     }
@@ -37,7 +39,7 @@ export default function AdminJointClient() {
       .select()
       .single();
     if (e2) {
-      alert(e2.message);
+      showToast(e2.message, 'error');
       setSaving(false);
       return;
     }

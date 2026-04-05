@@ -1,47 +1,196 @@
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import AdminSimplePage, { AdminPlaceholderTable } from './AdminSimplePage';
 import { AdminCard } from '../components/AdminCard';
+import { useAdminToast } from '../context/AdminToastContext';
+import { fetchProspects, insertProspect } from '../lib/adminData';
 
 export function ProspectsPage() {
+  const [rows, setRows] = useState([]);
+  const [q, setQ] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      const data = await fetchProspects();
+      if (!cancelled) {
+        setRows(data);
+        setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const filtered = useMemo(() => {
+    const s = q.toLowerCase().trim();
+    if (!s) return rows;
+    return rows.filter(
+      (r) =>
+        `${r.first_name||''} ${r.last_name||''}`.toLowerCase().includes(s) ||
+        (r.email || '').toLowerCase().includes(s) ||
+        (r.phone || '').includes(s)
+    );
+  }, [rows, q]);
+
   return (
     <AdminSimplePage
       title="Prospects"
-      subtitle="Searchable list of leads before conversion to clients."
+      subtitle="Leads before conversion to clients."
       actions={
         <Link
           to="/admin/prospects/new"
-          className="rounded-xl bg-[#2562FF] px-4 py-2 text-sm font-semibold text-white"
+          className="rounded-xl bg-[#2562FF] px-4 py-2 text-sm font-semibold text-white shadow-sm"
         >
           Add prospect
         </Link>
       }
     >
-      <AdminPlaceholderTable columns={['Name', 'Email', 'Source', 'Actions']} />
+      <AdminCard title="Search">
+        <input
+          className="w-full max-w-md rounded-xl border border-slate-200 px-3 py-2 text-sm"
+          placeholder="Filter by name, email, phone…"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+        />
+      </AdminCard>
+      <AdminCard title="Prospects">
+        {loading ? (
+          <div className="h-24 animate-pulse rounded-xl bg-slate-100" />
+        ) : filtered.length === 0 ? (
+          <p className="text-sm text-slate-500">
+            No prospects yet. Run <code className="rounded bg-slate-100 px-1">sql/admin_operational_migration.sql</code> then
+            add prospects.
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-slate-100 text-xs uppercase text-slate-500">
+                  <th className="pb-2 pr-4">Name</th>
+                  <th className="pb-2 pr-4">Email</th>
+                  <th className="pb-2 pr-4">Phone</th>
+                  <th className="pb-2 pr-4">Source</th>
+                  <th className="pb-2">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((r) => (
+                  <tr key={r.id} className="border-b border-slate-50">
+                    <td className="py-2 pr-4 font-medium text-[#002D5B]">
+                      {r.first_name} {r.last_name}
+                    </td>
+                    <td className="py-2 pr-4 text-slate-600">{r.email || '—'}</td>
+                    <td className="py-2 pr-4">{r.phone || '—'}</td>
+                    <td className="py-2 pr-4">{r.source || '—'}</td>
+                    <td className="py-2 capitalize">{r.status || 'new'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </AdminCard>
     </AdminSimplePage>
   );
 }
 
 export function ProspectNewPage() {
+  const navigate = useNavigate();
+  const { showToast } = useAdminToast();
+  const [form, setForm] = useState({
+    first_name: '',
+    last_name: '',
+    email: '',
+    phone: '',
+    source: '',
+    notes: '',
+  });
+  const [saving, setSaving] = useState(false);
+
+  const handleChange = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+
+  const save = async (e) => {
+    e.preventDefault();
+    if (!form.first_name.trim()) {
+      showToast('First name is required.', 'error');
+      return;
+    }
+    setSaving(true);
+    try {
+      await insertProspect({
+        first_name: form.first_name.trim(),
+        last_name: form.last_name.trim() || null,
+        email: form.email.trim() || null,
+        phone: form.phone.trim() || null,
+        source: form.source.trim() || null,
+        notes: form.notes.trim() || null,
+        status: 'new',
+      });
+      showToast('Prospect saved.', 'success');
+      navigate('/admin/prospects');
+    } catch (err) {
+      showToast(err.message || 'Save failed — run admin migration SQL.', 'error');
+    }
+    setSaving(false);
+  };
+
   return (
-    <AdminSimplePage title="Add prospect" subtitle="Capture lead details and trigger prospect autoresponders.">
-      <AdminCard title="Prospect form">
-        <div className="grid gap-3 md:grid-cols-2">
-          {['First name', 'Last name', 'Email', 'Phone'].map((ph) => (
+    <AdminSimplePage title="Add prospect" subtitle="Capture lead details and trigger autoresponder sequences when wired.">
+      <form onSubmit={save}>
+        <AdminCard title="Prospect form">
+          <div className="grid gap-3 md:grid-cols-2">
             <input
-              key={ph}
+              required
               className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
-              placeholder={ph}
+              placeholder="First name *"
+              value={form.first_name}
+              onChange={handleChange('first_name')}
             />
-          ))}
-        </div>
-        <button
-          type="button"
-          className="mt-4 rounded-xl bg-[#002D5B] px-4 py-2 text-sm font-semibold text-white"
-          onClick={() => alert('Insert into prospects table')}
-        >
-          Save prospect
-        </button>
-      </AdminCard>
+            <input
+              className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              placeholder="Last name"
+              value={form.last_name}
+              onChange={handleChange('last_name')}
+            />
+            <input
+              className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              placeholder="Email"
+              type="email"
+              value={form.email}
+              onChange={handleChange('email')}
+            />
+            <input
+              className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              placeholder="Phone"
+              value={form.phone}
+              onChange={handleChange('phone')}
+            />
+            <input
+              className="md:col-span-2 rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              placeholder="Source (e.g. referral, web)"
+              value={form.source}
+              onChange={handleChange('source')}
+            />
+            <textarea
+              className="md:col-span-2 min-h-[80px] rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              placeholder="Notes"
+              value={form.notes}
+              onChange={handleChange('notes')}
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={saving}
+            className="mt-4 rounded-xl bg-[#002D5B] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+          >
+            {saving ? 'Saving…' : 'Save prospect'}
+          </button>
+        </AdminCard>
+      </form>
     </AdminSimplePage>
   );
 }

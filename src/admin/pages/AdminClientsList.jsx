@@ -1,13 +1,25 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, portalFetch } from '../../lib/supabase';
+import { useAdminToast } from '../context/AdminToastContext';
 import { AdminCard } from '../components/AdminCard';
 import { CLIENT_STATUS_FILTERS } from '../constants/hotLinks';
 
 const PAGE_SIZES = [10, 25, 50];
 
+function normKey(s) {
+  return (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+function dfrFor(client) {
+  if (!client?.results_expected_date) return '—';
+  const t = new Date(client.results_expected_date + 'T12:00:00').getTime();
+  return String(Math.max(0, Math.ceil((t - Date.now()) / 86400000)));
+}
+
 export default function AdminClientsList() {
   const navigate = useNavigate();
+  const { showToast } = useAdminToast();
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -40,12 +52,12 @@ export default function AdminClientsList() {
       const data = await res.json();
       if (res.ok) {
         await loadClients();
-        alert(`Synced ${data.synced || 0} clients from GoHighLevel.`);
+        showToast(`Synced ${data.synced || 0} clients from GoHighLevel.`, 'success');
       } else {
-        alert('Sync error: ' + (data.error || 'Unknown error'));
+        showToast(data.error || 'Sync error', 'error');
       }
     } catch (err) {
-      alert('Sync failed: ' + err.message);
+      showToast(err.message || 'Sync failed', 'error');
     }
     setSyncing(false);
   };
@@ -53,17 +65,24 @@ export default function AdminClientsList() {
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
     return clients.filter((c) => {
-      const matchQ =
-        !q ||
-        `${c.first_name} ${c.last_name}`.toLowerCase().includes(q) ||
-        (c.email || '').toLowerCase().includes(q) ||
-        (c.phone || '').includes(q);
-      const st = (c.status || 'active').toLowerCase();
+      const matchField = () => {
+        if (!q) return true;
+        if (recordSearch === 'name') {
+          return `${c.first_name || ''} ${c.last_name || ''}`.toLowerCase().includes(q);
+        }
+        if (recordSearch === 'email') return (c.email || '').toLowerCase().includes(q);
+        if (recordSearch === 'phone') return (c.phone || '').includes(q);
+        return (
+          `${c.first_name} ${c.last_name}`.toLowerCase().includes(q) ||
+          (c.email || '').toLowerCase().includes(q) ||
+          (c.phone || '').includes(q)
+        );
+      };
       const matchStatus =
-        statusFilter === 'all' || st === statusFilter.toLowerCase().replace(/\s/g, '');
-      return matchQ && matchStatus;
+        statusFilter === 'all' || normKey(c.status || 'active') === normKey(statusFilter);
+      return matchField() && matchStatus;
     });
-  }, [clients, search, statusFilter]);
+  }, [clients, search, statusFilter, recordSearch]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const pageSlice = useMemo(() => {
@@ -96,11 +115,51 @@ export default function AdminClientsList() {
     });
   };
 
-  const exportXlsx = () => {
-    alert(
-      'Export XLSX: wire to server or sheetjs — selected IDs: ' +
-        ([...selected].join(', ') || 'none')
+  const exportCsv = () => {
+    const source =
+      selected.size > 0 ? filtered.filter((c) => selected.has(c.id)) : filtered;
+    const headers = [
+      'First name',
+      'Last name',
+      'Email',
+      'Phone',
+      'Status',
+      'Created',
+      'Setup fee',
+      'Monthly',
+      'DFR days',
+    ];
+    const escape = (v) => {
+      const s = String(v ?? '');
+      if (s.includes(',') || s.includes('"')) return `"${s.replace(/"/g, '""')}"`;
+      return s;
+    };
+    const lines = [headers.join(',')].concat(
+      source.map((c) => {
+        const p = c.payments?.[0];
+        return [
+          c.first_name,
+          c.last_name,
+          c.email,
+          c.phone,
+          c.status,
+          c.created_at ? new Date(c.created_at).toISOString().slice(0, 10) : '',
+          p?.setup_fee_amount != null ? (p.setup_fee_amount / 100).toFixed(2) : '',
+          p?.monthly_amount != null ? (p.monthly_amount / 100).toFixed(2) : '',
+          dfrFor(c),
+        ]
+          .map(escape)
+          .join(',');
+      })
     );
+    const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `clients-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast(`Exported ${source.length} row(s).`, 'success');
   };
 
   const paymentLabel = (c) => {
@@ -110,8 +169,6 @@ export default function AdminClientsList() {
     if (p.setup_fee_status === 'paid') return 'Setup paid';
     return p.monthly_status || '—';
   };
-
-  const dfr = () => '—';
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-6">
@@ -154,7 +211,9 @@ export default function AdminClientsList() {
           <button
             type="button"
             className="text-sm font-semibold text-[#2562FF] hover:underline"
-            onClick={() => alert('Advanced search: add filters for assigned, date range, bureau, etc.')}
+            onClick={() =>
+              showToast('Use Record search + status chips. Assigned / date filters can be added to schema.', 'info')
+            }
           >
             Advanced search
           </button>
@@ -216,10 +275,10 @@ export default function AdminClientsList() {
           <>
             <button
               type="button"
-              onClick={exportXlsx}
+              onClick={exportCsv}
               className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
             >
-              Export XLSX
+              Export CSV
             </button>
             <button
               type="button"
@@ -293,7 +352,7 @@ export default function AdminClientsList() {
                             {c.status || 'active'}
                           </span>
                         </td>
-                        <td className="py-3 pr-4 text-slate-500">{dfr()}</td>
+                        <td className="py-3 pr-4 text-slate-500">{dfrFor(c)}</td>
                         <td className="py-3">
                           <button
                             type="button"

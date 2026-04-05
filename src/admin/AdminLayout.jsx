@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { adminNavGroups, adminQuickLinks } from './navConfig';
+import { fetchOpenTicketCount } from './lib/adminData';
 import {
   Search,
   Maximize2,
@@ -12,9 +13,6 @@ import {
   X,
   HelpCircle,
 } from 'lucide-react';
-
-/** Demo badge for Help Desk open count (wire to API later). */
-const MOCK_OPEN_TICKETS = 79;
 
 function matchBadge(item, openCount) {
   if (item.badgeKey === 'openTickets') return openCount;
@@ -30,8 +28,23 @@ export default function AdminLayout() {
   const [searchQ, setSearchQ] = useState('');
   const [fs, setFs] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [openTickets, setOpenTickets] = useState(0);
 
-  const openTickets = MOCK_OPEN_TICKETS;
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const n = await fetchOpenTicketCount();
+      if (!cancelled) setOpenTickets(n);
+    })();
+    const onFocus = () => {
+      void fetchOpenTicketCount().then((n) => setOpenTickets(n));
+    };
+    window.addEventListener('focus', onFocus);
+    return () => {
+      cancelled = true;
+      window.removeEventListener('focus', onFocus);
+    };
+  }, [location.pathname]);
 
   const breadcrumbs = useMemo(() => {
     const path = location.pathname;

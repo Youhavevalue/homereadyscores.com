@@ -1,9 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../context/AuthContext';
+import { useAdminToast } from '../context/AdminToastContext';
 import DisputeLetterModal from '../../components/DisputeLetterModal';
 import CloverPaymentForm from '../../components/CloverPaymentForm';
 import { AdminCard } from '../components/AdminCard';
+import AdminDocumentList from '../components/AdminDocumentList';
 import {
   HARD_CODED_HOT_LINKS,
   CUSTOM_HOT_LINKS_DEFAULT,
@@ -11,6 +14,14 @@ import {
   TAIL_ENDS_SAMPLE,
 } from '../constants/hotLinks';
 import { BUREAU_LETTER_ROUNDS, CREDITOR_LETTER_TYPES } from '../constants/letterRounds';
+import {
+  fetchClientNotes,
+  insertClientNote,
+  fetchStaffHotLinks,
+  insertStaffHotLink,
+  deleteStaffHotLink,
+  ensureDefaultStaffHotLinks,
+} from '../lib/adminData';
 
 const TABS = [
   { id: 'status', label: 'Client status' },
@@ -32,14 +43,22 @@ const MOCK_CREDITORS = Array.from({ length: 24 }, (_, i) => ({
   name: `Sample Creditor ${String.fromCharCode(65 + (i % 26))}${i}`,
 }));
 
+const CLOSED_DISPUTE = new Set(['resolved', 'deleted']);
+
 export default function AdminClientDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { showToast } = useAdminToast();
+
   const [client, setClient] = useState(null);
+  const [intake, setIntake] = useState(null);
   const [payment, setPayment] = useState(null);
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [disputes, setDisputes] = useState([]);
-  const [, setDocuments] = useState([]);
+  const [documents, setDocuments] = useState([]);
+  const [clientNotes, setClientNotes] = useState([]);
+  const [staffHotRows, setStaffHotRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('status');
   const [notesSub, setNotesSub] = useState('notes');
@@ -49,8 +68,8 @@ export default function AdminClientDetail() {
   const [extraFields, setExtraFields] = useState(false);
   const [modalDispute, setModalDispute] = useState(null);
   const [creditorQ, setCreditorQ] = useState('');
+  const [selectedCreditorName, setSelectedCreditorName] = useState('');
   const [newNote, setNewNote] = useState({ received: '', action: '' });
-  const [customHot, setCustomHot] = useState(CUSTOM_HOT_LINKS_DEFAULT);
   const [newHot, setNewHot] = useState('');
   const [resultsDate, setResultsDate] = useState('');
   const [clientStatus, setClientStatus] = useState('active');
@@ -63,21 +82,69 @@ export default function AdminClientDetail() {
     monthly_start_date: '',
   });
   const [savingPay, setSavingPay] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [savingNote, setSavingNote] = useState(false);
+  const [profile, setProfile] = useState({
+    first_name: '',
+    last_name: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    state: '',
+    zip: '',
+    notes: '',
+  });
+  const [dob, setDob] = useState('');
+  const [disputeForm, setDisputeForm] = useState({
+    bureau: 'Experian',
+    accountName: '',
+    accountLast4: '',
+    beginningStatus: BEGINNING_STATUSES_SAMPLE[0],
+    tailEnd: TAIL_ENDS_SAMPLE[0],
+  });
+  const [dfrDays, setDfrDays] = useState('—');
 
   const load = async () => {
     setLoading(true);
-    const [cr, pr, hr, dr, docr] = await Promise.all([
+    const [cr, pr, hr, dr, docr, intakeRes] = await Promise.all([
       supabase.from('clients').select('*').eq('id', id).single(),
       supabase.from('payments').select('*').eq('client_id', id).maybeSingle(),
       supabase.from('payment_history').select('*').eq('client_id', id).order('charged_at', { ascending: false }),
       supabase.from('dispute_letters').select('*').eq('client_id', id).order('created_at', { ascending: false }),
       supabase.from('documents').select('*').eq('client_id', id).order('created_at', { ascending: false }),
+      supabase.from('intake_forms').select('*').eq('client_id', id).maybeSingle(),
     ]);
-    setClient(cr.data);
+
+    const c = cr.data;
+    setClient(c);
     setPayment(pr.data);
     setPaymentHistory(hr.data || []);
     setDisputes(dr.data || []);
     setDocuments(docr.data || []);
+    setIntake(intakeRes.data);
+
+    if (c) {
+      setProfile({
+        first_name: c.first_name || '',
+        last_name: c.last_name || '',
+        email: c.email || '',
+        phone: c.phone || '',
+        address: c.address || '',
+        city: c.city || '',
+        state: c.state || '',
+        zip: c.zip || '',
+        notes: c.notes || '',
+      });
+      setClientStatus(c.status || 'active');
+      setResultsDate(c.results_expected_date || '');
+      setDob(intakeRes.data?.dob || '');
+    }
+
+    await ensureDefaultStaffHotLinks(CUSTOM_HOT_LINKS_DEFAULT);
+    const links = await fetchStaffHotLinks();
+    setStaffHotRows(links);
+
     if (pr.data) {
       setPayForm({
         setup_fee_amount: pr.data.setup_fee_amount ?? '',
@@ -85,8 +152,8 @@ export default function AdminClientDetail() {
         monthly_amount: pr.data.monthly_amount ?? '',
         monthly_start_date: pr.data.monthly_start_date ?? '',
       });
-    } else if (cr.data?.created_at) {
-      const sd = new Date(cr.data.created_at).toISOString().split('T')[0];
+    } else if (c?.created_at) {
+      const sd = new Date(c.created_at).toISOString().split('T')[0];
       setPayForm({
         setup_fee_amount: '',
         setup_fee_date: sd,
@@ -94,16 +161,21 @@ export default function AdminClientDetail() {
         monthly_start_date: addOneMonth(sd),
       });
     }
-    if (cr.data?.status) setClientStatus(cr.data.status);
     setLoading(false);
   };
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- reload on client id
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const [dfrDays, setDfrDays] = useState('—');
+  useEffect(() => {
+    void (async () => {
+      const n = await fetchClientNotes(id, notesSub);
+      setClientNotes(n);
+    })();
+  }, [id, notesSub]);
+
   useEffect(() => {
     if (!resultsDate) {
       setDfrDays('—');
@@ -115,7 +187,7 @@ export default function AdminClientDetail() {
   }, [resultsDate]);
 
   const openDisputes = useMemo(
-    () => disputes.filter((d) => d.status !== 'completed'),
+    () => disputes.filter((d) => !CLOSED_DISPUTE.has((d.status || '').toLowerCase())),
     [disputes]
   );
 
@@ -134,11 +206,146 @@ export default function AdminClientDetail() {
       monthly_amount: parseInt(payForm.monthly_amount, 10) || 0,
       monthly_start_date: payForm.monthly_start_date || null,
     };
-    if (payment) await supabase.from('payments').update(payload).eq('id', payment.id);
-    else await supabase.from('payments').insert(payload);
+    try {
+      if (payment) await supabase.from('payments').update(payload).eq('id', payment.id);
+      else await supabase.from('payments').insert(payload);
+      showToast('Payment settings saved.', 'success');
+      setPaymentEdit(false);
+      load();
+    } catch (e) {
+      showToast(e.message || 'Save failed', 'error');
+    }
     setSavingPay(false);
-    setPaymentEdit(false);
-    load();
+  };
+
+  const saveProfile = async () => {
+    setSavingProfile(true);
+    try {
+      const { error } = await supabase
+        .from('clients')
+        .update({
+          first_name: profile.first_name,
+          last_name: profile.last_name,
+          email: profile.email || null,
+          phone: profile.phone || null,
+          address: profile.address || null,
+          city: profile.city || null,
+          state: profile.state || null,
+          zip: profile.zip || null,
+          notes: profile.notes || null,
+          results_expected_date: resultsDate || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id);
+      if (error) throw error;
+
+      if (dob) {
+        if (intake?.id) {
+          await supabase.from('intake_forms').update({ dob }).eq('id', intake.id);
+        } else {
+          await supabase.from('intake_forms').insert({ client_id: id, dob });
+        }
+      }
+      showToast('Client profile updated.', 'success');
+      load();
+    } catch (e) {
+      showToast(e.message || 'Update failed', 'error');
+    }
+    setSavingProfile(false);
+  };
+
+  const saveStatusOnly = async () => {
+    try {
+      await supabase.from('clients').update({ status: clientStatus }).eq('id', id);
+      showToast('Status updated.', 'success');
+      load();
+    } catch (e) {
+      showToast(e.message || 'Failed', 'error');
+    }
+  };
+
+  const addNote = async () => {
+    if (!newNote.received.trim() && !newNote.action.trim()) {
+      showToast('Add received text or action taken.', 'error');
+      return;
+    }
+    setSavingNote(true);
+    try {
+      await insertClientNote({
+        clientId: id,
+        noteType: notesSub,
+        receivedText: newNote.received,
+        actionText: newNote.action,
+        counselorName: user?.name || user?.email || 'Staff',
+      });
+      setNewNote({ received: '', action: '' });
+      const n = await fetchClientNotes(id, notesSub);
+      setClientNotes(n);
+      showToast('Note saved.', 'success');
+    } catch (e) {
+      showToast(e.message || 'Run sql/admin_operational_migration.sql for client_notes.', 'error');
+    }
+    setSavingNote(false);
+  };
+
+  const addHotFromDb = async () => {
+    if (!newHot.trim()) return;
+    try {
+      await insertStaffHotLink(newHot.trim());
+      setNewHot('');
+      setStaffHotRows(await fetchStaffHotLinks());
+      showToast('Hot link added.', 'success');
+    } catch (e) {
+      showToast(e.message || 'Failed', 'error');
+    }
+  };
+
+  const removeHotDb = async (hid) => {
+    try {
+      await deleteStaffHotLink(hid);
+      setStaffHotRows(await fetchStaffHotLinks());
+      showToast('Removed.', 'success');
+    } catch (e) {
+      showToast(e.message || 'Failed', 'error');
+    }
+  };
+
+  const insertTemplate = (text) => {
+    setNewNote((prev) => ({
+      ...prev,
+      received: prev.received ? `${prev.received}\n${text}` : text,
+    }));
+  };
+
+  const addDisputeItem = async () => {
+    const name = selectedCreditorName || disputeForm.accountName;
+    if (!name?.trim()) {
+      showToast('Select or enter a creditor / account name.', 'error');
+      return;
+    }
+    try {
+      const { error } = await supabase.from('dispute_letters').insert({
+        client_id: id,
+        bureau: disputeForm.bureau,
+        account_name: name.trim(),
+        account_number_last4: (disputeForm.accountLast4 || '').slice(-4) || null,
+        dispute_reason: disputeForm.beginningStatus,
+        status: 'draft',
+        notes: disputeForm.tailEnd,
+        round_number: 1,
+      });
+      if (error) throw error;
+      showToast('Dispute item added.', 'success');
+      setDisputeForm({
+        ...disputeForm,
+        accountName: '',
+        accountLast4: '',
+      });
+      setSelectedCreditorName('');
+      load();
+    } catch (e) {
+      showToast(e.message || 'Insert failed', 'error');
+    }
   };
 
   const formatCents = (cents) => (cents ? `$${(cents / 100).toFixed(2)}` : '$0.00');
@@ -152,8 +359,9 @@ export default function AdminClientDetail() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center text-slate-500">
-        Loading client…
+      <div className="flex min-h-[40vh] flex-col items-center justify-center gap-3 text-slate-500">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-[#2562FF] border-t-transparent" />
+        <p className="text-sm">Loading client…</p>
       </div>
     );
   }
@@ -173,6 +381,8 @@ export default function AdminClientDetail() {
     );
   }
 
+  const notesForTab = clientNotes.filter((n) => n.note_type === notesSub);
+
   return (
     <div className="mx-auto max-w-[1600px] space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -188,7 +398,7 @@ export default function AdminClientDetail() {
             {client.first_name} {client.last_name}
           </h1>
           <p className="text-sm text-slate-500">
-            Client ID: <span className="font-mono text-xs">{client.id}</span> · Logins: 0 · Last login: —
+            Client ID: <span className="font-mono text-xs">{client.id}</span>
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -198,7 +408,7 @@ export default function AdminClientDetail() {
           <button
             type="button"
             onClick={() => navigate('/admin')}
-            className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700"
+            className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 shadow-sm"
           >
             Dashboard
           </button>
@@ -211,9 +421,9 @@ export default function AdminClientDetail() {
             key={t.id}
             type="button"
             onClick={() => setTab(t.id)}
-            className={`rounded-t-lg px-4 py-2 text-sm font-semibold ${
+            className={`rounded-t-lg px-4 py-2 text-sm font-semibold transition ${
               tab === t.id
-                ? 'bg-[#002D5B] text-white'
+                ? 'bg-[#002D5B] text-white shadow-sm'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
@@ -228,67 +438,91 @@ export default function AdminClientDetail() {
             <div className="space-y-4 lg:col-span-4">
               <AdminCard title="Personal info">
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <Field label="Name">
-                    {client.first_name} {client.last_name}
+                  <Field label="First name">
+                    <input
+                      className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+                      value={profile.first_name}
+                      onChange={(e) => setProfile({ ...profile, first_name: e.target.value })}
+                    />
                   </Field>
-                  <Field label="Country">
-                    <select className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm">
-                      <option>United States</option>
-                      <option>Canada</option>
-                    </select>
+                  <Field label="Last name">
+                    <input
+                      className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+                      value={profile.last_name}
+                      onChange={(e) => setProfile({ ...profile, last_name: e.target.value })}
+                    />
                   </Field>
                   <Field label="Address" className="sm:col-span-2">
-                    <input className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm" defaultValue={client.address || ''} />
+                    <input
+                      className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+                      value={profile.address}
+                      onChange={(e) => setProfile({ ...profile, address: e.target.value })}
+                    />
                   </Field>
                   <Field label="City">
-                    <input className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm" defaultValue={client.city || ''} />
+                    <input
+                      className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+                      value={profile.city}
+                      onChange={(e) => setProfile({ ...profile, city: e.target.value })}
+                    />
                   </Field>
                   <Field label="State">
-                    <input className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm" defaultValue={client.state || ''} />
+                    <input
+                      className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+                      value={profile.state}
+                      onChange={(e) => setProfile({ ...profile, state: e.target.value })}
+                    />
                   </Field>
                   <Field label="Zip">
-                    <input className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm" defaultValue={client.zip || ''} />
+                    <input
+                      className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+                      value={profile.zip}
+                      onChange={(e) => setProfile({ ...profile, zip: e.target.value })}
+                    />
                   </Field>
                   <Field label="Email">
-                    <input className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm" defaultValue={client.email || ''} />
+                    <input
+                      className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+                      type="email"
+                      value={profile.email}
+                      onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                    />
                   </Field>
-                  <Field label="Daytime phone">
-                    <input className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm" defaultValue={client.phone || ''} />
+                  <Field label="Phone">
+                    <input
+                      className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+                      value={profile.phone}
+                      onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                    />
                   </Field>
-                  <Field label="Carrier (SMS)">
-                    <select className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm">
-                      <option>Do Not SMS</option>
-                      <option>Verizon</option>
-                      <option>AT&T</option>
-                    </select>
-                  </Field>
-                  <Field label="SSN">
+                  <Field label="SSN (intake)">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-sm">{showSSN ? '***-**-1234' : '••••••••'}</span>
+                      <span className="font-mono text-sm">
+                        {showSSN && intake?.ssn_last4 ? `***-**-${intake.ssn_last4}` : '••••••••'}
+                      </span>
                       <button
                         type="button"
                         className="text-xs font-semibold text-[#2562FF]"
                         onClick={() => setShowSSN(!showSSN)}
                       >
-                        Reveal
+                        {intake?.ssn_last4 ? 'Toggle' : '—'}
                       </button>
                     </div>
                   </Field>
                   <Field label="DOB">
-                    <input className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm" type="date" />
-                  </Field>
-                  <Field label="Font (letters)">
-                    <select className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm">
-                      <option>Times New Roman</option>
-                      <option>Arial</option>
-                    </select>
+                    <input
+                      className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
+                      type="date"
+                      value={dob || ''}
+                      onChange={(e) => setDob(e.target.value)}
+                    />
                   </Field>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <button
                     type="button"
-                    className="rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-semibold"
-                    onClick={() => alert('Resend welcome email (wire to email API)')}
+                    className="rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-semibold text-slate-700"
+                    onClick={() => showToast('Connect email provider for welcome emails.', 'info')}
                   >
                     Resend welcome email
                   </button>
@@ -301,27 +535,24 @@ export default function AdminClientDetail() {
                   </button>
                 </div>
                 {extraFields && (
-                  <div className="mt-3 grid gap-2 rounded-xl bg-slate-50 p-3 text-sm">
-                    <Field label="Username">
-                      <input className="w-full rounded border border-slate-200 px-2 py-1" />
-                    </Field>
-                    <Field label="Password">
-                      <input className="w-full rounded border border-slate-200 px-2 py-1" type="password" />
-                    </Field>
+                  <div className="mt-3 grid gap-2 rounded-xl bg-slate-50 p-3 text-sm text-slate-600">
+                    Portal credentials can be stored when you add dedicated columns or auth integration.
                   </div>
                 )}
                 <textarea
                   className="mt-4 w-full rounded-xl border border-slate-200 p-3 text-sm"
                   rows={4}
                   placeholder="Details / notes (affiliate, broker, assigned, sales, special instructions)"
-                  defaultValue={client.notes || ''}
+                  value={profile.notes}
+                  onChange={(e) => setProfile({ ...profile, notes: e.target.value })}
                 />
                 <button
                   type="button"
-                  className="mt-3 rounded-xl bg-[#2562FF] px-4 py-2 text-sm font-semibold text-white"
-                  onClick={() => alert('Save profile (wire fields to Supabase columns)')}
+                  disabled={savingProfile}
+                  className="mt-3 rounded-xl bg-[#2562FF] px-4 py-2 text-sm font-semibold text-white shadow-sm disabled:opacity-60"
+                  onClick={saveProfile}
                 >
-                  Update
+                  {savingProfile ? 'Saving…' : 'Update profile'}
                 </button>
               </AdminCard>
             </div>
@@ -346,17 +577,32 @@ export default function AdminClientDetail() {
                   </div>
                 }
               >
-                {notesSub === 'notes' && (
-                  <div className="max-h-48 space-y-2 overflow-auto text-sm text-slate-600">
-                    <p className="rounded-lg bg-slate-50 p-2 text-xs">
-                      <span className="font-semibold text-slate-800">2026-04-01 · Counselor</span>
-                      <br />
-                      Called client — left voicemail.
-                    </p>
-                  </div>
+                <div className="max-h-56 space-y-2 overflow-auto text-sm text-slate-600">
+                  {notesForTab.length === 0 ? (
+                    <p className="text-xs text-slate-400">No notes in this channel yet.</p>
+                  ) : (
+                    notesForTab.map((n) => (
+                      <div key={n.id} className="rounded-lg bg-slate-50 p-2 text-xs">
+                        <span className="font-semibold text-slate-800">
+                          {new Date(n.created_at).toLocaleString()} · {n.counselor_name || 'Staff'}
+                        </span>
+                        {n.received_text && (
+                          <p className="mt-1 whitespace-pre-wrap text-slate-700">
+                            <strong>Received:</strong> {n.received_text}
+                          </p>
+                        )}
+                        {n.action_text && (
+                          <p className="mt-1 whitespace-pre-wrap text-slate-700">
+                            <strong>Action:</strong> {n.action_text}
+                          </p>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+                {notesSub === 'sms' && (
+                  <p className="text-xs text-slate-500">Log SMS-style updates here; full SMS gateway is separate.</p>
                 )}
-                {notesSub === 'sms' && <p className="text-sm text-slate-500">SMS thread (carrier-aware).</p>}
-                {notesSub === 'internal' && <p className="text-sm text-slate-500">Internal notes (admin only).</p>}
                 <div className="mt-4 grid gap-2 border-t border-slate-100 pt-4">
                   <p className="text-xs font-bold uppercase text-slate-500">Add new note</p>
                   <textarea
@@ -373,22 +619,23 @@ export default function AdminClientDetail() {
                   />
                   <button
                     type="button"
-                    className="w-fit rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-semibold text-white"
-                    onClick={() => alert('Persist to notes table')}
+                    disabled={savingNote}
+                    className="w-fit rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60"
+                    onClick={addNote}
                   >
-                    Add note
+                    {savingNote ? 'Saving…' : 'Add note'}
                   </button>
                 </div>
 
                 <div className="mt-6">
                   <p className="text-xs font-bold uppercase text-slate-500">Hard-coded hot links</p>
-                  <div className="mt-2 flex max-h-40 flex-wrap gap-1 overflow-auto">
+                  <div className="mt-2 flex max-h-36 flex-wrap gap-1 overflow-auto">
                     {HARD_CODED_HOT_LINKS.map((h) => (
                       <button
                         key={h}
                         type="button"
                         className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-700 hover:bg-slate-200"
-                        onClick={() => alert(`Insert template: ${h}`)}
+                        onClick={() => insertTemplate(h)}
                       >
                         {h}
                       </button>
@@ -396,17 +643,20 @@ export default function AdminClientDetail() {
                   </div>
                 </div>
                 <div className="mt-4">
-                  <p className="text-xs font-bold uppercase text-slate-500">Custom hot links</p>
-                  <div className="mt-2 flex max-h-48 flex-wrap gap-1 overflow-auto">
-                    {customHot.map((h) => (
-                      <button
-                        key={h}
-                        type="button"
-                        className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-900 hover:bg-emerald-100"
-                        onClick={() => alert(`Template: ${h}`)}
+                  <p className="text-xs font-bold uppercase text-slate-500">Custom hot links (shared)</p>
+                  <div className="mt-2 flex max-h-40 flex-wrap gap-1 overflow-auto">
+                    {staffHotRows.map((row) => (
+                      <span
+                        key={row.id}
+                        className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-900"
                       >
-                        {h}
-                      </button>
+                        <button type="button" className="hover:underline" onClick={() => insertTemplate(row.label)}>
+                          {row.label}
+                        </button>
+                        <button type="button" className="text-red-600 hover:text-red-800" onClick={() => removeHotDb(row.id)} aria-label="Remove">
+                          ×
+                        </button>
+                      </span>
                     ))}
                   </div>
                   <div className="mt-2 flex gap-2">
@@ -419,11 +669,7 @@ export default function AdminClientDetail() {
                     <button
                       type="button"
                       className="rounded-lg bg-[#2562FF] px-3 py-1 text-sm font-semibold text-white"
-                      onClick={() => {
-                        if (!newHot.trim()) return;
-                        setCustomHot((prev) => [...prev, newHot.trim()]);
-                        setNewHot('');
-                      }}
+                      onClick={addHotFromDb}
                     >
                       Add
                     </button>
@@ -463,23 +709,23 @@ export default function AdminClientDetail() {
                         value={clientStatus}
                         onChange={(e) => setClientStatus(e.target.value)}
                       >
-                        {['scheduled', 'pending', 'active', 'complete', 'cancelled'].map((s) => (
-                          <option key={s} value={s}>
-                            {s}
-                          </option>
-                        ))}
+                        {['scheduled', 'pending', 'active', 'contact1', 'contact2', 'contact3', 'complete', 'nsf', 'cancelled', 'expired'].map(
+                          (s) => (
+                            <option key={s} value={s}>
+                              {s}
+                            </option>
+                          )
+                        )}
                       </select>
                       <button
                         type="button"
                         className="rounded-lg bg-[#2562FF] px-3 py-1.5 text-sm font-semibold text-white"
-                        onClick={() => alert('Update status in DB')}
+                        onClick={saveStatusOnly}
                       >
                         Update
                       </button>
                     </div>
-                    <label className="mt-4 block text-xs font-bold uppercase text-slate-500">
-                      Date for results
-                    </label>
+                    <label className="mt-4 block text-xs font-bold uppercase text-slate-500">Date for results</label>
                     <input
                       type="date"
                       className="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm"
@@ -487,63 +733,41 @@ export default function AdminClientDetail() {
                       onChange={(e) => setResultsDate(e.target.value)}
                     />
                     <p className="mt-2 text-sm text-slate-600">
-                      DFR (days for results): <strong>{dfrDays}</strong>
+                      DFR (days): <strong>{dfrDays}</strong>
                     </p>
                     <button
                       type="button"
-                      className="mt-3 w-full rounded-xl border border-slate-200 py-2 text-sm font-semibold"
+                      className="mt-3 w-full rounded-xl border border-slate-200 py-2 text-sm font-semibold shadow-sm"
                       onClick={() => navigate('/admin/appointments')}
                     >
                       Set follow-up
                     </button>
-                    <div className="mt-4 rounded-xl border border-dashed border-slate-300 p-4 text-center text-sm text-slate-500">
-                      Secure docs: drag & drop or{' '}
-                      <button type="button" className="font-semibold text-[#2562FF]" onClick={() => alert('Open file picker')}>
-                        select files
-                      </button>
+                    <div className="mt-4 border-t border-slate-100 pt-4">
+                      <p className="mb-2 text-xs font-bold uppercase text-slate-500">Secure documents</p>
+                      <AdminDocumentList
+                        clientId={id}
+                        documents={documents}
+                        onReload={load}
+                        showToast={showToast}
+                      />
                     </div>
-                    <p className="mt-2 text-xs text-slate-500">Proofs: AV + SSN proof uploads (use existing documents API).</p>
                   </>
                 )}
                 {panel === 'results' && (
                   <p className="text-sm text-slate-600">
-                    Results summary and bureau pull placeholders. Connect credit monitoring integration here.
+                    Track bureau responses and scores here. Connect credit monitoring or import bureau PDFs under
+                    Documents.
                   </p>
                 )}
               </AdminCard>
             </div>
           </div>
 
-          <AdminCard title="Assignments & status line">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {['Affiliate', 'Broker', 'Sales', 'Counselor'].map((role) => (
-                <div key={role}>
-                  <label className="text-xs font-bold uppercase text-slate-500">{role}</label>
-                  <div className="mt-1 flex gap-1">
-                    <select className="flex-1 rounded-lg border border-slate-200 px-2 py-1.5 text-sm">
-                      <option>— Unassigned —</option>
-                      <option>Team member A</option>
-                    </select>
-                    <button type="button" className="rounded-lg bg-slate-100 px-2 text-xs">
-                      Set
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-4 flex flex-wrap gap-4">
-              <div>
-                <label className="text-xs font-bold uppercase text-slate-500">Status line (client menu)</label>
-                <select className="mt-1 block rounded-lg border border-slate-200 px-2 py-1.5 text-sm">
-                  <option>Standard</option>
-                  <option>VIP</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-xs font-bold uppercase text-slate-500">Interviewer link</label>
-                <input className="mt-1 w-full max-w-xs rounded-lg border border-slate-200 px-2 py-1.5 text-sm" placeholder="https://…" />
-              </div>
-            </div>
+          <AdminCard title="Assignments">
+            <p className="text-sm text-slate-600">
+              Affiliate / broker / sales / counselor assignment fields can be added to `clients` or a junction table when
+              you define your CRM model.
+            </p>
           </AdminCard>
         </div>
       )}
@@ -579,11 +803,12 @@ export default function AdminClientDetail() {
                       .map((d) => (
                         <li key={d.id} className="rounded-lg bg-white p-2 shadow-sm">
                           <div className="font-medium">{d.account_name || 'Account'}</div>
-                          <div className="text-xs text-slate-500">{d.status || 'open'}</div>
+                          <div className="text-xs text-slate-500">{d.status || 'draft'}</div>
                         </li>
                       ))}
-                    {disputes.filter((d) => (d.bureau || '').toLowerCase() === bureau.toLowerCase()).length ===
-                      0 && <li className="text-slate-500">No items yet.</li>}
+                    {disputes.filter((d) => (d.bureau || '').toLowerCase() === bureau.toLowerCase()).length === 0 && (
+                      <li className="text-slate-500">No items yet.</li>
+                    )}
                   </ul>
                 </div>
               ))}
@@ -593,46 +818,83 @@ export default function AdminClientDetail() {
           <AdminCard title="Add new account (dispute item)">
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
               <label className="text-sm">
-                Account type
-                <select className="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5">
+                Bureau
+                <select
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5"
+                  value={disputeForm.bureau}
+                  onChange={(e) => setDisputeForm({ ...disputeForm, bureau: e.target.value })}
+                >
                   <option>Equifax</option>
                   <option>Experian</option>
                   <option>TransUnion</option>
                 </select>
               </label>
               <label className="text-sm sm:col-span-2">
-                Creditor
+                Creditor (search sample list)
                 <input
                   className="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5"
-                  placeholder="Search 4,420+ creditors"
+                  placeholder="Search creditors"
                   value={creditorQ}
                   onChange={(e) => setCreditorQ(e.target.value)}
                 />
                 <div className="mt-1 max-h-24 overflow-auto rounded border border-slate-100 bg-white text-xs">
                   {filteredCreditors.map((c) => (
-                    <div key={c.id} className="cursor-pointer px-2 py-1 hover:bg-slate-50">
+                    <button
+                      key={c.id}
+                      type="button"
+                      className="block w-full px-2 py-1 text-left hover:bg-slate-50"
+                      onClick={() => {
+                        setSelectedCreditorName(c.name);
+                        setDisputeForm({ ...disputeForm, accountName: c.name });
+                      }}
+                    >
                       {c.name}
-                    </div>
+                    </button>
                   ))}
                 </div>
               </label>
               <label className="text-sm">
-                Account #
-                <input className="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5" />
+                Account name
+                <input
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5"
+                  value={disputeForm.accountName}
+                  onChange={(e) => setDisputeForm({ ...disputeForm, accountName: e.target.value })}
+                />
+              </label>
+              <label className="text-sm">
+                Account # (last 4)
+                <input
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5"
+                  value={disputeForm.accountLast4}
+                  onChange={(e) => setDisputeForm({ ...disputeForm, accountLast4: e.target.value })}
+                  maxLength={4}
+                />
               </label>
               <label className="text-sm">
                 Beginning status
-                <select className="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5">
+                <select
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5"
+                  value={disputeForm.beginningStatus}
+                  onChange={(e) => setDisputeForm({ ...disputeForm, beginningStatus: e.target.value })}
+                >
                   {BEGINNING_STATUSES_SAMPLE.map((s) => (
-                    <option key={s}>{s}</option>
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
                   ))}
                 </select>
               </label>
               <label className="text-sm">
-                Tail end dispute
-                <select className="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5">
+                Tail end / template
+                <select
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5"
+                  value={disputeForm.tailEnd}
+                  onChange={(e) => setDisputeForm({ ...disputeForm, tailEnd: e.target.value })}
+                >
                   {TAIL_ENDS_SAMPLE.map((s) => (
-                    <option key={s}>{s}</option>
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
                   ))}
                 </select>
               </label>
@@ -641,11 +903,25 @@ export default function AdminClientDetail() {
               <button
                 type="button"
                 className="rounded-lg bg-[#2562FF] px-4 py-2 text-sm font-semibold text-white"
-                onClick={() => alert('Insert into dispute_items table')}
+                onClick={addDisputeItem}
               >
-                Add
+                Add dispute
               </button>
-              <button type="button" className="rounded-lg border border-slate-200 px-4 py-2 text-sm">
+              <button
+                type="button"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm"
+                onClick={() => {
+                  setDisputeForm({
+                    bureau: 'Experian',
+                    accountName: '',
+                    accountLast4: '',
+                    beginningStatus: BEGINNING_STATUSES_SAMPLE[0],
+                    tailEnd: TAIL_ENDS_SAMPLE[0],
+                  });
+                  setSelectedCreditorName('');
+                  setCreditorQ('');
+                }}
+              >
                 Clear
               </button>
             </div>
@@ -664,7 +940,7 @@ export default function AdminClientDetail() {
                   <div>
                     <div className="font-medium text-[#002D5B]">{d.account_name || 'Account'}</div>
                     <div className="text-xs text-slate-500">
-                      {d.bureau} · {d.status || 'open'}
+                      {d.bureau} · {d.status || 'draft'}
                     </div>
                   </div>
                   <button
@@ -689,17 +965,7 @@ export default function AdminClientDetail() {
                 <div key={round} className="rounded-xl border border-slate-200 p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="font-semibold text-[#002D5B]">{round}</span>
-                    <div className="flex gap-2 text-xs">
-                      <button type="button" className="text-[#2562FF] hover:underline">
-                        Add to list
-                      </button>
-                      <button type="button" className="text-slate-500 hover:underline">
-                        Edit
-                      </button>
-                      <button type="button" className="text-red-600 hover:underline">
-                        Delete
-                      </button>
-                    </div>
+                    <span className="text-xs text-slate-400">Template library</span>
                   </div>
                   <div className="mt-2 flex flex-wrap gap-2 text-sm">
                     {['Equifax', 'Experian', 'TransUnion', '3-Bureau'].map((b) => (
@@ -707,7 +973,7 @@ export default function AdminClientDetail() {
                         key={b}
                         type="button"
                         className="rounded-lg bg-slate-100 px-2 py-1 font-medium hover:bg-slate-200"
-                        onClick={() => alert(`Template editor: ${round} · ${b}`)}
+                        onClick={() => showToast(`Open template editor: ${round} · ${b}`, 'info')}
                       >
                         {b}
                       </button>
@@ -722,14 +988,13 @@ export default function AdminClientDetail() {
               {CREDITOR_LETTER_TYPES.map((t) => (
                 <li key={t} className="flex flex-wrap items-center justify-between gap-2 py-2">
                   <span>{t}</span>
-                  <span className="flex gap-2 text-xs">
-                    <button type="button" className="font-semibold text-[#2562FF] hover:underline">
-                      Edit
-                    </button>
-                    <button type="button" className="text-red-600 hover:underline">
-                      Delete
-                    </button>
-                  </span>
+                  <button
+                    type="button"
+                    className="text-xs font-semibold text-[#2562FF]"
+                    onClick={() => showToast(`Template: ${t}`, 'info')}
+                  >
+                    Open
+                  </button>
                 </li>
               ))}
             </ul>
@@ -819,7 +1084,7 @@ export default function AdminClientDetail() {
                     readOnly
                   />
                 </label>
-                <div className="md:col-span-2 flex justify-end gap-2">
+                <div className="flex justify-end gap-2 md:col-span-2">
                   <button
                     type="button"
                     className="rounded-lg border border-slate-200 px-4 py-2 text-sm"
@@ -842,15 +1107,11 @@ export default function AdminClientDetail() {
                 <div className="rounded-xl bg-slate-50 p-4">
                   <div className="text-xs font-bold uppercase text-slate-500">Setup fee</div>
                   <div className="font-display text-xl font-bold">{formatCents(payment.setup_fee_amount)}</div>
-                  <div className="text-xs text-slate-500">
-                    Status: {payment.setup_fee_status || '—'}
-                  </div>
+                  <div className="text-xs text-slate-500">Status: {payment.setup_fee_status || '—'}</div>
                 </div>
                 <div className="rounded-xl bg-slate-50 p-4">
                   <div className="text-xs font-bold uppercase text-slate-500">Monthly</div>
-                  <div className="font-display text-xl font-bold">
-                    {formatCents(payment.monthly_amount)}/mo
-                  </div>
+                  <div className="font-display text-xl font-bold">{formatCents(payment.monthly_amount)}/mo</div>
                   <div className="text-xs text-slate-500">Start: {payment.monthly_start_date || '—'}</div>
                 </div>
               </div>
@@ -875,37 +1136,16 @@ export default function AdminClientDetail() {
           </AdminCard>
 
           <AdminCard title="Demand draft">
-            <div className="grid gap-3 md:grid-cols-2">
-              {[
-                ['Setup fee', 'Paid'],
-                ['Monthly fee', 'Due date'],
-                ['Payment method', 'CC / Check'],
-                ['Bank / card #', '••••4242'],
-                ['Routing #', '—'],
-                ['Account #', '—'],
-                ['ABA', '—'],
-                ['Account holder', `${client.first_name} ${client.last_name}`],
-              ].map(([a, b]) => (
-                <div key={a} className="flex justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm">
-                  <span className="text-slate-500">{a}</span>
-                  <span className="font-medium">{b}</span>
-                </div>
-              ))}
-            </div>
+            <p className="text-sm text-slate-600">
+              Check drafting integrates with your bank / processor. Clover card-on-file is shown above when connected.
+            </p>
             <div className="mt-4 flex flex-wrap gap-2">
               <button
                 type="button"
                 className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm"
-                onClick={() => alert('Draft check workflow')}
+                onClick={() => showToast('Connect ACH / check printing provider.', 'info')}
               >
                 Draft check
-              </button>
-              <button
-                type="button"
-                className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm"
-                onClick={() => alert('Sample check PDF')}
-              >
-                Sample check
               </button>
             </div>
           </AdminCard>

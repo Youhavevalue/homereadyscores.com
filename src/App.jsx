@@ -23,6 +23,7 @@ import CROADisclosure from './pages/legal/CROADisclosure';
 
 // Portal imports
 import { AuthProvider } from './context/AuthContext';
+import { AdminToastProvider } from './admin/context/AdminToastContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import PortalLogin from './pages/portal/PortalLogin';
 import AddClient from './pages/portal/AddClient';
@@ -101,6 +102,7 @@ const AppLayout = ({ children }) => {
 const App = () => {
   return (
     <AuthProvider>
+      <AdminToastProvider>
       <Router>
         <ScrollToTop />
         <AppLayout>
@@ -215,6 +217,7 @@ const App = () => {
           </Routes>
         </AppLayout>
       </Router>
+      </AdminToastProvider>
     </AuthProvider>
   );
 };

@@ -1,0 +1,26 @@
+/* Admin shell refinements — imported once in main.jsx */
+.admin-shell {
+  font-feature-settings: 'kern' 1, 'liga' 1;
+}
+
+.admin-shell ::selection {
+  background: rgba(37, 98, 255, 0.18);
+}
+
+.admin-shell input:focus,
+.admin-shell select:focus,
+.admin-shell textarea:focus,
+.admin-shell button:focus-visible {
+  outline: 2px solid rgba(37, 98, 255, 0.45);
+  outline-offset: 2px;
+}
+
+.admin-toast {
+  font-family: inherit;
+}
+
+/* Nav active state polish */
+.admin-shell a[aria-current='page'],
+.admin-shell [data-active='true'] {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}

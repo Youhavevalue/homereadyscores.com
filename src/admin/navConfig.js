@@ -1,5 +1,6 @@
 import {
   LayoutDashboard,
+  GraduationCap,
   Users,
   UserPlus,
   Handshake,
@@ -28,6 +29,7 @@ export const adminNavGroups = [
     label: 'Overview',
     items: [
       { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
+      { to: '/admin/training', label: 'Training', icon: GraduationCap },
     ],
   },
   {
@@ -70,6 +72,7 @@ export const adminNavGroups = [
 
 /** Flat list for search / quick jump */
 export const adminQuickLinks = [
+  { to: '/admin/training', label: 'Training' },
   { to: '/admin/clients', label: 'All clients' },
   { to: '/admin/clients/new', label: 'Add client' },
   { to: '/admin/clients/joint', label: 'Add joint client' },

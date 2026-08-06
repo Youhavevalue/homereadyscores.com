@@ -35,6 +35,7 @@ import AdminClientsList from './admin/pages/AdminClientsList';
 import AdminClientDetail from './admin/pages/AdminClientDetail';
 import AdminJointClient from './admin/pages/AdminJointClient';
 import AdminSystemHub from './admin/pages/AdminSystemHub';
+import AdminTrainingPage from './admin/pages/AdminTrainingPage';
 import AdminAutorespondersPage from './admin/pages/AdminAutorespondersPage';
 import AdminAPIPage from './admin/pages/AdminAPIPage';
 import {
@@ -167,6 +168,7 @@ const App = () => {
               }
             >
               <Route index element={<AdminHome />} />
+              <Route path="training" element={<AdminTrainingPage />} />
               <Route path="clients" element={<AdminClientsList />} />
               <Route path="clients/new" element={<AddClient />} />
               <Route path="clients/joint" element={<AdminJointClient />} />

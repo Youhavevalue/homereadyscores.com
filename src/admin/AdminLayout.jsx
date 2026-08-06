@@ -74,6 +74,7 @@ export default function AdminLayout() {
       'system-emails': 'System emails',
       'letter-menu': 'Letter menu',
       hotlinks: 'Hotlinks',
+      training: 'Training',
       referrals: 'Referrals',
       'creation-report': 'Creation report',
       global: 'Global view',

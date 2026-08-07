@@ -2162,8 +2162,646 @@ export const salesTrainingSections = [
     ],
   },
   {
-    id: 'roadmap',
+    id: 'legacy-knowledge-base',
     number: 13,
+    title: 'Credit repair expertise — the complete knowledge base',
+    blocks: [
+      {
+        type: 'p',
+        text:
+          'This section is translated from the complete Home Ready Scores (formerly Legacy Credits) AI Voice Agent Knowledge Base. Every script, objection handler, credit education response, closing technique, and power phrase below has been used in production to enroll clients. Read it until you can answer every question a prospect could ask about credit repair. Every reference to the old company name has been replaced with Home Ready Scores and every price updated to the current plan.',
+      },
+
+      { type: 'h3', text: 'Section A — Identity and role' },
+      {
+        type: 'p',
+        text:
+          'When a prospect asks who you are or what you do, you are a Home Ready Scores sales specialist. You work with leads referred by mortgage companies who have credit scores below 640. Your mission is to convert leads into enrolled clients by establishing trust, providing clarity, giving hope, and guiding their decision. You are confident and professional, empathetic and understanding, solution focused, never pushy, always helpful. You sound human, not robotic. You are a world class sales expert.',
+      },
+      {
+        type: 'blockquote',
+        text:
+          'I am a credit repair enrollment specialist with Home Ready Scores. I help people fix their credit so they can qualify for a mortgage and buy a home. I work with leads referred by mortgage companies who have credit scores below 640, and my job is to help you take your next step toward homeownership.',
+      },
+
+      { type: 'h3', text: 'Section B — Company overview' },
+      {
+        type: 'ul',
+        items: [
+          'Vision: Creating a clear path toward home ownership.',
+          'Mission: Providing affordable, fast credit restoration.',
+          'Core purpose: To assist families and individuals in purchasing the home they desire.',
+          'Philosophy: We recognize that life happens and many times it affects the credit landscape of good hardworking individuals.',
+          'Track record: 15+ years helping brokers close more loans.',
+        ],
+      },
+      {
+        type: 'p',
+        text: 'Service promise. Memorize these five points:',
+      },
+      {
+        type: 'ul',
+        items: [
+          'One monthly fee. Unlimited verifications.',
+          '100% Satisfaction Guarantee.',
+          'No long term contracts.',
+          'Pause or resume services anytime.',
+          'Lifetime guarantee on deletions staying deleted (confirm exact wording with leadership before quoting verbatim).',
+        ],
+      },
+
+      { type: 'h3', text: 'Section C — Pricing and packages' },
+      {
+        type: 'p',
+        text:
+          'Always quote the current pricing. The old knowledge base listed $179 starter and $109 monthly. Those are outdated. Use the prices below.',
+      },
+      {
+        type: 'ul',
+        items: [
+          'Single Enrollment: $184.99 due today, then $114.00 per month. One client, one credit file.',
+          'Couple Enrollment: $304.99 due today, then $190.00 per month. Two related clients (spouses, joint applicants) under one plan.',
+        ],
+      },
+      {
+        type: 'p',
+        text:
+          'Payment structure: the setup fee is charged at enrollment. The monthly recurring charge starts one month after the setup fee date. Average client duration is 3 to 4 months. Most see results in 30 to 45 days.',
+      },
+
+      { type: 'h3', text: 'Section D — The credit repair process' },
+      {
+        type: 'p',
+        text: 'How Home Ready Scores works:',
+      },
+      {
+        type: 'ol',
+        items: [
+          'Review current credit report to determine items needing attention.',
+          'Open inquiries with each bureau to verify documentation.',
+          'Send 100+ hand typed legal dispute letters within 48 hours of enrollment.',
+          'Analyze and create personalized credit repair plans.',
+          'Work with creditors and bureaus to dispute negative items.',
+          'Client tracks progress through the online portal.',
+        ],
+      },
+      {
+        type: 'p',
+        text: 'What we dispute:',
+      },
+      {
+        type: 'ul',
+        items: [
+          'Collections (paid and unpaid)',
+          'Medical debt',
+          'Late payments',
+          'Foreclosures',
+          'Repossessions',
+          'Bankruptcies',
+          'Tax liens',
+          'Judgments',
+          'Student loan late payments',
+          'Inquiries',
+          'Any inaccurate information',
+        ],
+      },
+      {
+        type: 'p',
+        text: 'Our unique dispute method. We do NOT dispute ownership. We dispute the PROCESS. This is the key differentiator. Memorize this:',
+      },
+      {
+        type: 'ul',
+        items: [
+          'We verify proper documentation was followed.',
+          'We challenge the method items were reported.',
+          'Results in permanent deletions that cannot be re added without new verification.',
+          'Example: For medical collections, we request itemized bills knowing HIPAA prevents disclosure. When they cannot provide details within 30 days, the item must be deleted permanently.',
+        ],
+      },
+
+      { type: 'h3', text: 'Section E — Conversation scripts from the original knowledge base' },
+      {
+        type: 'p',
+        text:
+          'These are the original scripts from the Legacy Credits knowledge base, updated with Home Ready Scores branding and current pricing. Use them as an alternative to the cold call script in the Sales Playbook. Some prospects respond better to this consultative approach.',
+      },
+
+      { type: 'h3', text: 'Lead follow up introduction' },
+      {
+        type: 'blockquote',
+        text:
+          'Hi, this is [YOUR NAME] with Home Ready Scores. How are you doing today? Thank you for taking my call. I wanted to follow up since you expressed interest in purchasing a home.',
+      },
+
+      { type: 'h3', text: 'Immediate call introduction' },
+      {
+        type: 'blockquote',
+        text:
+          'Hi, this is [YOUR NAME] with Home Ready Scores. I understand you were interested in purchasing a home. I am here to help. Are you still interested in purchasing a home?',
+      },
+
+      { type: 'h3', text: 'Discovery process' },
+      {
+        type: 'blockquote',
+        text:
+          'Great. Where are you at in the home buying process? Fantastic. I want to help you take your next step. The first thing to consider when purchasing a home is the health of your credit.',
+      },
+      {
+        type: 'p',
+        text: 'Key questions to ask during discovery:',
+      },
+      {
+        type: 'ol',
+        items: [
+          'When is the last time you checked your credit?',
+          'Do you happen to know your credit score?',
+          'Do you have any collections, late payments, or medical collections?',
+        ],
+      },
+
+      { type: 'h3', text: 'Building value — Why Home Ready Scores' },
+      {
+        type: 'blockquote',
+        text:
+          'Let me tell you why mortgage companies trust us. First, we are partnered with realtors and mortgage bankers to ensure you are moving in the right direction. Second, our system gives you and your lender real time updates on your progress. Third, we send over 100 hand typed legal dispute letters within 48 hours of enrollment. Fourth, our process is 50% faster than any other company in the industry. Fifth, we help with everything, even finding you a realtor and lenders in your area.',
+      },
+
+      { type: 'h3', text: 'The close (original version)' },
+      {
+        type: 'blockquote',
+        text:
+          'It only takes 5 minutes to get enrolled. Let me pull up the enrollment form so we can get you started. Is that OK?',
+      },
+      {
+        type: 'p',
+        text: 'If hesitant:',
+      },
+      {
+        type: 'blockquote',
+        text:
+          'We offer a 100% Satisfaction Guarantee and a lifetime guarantee on all deletions staying deleted. Are you serious about purchasing a home? I am serious about helping you. Let us get this started today.',
+      },
+
+      { type: 'h3', text: 'Enrollment process' },
+      {
+        type: 'blockquote',
+        text:
+          'Great. Go to homereadyscores.com/get-started. I will stay on the line and guide you through each step. Takes less than 5 minutes.',
+      },
+
+      { type: 'h3', text: 'Post enrollment script' },
+      {
+        type: 'blockquote',
+        text:
+          '[NAME], looking forward to helping you. Here is what happens next. You will receive a Welcome Email and Welcome Packet. Our team will contact you within 24 hours. We will need these documents: two proofs of address, one proof of social security, and your credit report. Thanks [NAME], we will take it from here.',
+      },
+
+      { type: 'h3', text: 'Section F — Objection handling from the original knowledge base' },
+      {
+        type: 'p',
+        text:
+          'These objection handlers are more detailed than the ones in the Sales Playbook. Use these when the prospect needs a deeper, more specific response.',
+      },
+
+      { type: 'h3', text: 'I am already using another service' },
+      {
+        type: 'blockquote',
+        text:
+          'Which company are you using? [Listen]. I understand. Here is what our clients who switched from that company tell us. They were with them for a long time with minimal results. Home Ready Scores has a proven track record with mortgage companies because we deliver results in 3 to 4 months, not 12 or more. Plus, your lender can track progress in real time. Do not waste more time and money. Let us get you home ready faster.',
+      },
+
+      { type: 'h3', text: 'It is too expensive' },
+      {
+        type: 'blockquote',
+        text:
+          'I understand cost is a concern. Think of it this way. $184.99 is less than most people spend on coffee in a month. But here is the real math. Fixing your credit now means qualifying for a better mortgage rate. Just 1% lower rate saves you $30,000 or more over the life of a $200,000 loan. Can you really afford NOT to fix your credit?',
+      },
+
+      { type: 'h3', text: 'I will do it myself' },
+      {
+        type: 'blockquote',
+        text:
+          'You absolutely could try, but here is what I have seen. DIY credit repair typically takes 12 or more months with minimal results. We have expertise, relationships with bureaus, and proven systems to get results in 3 to 4 months. Plus, you have a mortgage company waiting to approve you. Why risk delays when we guarantee results?',
+      },
+
+      { type: 'h3', text: 'I need to think about it (deeper version)' },
+      {
+        type: 'blockquote',
+        text:
+          'I understand. What specifically concerns you, the cost, the process, or something else? Let me address that directly so you can make the best decision. Remember, every day you wait is another day paying rent instead of building equity in your own home.',
+      },
+
+      { type: 'h3', text: 'Do I need to pull my credit?' },
+      {
+        type: 'blockquote',
+        text:
+          'No, you do not need to pull your credit. Based on what you have told me, I can already see you need our help. We will handle everything once you are enrolled.',
+      },
+
+      { type: 'h3', text: 'What if it does not work?' },
+      {
+        type: 'blockquote',
+        text:
+          'That is why we offer a 100% Satisfaction Guarantee. We are so confident because we have been doing this for over 15 years. We have helped hundreds of people just like you get into homes.',
+      },
+
+      { type: 'h3', text: 'Section G — Credit education responses' },
+      {
+        type: 'p',
+        text:
+          'These are the exact responses the original knowledge base gave when prospects asked about specific credit situations. Memorize them. A new rep who can answer these is more valuable than one who cannot.',
+      },
+
+      { type: 'h3', text: 'Credit cards' },
+      {
+        type: 'blockquote',
+        text:
+          'Best practice: Have high available credit with low or no balance. Using over 30% of your limit drops your score significantly. A $10,000 limit with $0 balance looks better than using and paying off monthly.',
+      },
+
+      { type: 'h3', text: 'Student loans' },
+      {
+        type: 'blockquote',
+        text:
+          'Federal loans cannot be removed, but we can delete late payments. Also, consolidating at studentloans.gov creates a new positive tradeline, a trick we have used for years to boost scores quickly.',
+      },
+
+      { type: 'h3', text: 'Medical collections' },
+      {
+        type: 'blockquote',
+        text:
+          'We are experts at removing these. We request itemized bills knowing HIPAA laws prevent disclosure. When they cannot provide details within 30 days, it must be deleted permanently.',
+      },
+
+      { type: 'h3', text: 'Bankruptcies' },
+      {
+        type: 'blockquote',
+        text:
+          '85% success rate removing bankruptcies within 4 to 6 months. If not removable, we add positive credit to overcome its impact. Most loans are score driven, so higher scores can offset bankruptcy presence.',
+      },
+
+      { type: 'h3', text: 'Repossessions' },
+      {
+        type: 'blockquote',
+        text:
+          'We challenge documentation requirements. The complex repo process often has missing paperwork. Without proper verification in 30 days, permanent deletion is required. We have deleted 3 repos in 60 days for one client.',
+      },
+
+      { type: 'h3', text: 'Foreclosures' },
+      {
+        type: 'blockquote',
+        text:
+          'Similar to repos. We challenge the reporting method. The lengthy foreclosure process often leads to documentation errors. No verification in 30 days means permanent removal.',
+      },
+
+      { type: 'h3', text: 'Late payments' },
+      {
+        type: 'blockquote',
+        text:
+          'Most common and most successful disputes. Payment history is 35% of your score, so removing lates has immediate impact.',
+      },
+
+      { type: 'h3', text: 'Collections' },
+      {
+        type: 'blockquote',
+        text:
+          'Paying collections does not remove them or guarantee a score increase. We dispute the verification process for permanent removal.',
+      },
+
+      { type: 'h3', text: 'Section H — Technical credit knowledge' },
+      {
+        type: 'p',
+        text:
+          'A good rep knows the technical side. These are the facts you should be able to state when a prospect asks how credit works.',
+      },
+
+      { type: 'h3', text: 'Credit report components' },
+      {
+        type: 'ul',
+        items: [
+          'Identity: Name, address, SSN, DOB, employment.',
+          'Accounts: All credit accounts, terms, balances, payment history.',
+          'Public records: Judgments, liens, bankruptcies.',
+          'Inquiries: Who has pulled your report.',
+        ],
+      },
+
+      { type: 'h3', text: 'Three credit bureaus' },
+      {
+        type: 'ul',
+        items: [
+          'Equifax',
+          'Experian',
+          'TransUnion',
+        ],
+      },
+      {
+        type: 'p',
+        text: 'Each may have different information. That is why we dispute with all three.',
+      },
+
+      { type: 'h3', text: 'Negative information timelines' },
+      {
+        type: 'ul',
+        items: [
+          'Most negative items: 7 years.',
+          'Bankruptcy: 10 years.',
+          'Unpaid judgments: 7 years or statute of limitations.',
+          'We can often remove items before these timelines.',
+        ],
+      },
+
+      { type: 'h3', text: 'Credit score factors' },
+      {
+        type: 'ul',
+        items: [
+          'Payment history: 35%',
+          'Credit utilization: 30%',
+          'Length of credit history: 15%',
+          'Credit mix: 10%',
+          'New credit: 10%',
+        ],
+      },
+
+      { type: 'h3', text: 'Legal requirements' },
+      {
+        type: 'ul',
+        items: [
+          'Bureaus must investigate disputes within 30 days.',
+          'Can extend 15 days if new information is provided.',
+          'Must delete if they cannot verify.',
+          'Deleted items cannot be re added without new verification.',
+        ],
+      },
+
+      { type: 'h3', text: 'Section I — Success stories and social proof' },
+      {
+        type: 'p',
+        text:
+          'Use these when a prospect needs reassurance. Do not make up new testimonials. Use these or check with leadership for current ones.',
+      },
+      {
+        type: 'ul',
+        items: [
+          'Best credit repair company ever. Repaired in 2 months, bought a home. Tina.',
+          'Score went from 400 to 590 in 3 months. Wesley.',
+          'Got approved to buy a house. Score up 73 points in 3 months. BBB Review.',
+          '80 point jump in just 25 days. Referred client.',
+          'Less than a month and my low 500s became mid 600s. Client review.',
+        ],
+      },
+      {
+        type: 'p',
+        text: 'Mortgage company trust:',
+      },
+      {
+        type: 'blockquote',
+        text:
+          'There is a reason mortgage companies use us exclusively. We deliver results and send clients back loan ready.',
+      },
+
+      { type: 'h3', text: 'Section J — Key differentiators' },
+      {
+        type: 'p',
+        text: 'What makes Home Ready Scores different:',
+      },
+      {
+        type: 'ol',
+        items: [
+          'Speed: 50% faster than industry average.',
+          'Method: We dispute the process, not ownership. This means permanent deletions.',
+          'Transparency: Real time tracking portal for the client and the lender.',
+          'Guarantee: 100% Satisfaction Guarantee plus lifetime deletion guarantee.',
+          'Expertise: 15+ years, hundreds of success stories.',
+          'Partnership: Direct mortgage company relationships.',
+        ],
+      },
+      {
+        type: 'p',
+        text: 'Why not DIY or competitors:',
+      },
+      {
+        type: 'ul',
+        items: [
+          'DIY takes 12+ months vs our 3 to 4 months.',
+          'Competitors only dispute half of items monthly.',
+          'Generic disputes get temporary results.',
+          'We know the legal requirements and timelines.',
+          'Professional disputes ensure permanent removal.',
+        ],
+      },
+
+      { type: 'h3', text: 'Section K — Closing techniques' },
+      {
+        type: 'p',
+        text:
+          'Multiple closing techniques. Use the one that fits the prospect situation. Do not use the same close on every prospect.',
+      },
+
+      { type: 'h3', text: 'Assumptive close' },
+      {
+        type: 'blockquote',
+        text:
+          'Great. Let me walk you through enrollment right now. Go to homereadyscores.com/get-started and I will guide you through each step.',
+      },
+
+      { type: 'h3', text: 'Alternative close' },
+      {
+        type: 'blockquote',
+        text:
+          'Would you prefer to enroll online while I guide you, or should I text you the link to complete when ready? Most people find it easier with my help.',
+      },
+
+      { type: 'h3', text: 'Urgency close' },
+      {
+        type: 'blockquote',
+        text:
+          'Look, you reached out because you want to buy a home. Credit is literally the only thing standing in your way. Every day you wait is another day throwing away rent money instead of building equity. Let us fix this today.',
+      },
+
+      { type: 'h3', text: 'Value close' },
+      {
+        type: 'blockquote',
+        text:
+          'For less than your monthly cell phone bill, you can fix your credit and save thousands on your mortgage. This is an investment that pays for itself many times over.',
+      },
+
+      { type: 'h3', text: 'Section L — Quick reference responses' },
+      {
+        type: 'p',
+        text: 'When a prospect fires a quick question at you, here is the quick answer.',
+      },
+      {
+        type: 'ul',
+        items: [
+          'How long does it take? Most clients see results in 30 to 45 days, reach 640+ in 3 to 4 months.',
+          'What is your success rate? We have helped hundreds get approved for homes.',
+          'Is this legal? 100% legal. We use federal laws that protect consumers.',
+          'Can I cancel? No contracts. Pause or cancel anytime.',
+          'What if I am not satisfied? 100% Satisfaction Guarantee.',
+        ],
+      },
+
+      { type: 'h3', text: 'Power phrases' },
+      {
+        type: 'p',
+        text: 'Memorize these. Drop them into the conversation naturally. They work.',
+      },
+      {
+        type: 'ul',
+        items: [
+          'I specialize in cases just like yours.',
+          'The mortgage company is waiting to approve you.',
+          'This is an investment in your future.',
+          'Every day you wait costs you money.',
+          'Let us turn your no into a yes for homeownership.',
+          'I am here to make this simple and stress free.',
+        ],
+      },
+
+      { type: 'h3', text: 'Section M — Compliance from the original knowledge base' },
+      {
+        type: 'p',
+        text: 'Never say:',
+      },
+      {
+        type: 'ul',
+        items: [
+          'Specific score increase guarantees.',
+          'Exact timeframes for individual results.',
+          'That we can remove accurate information.',
+          'Anything that could be construed as legal advice.',
+        ],
+      },
+      {
+        type: 'p',
+        text: 'Always say:',
+      },
+      {
+        type: 'ul',
+        items: [
+          'Results vary by individual situation.',
+          'Average timeline is 3 to 4 months.',
+          'We dispute inaccurate or unverifiable items.',
+          'Money back guarantee for confidence.',
+          'We have helped hundreds in similar situations.',
+        ],
+      },
+      {
+        type: 'p',
+        text: 'Documentation required after enrollment:',
+      },
+      {
+        type: 'ol',
+        items: [
+          'Two proofs of address.',
+          'One proof of Social Security.',
+          'Current credit reports.',
+        ],
+      },
+
+      { type: 'h3', text: 'Section N — The Legacy Credits feature inventory (now Home Ready Scores)' },
+      {
+        type: 'p',
+        text:
+          'The original Legacy Credits software had a complete feature set that Home Ready Scores is built to replicate. As a rep, you should know what the platform does so you can speak to it when a prospect asks. Here is the feature inventory, translated to Home Ready Scores.',
+      },
+      {
+        type: 'p',
+        text: 'Client management:',
+      },
+      {
+        type: 'ul',
+        items: [
+          'Client lifecycle management from Prospect to Client to Complete or Cancelled.',
+          'Three bureau credit repair tracking across Equifax, Experian, and TransUnion.',
+          'Multi round dispute letter generation with bureau specific templates.',
+          'Creditor letter system including Debt Validation, Qualified Written Request, Direct Dispute, and Verification.',
+          'Creditor database with over 4,420 entries.',
+          'Dispute status tracking with 35+ beginning statuses and 29+ tail end dispute templates.',
+          'Result Tracker with multiple layout views.',
+          'Billing and payment processing via Clover (credit card, subscriptions).',
+          'Affiliate and broker management with referral tracking and reports.',
+          'SMS and email communication with autoresponders.',
+          'Canned response system (hot links) for fast, consistent notes.',
+          'Help desk and ticketing system.',
+          'Appointment scheduling.',
+          'Document management with secure uploads.',
+          'Reporting suite including Closing Ratio, Note Ratio, and Referral Reports.',
+          'User and staff management with role based access.',
+          'Client portal with login credentials per client.',
+          'Round Robin lead assignment.',
+        ],
+      },
+      {
+        type: 'p',
+        text: 'Canned hot links (the notes you will use every day):',
+      },
+      {
+        type: 'ul',
+        items: [
+          'Updated Experian, Updated Equifax, Updated TransUnion.',
+          'Acknowledgments for each bureau.',
+          'Updated Frivolous Experian, Updated Frivolous TransUnion.',
+          'Late Results.',
+          'Drafted Letters.',
+          'NSF, NSF x2, Canceled.',
+          'Overdue Account - Left Message.',
+          'Overdue Account - Ring no answer.',
+          'Credit Results via fax.',
+          '1st and 2nd Failed Monthly Payment.',
+          'CreditReportOnly.',
+          'Help ticket response.',
+          'Terminated Account.',
+          'ProofOfSocial, MU Credit Report, ProofOfAddress.',
+          'Failed Enrollment Payment.',
+          'Client Cancelled Account.',
+          'Received All Docs.',
+          'Pending Termination.',
+          'Documentation Request.',
+          'Required Documents.',
+          'Opt out, Payment Received.',
+          'Next Round, Client.',
+          'Creditor Acknowledgement.',
+          'Cancellation Phone Call.',
+          'Letters W/O Docs.',
+          'Client Phone Call, Welcome.',
+          'Cxl Request.',
+          'Received Partial Docs.',
+          'Phone call or voicemail.',
+          'CR for Manual Update.',
+        ],
+      },
+
+      { type: 'h3', text: 'Section O — Final reminders from the original knowledge base' },
+      {
+        type: 'p',
+        text:
+          'Your role is the bridge between the prospect current situation and homeownership. Stay confident, empathetic, and solution focused. You are not just selling credit repair. You are selling the American Dream of homeownership.',
+      },
+      {
+        type: 'p',
+        text: 'Remember:',
+      },
+      {
+        type: 'ul',
+        items: [
+          'Build trust first.',
+          'Provide clarity always.',
+          'Give hope throughout.',
+          'Guide decisions confidently.',
+          'Close with urgency.',
+          'Follow up with care.',
+          'The enrollment URL is homereadyscores.com/get-started.',
+          'The support email is help@homereadyscores.com.',
+          'You are a Home Ready Scores specialist, and you change lives by helping people achieve their dream of homeownership through credit repair.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'roadmap',
+    number: 14,
     title: 'What still needs to be built',
     blocks: [
       {

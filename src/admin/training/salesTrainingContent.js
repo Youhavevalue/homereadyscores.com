@@ -1700,8 +1700,470 @@ export const salesTrainingSections = [
     ],
   },
   {
-    id: 'roadmap',
+    id: 'sales-playbook',
     number: 12,
+    title: 'The Sales Playbook — step by step on every call',
+    blocks: [
+      {
+        type: 'p',
+        text:
+          'This is the step by step playbook for a Home Ready Scores sales rep on every call. Follow it in order. Every step has the exact script. Do not skip steps. Do not improvise until you can deliver every step from memory. This playbook covers the cold call, the inbound call, and the full conversation from the moment you say hello to the moment they enroll or tell you no.',
+      },
+
+      { type: 'h3', text: 'PLAYBOOK 1 — The Cold Call (outbound to a new lead)' },
+      {
+        type: 'p',
+        text:
+          'Use this when you are calling a lead who came in through the website, an ad, a referral, or a list. The goal is to qualify them, build trust, and get them enrolled on the call or scheduled for a follow up.',
+      },
+
+      { type: 'h3', text: 'Step 1: The Opening' },
+      {
+        type: 'p',
+        text: 'Say this word for word. Do not ad lib the opening. The opening does three things: identifies you, states the reason for the call, and asks for their timeline.',
+      },
+      {
+        type: 'blockquote',
+        text:
+          'Hello, [NAME]. It is [YOUR NAME] with Home Ready Scores. How are you doing today? Thank you for taking my call. I understand that you are interested in purchasing a home, but need some help with your credit. What is your time frame for wanting to buy the new home?',
+      },
+      {
+        type: 'p',
+        text:
+          'Pause. Listen. Their timeline tells you everything. 30 to 60 days means hot. 6 to 12 months means warm. Not sure means early stage. Tag accordingly in the admin after the call.',
+      },
+
+      { type: 'h3', text: 'Step 2: The Discovery' },
+      {
+        type: 'p',
+        text:
+          'Let them talk. Do not interrupt. Take notes in the admin while they speak. The more they feel heard, the more they trust you. After they finish their story, say this:',
+      },
+      {
+        type: 'blockquote',
+        text:
+          'Great, I can help with that. Please give me an idea of what is going on with your credit, so I can explain how we can help.',
+      },
+      {
+        type: 'p',
+        text:
+          'Then listen again. Let them explain what is on their credit report, what they have tried, what their loan officer told them, what their realtor said. Take notes on every detail. This is where you earn the right to pitch.',
+      },
+
+      { type: 'h3', text: 'Step 3: The Credit Score Check' },
+      {
+        type: 'p',
+        text:
+          'You need to know their credit score to route them correctly. Ask directly:',
+      },
+      {
+        type: 'blockquote',
+        text:
+          'Do you have a rough idea of where your credit score sits right now, even a range? That helps me point you to the right next step.',
+      },
+      {
+        type: 'p',
+        text:
+          'If they say below 640: you are on the credit repair path. Proceed to Step 4.\n\nIf they say 640 or above: you are on the mortgage path. Say this: That is great. With a score in that range, the best next step is a phone consultation so we can match you with the right lender and get your application moving. When is a good time for a specialist to call you? Then book the consultation and end the call. Do NOT send any third party link. Do NOT name any outside company.\n\nIf they do not know: ask for a range. If they truly have no idea, book a phone consultation with a specialist.',
+      },
+
+      { type: 'h3', text: 'Step 4: The Three Selling Points' },
+      {
+        type: 'p',
+        text:
+          'Only deliver these after you have heard their story and confirmed they are below 640. Deliver all three. Do not skip any.',
+      },
+      {
+        type: 'blockquote',
+        text:
+          'Based on what you told me, here is how we help. First, the partnership. We work directly with your realtor and your mortgage professional so everyone sees your progress. You are on a tracked path to homeownership, not guessing alone. Second, the speed. Our process is built to move disputes forward efficiently, so your score can improve as fast as your file allows. Most clients see real movement in about 45 days. Third, the guarantee. We stand behind our program with a 100% Satisfaction Guarantee. If we cannot help, you are not stuck with us.',
+      },
+
+      { type: 'h3', text: 'Step 5: The Price Reveal' },
+      {
+        type: 'p',
+        text:
+          'State the price clearly and confidently. Do not apologize for the price. Do not hedge. Do not offer discounts. If the price feels high to you, that is your problem, not the prospect problem. Say this:',
+      },
+      {
+        type: 'blockquote',
+        text:
+          'There are two plans. Single Enrollment is $184.99 due today, then $114 a month. Couple Enrollment is $304.99 due today, then $190 a month. Both include the full three bureau review, a custom dispute strategy, bureau and creditor disputes on schedule, and our 100% Satisfaction Guarantee. Most clients work toward mortgage readiness over a 4 to 5 month window. Which plan fits your situation?',
+      },
+
+      { type: 'h3', text: 'Step 6: The Close' },
+      {
+        type: 'p',
+        text:
+          'Go for the close immediately after the price reveal. Do not wait. Do not ask if they have questions first. Ask for the enrollment directly.',
+      },
+      {
+        type: 'blockquote',
+        text:
+          'If you are serious about buying a home, we can start improving your credit today. I can get you enrolled right now at homereadyscores.com/get-started. It takes about five minutes. Are you ready to begin?',
+      },
+      {
+        type: 'p',
+        text:
+          'If YES: send the enrollment link immediately. Stay on the line while they fill it out. Walk them through each step if needed. Confirm the setup fee charged. Welcome them to Home Ready Scores. Tag the lead ENROLLED in the admin.\n\nIf HESITATION: go to Step 7 (objection handling).\n\nIf NOT SURE / NEED TO THINK: tag WARM. Say: I understand. Let me follow up with you tomorrow at [TIME]. Does that work? Then set the follow up task in the admin.\n\nIf NO: go to Step 8 (the graceful exit).',
+      },
+
+      { type: 'h3', text: 'Step 7: Objection Handling' },
+      {
+        type: 'p',
+        text:
+          'Never treat no as final. Redirect to the dream, owning a home. When full commitment feels heavy, offer a lighter next step. Handle the objection, then go back to the close.',
+      },
+      {
+        type: 'p',
+        text: 'If they say: Not right now.',
+      },
+      {
+        type: 'blockquote',
+        text: 'May I ask why?',
+      },
+      {
+        type: 'p',
+        text: 'Listen. Address the real objection. Then return to the close: So based on what you told me, would you agree that getting your credit on track is the right next step? Great, let us get you started today.',
+      },
+      {
+        type: 'p',
+        text: 'If they say: Money is tight.',
+      },
+      {
+        type: 'blockquote',
+        text:
+          'That is okay. Let us do a free consultation so you know your options. No pressure, no commitment. Just a conversation so you know exactly what your credit needs to look like and how we can help you get there.',
+      },
+      {
+        type: 'p',
+        text: 'If they say: Credit repair does not work.',
+      },
+      {
+        type: 'blockquote',
+        text:
+          'Have you read our reviews? We are rated number one in Texas. The real question is, are you serious about buying a home? Because if you are, we can help you get there.',
+      },
+      {
+        type: 'p',
+        text: 'If they say: I am too busy.',
+      },
+      {
+        type: 'blockquote',
+        text:
+          'You are not too busy for your dreams. I will call you on your schedule, never too early, never too late. Tell me when to call and I will be there.',
+      },
+      {
+        type: 'p',
+        text: 'If they say: I do not feel comfortable.',
+      },
+      {
+        type: 'blockquote',
+        text:
+          'Totally fair. Let us schedule a free consultation with our partner lender. He will look at your specific situation and tell you exactly what your credit needs to look like. That way you know for sure what to do next, with no pressure. Would [DAY] at [TIME] work for you?',
+      },
+      {
+        type: 'p',
+        text:
+          'This is the most important redirect. When someone is uncomfortable with credit repair, pivot to the free mortgage consultation. It is the lower commitment step that keeps them in the pipeline. Once the lender tells them what their score needs to be, they come back to us ready.',
+      },
+      {
+        type: 'p',
+        text: 'If they say: I need to think about it.',
+      },
+      {
+        type: 'blockquote',
+        text:
+          'I understand. Let me ask you this: what is there to think about? Is it the timing, the cost, or something else? If I can address it right now, I will. If not, I will follow up with you [DAY] at [TIME]. Does that work?',
+      },
+      {
+        type: 'p',
+        text:
+          'Tag WARM. Set a follow up task. Do not let a think about it sit untouched for more than 24 hours.',
+      },
+
+      { type: 'h3', text: 'Step 8: The Graceful Exit' },
+      {
+        type: 'p',
+        text:
+          'If they say no clearly, respect it. Do not burn the bridge. Leave the door open.',
+      },
+      {
+        type: 'blockquote',
+        text:
+          'I understand. If your situation changes, we are always here. You can reach us at homereadyscores.com or help@homereadyscores.com. Have a great day, [NAME].',
+      },
+      {
+        type: 'p',
+        text:
+          'If they say do not ever call again: say Understood, I respect that, have a good day. Document it in the admin. Cease outreach per policy. Do not argue. Do not push back. The CROA and TCPA both protect this request.',
+      },
+
+      { type: 'h3', text: 'Step 9: Post Call Documentation' },
+      {
+        type: 'p',
+        text:
+          'Every call gets logged in the admin. No exceptions. Even if they said no. Even if they did not answer. Even if you left a voicemail. Here is what you log:',
+      },
+      {
+        type: 'ol',
+        items: [
+          'Open the client or prospect profile in the admin.',
+          'Go to Client Status tab.',
+          'Use the canned Hot Links for the outcome: Client Phone Call, Welcome, Cancellation Phone Call, Next Round, etc.',
+          'If the action is not in the hot links, type a manual note with: the date, the outcome, what was discussed, the next step.',
+          'Update the status field: Pending, Scheduled, Active, Contact 1, Contact 2, Contact 3, Complete, NSF, Cancelled, Expired.',
+          'If they enrolled: tag ENROLLED, confirm the enrollment record was created, set a task for the 24 hour follow up.',
+          'If they said no: tag the reason in the notes so leadership can see the pattern.',
+          'If they did not answer: tag NO ANSWER and add to the blast list for the next cadence wave.',
+        ],
+      },
+
+      { type: 'h3', text: 'PLAYBOOK 2 — The Inbound Call (prospect called us)' },
+      {
+        type: 'p',
+        text:
+          'Use this when a prospect calls in. The caller called us for credit repair, so the job is to help them enroll, not to ask 20 questions first. Move fast. Be warm. Be direct.',
+      },
+
+      { type: 'h3', text: 'Step 1: The Inbound Opening' },
+      {
+        type: 'p',
+        text: 'Say this word for word. This mirrors the Alex voice agent script exactly.',
+      },
+      {
+        type: 'blockquote',
+        text:
+          'Hi, this is [YOUR NAME] with Home Ready Scores. Thanks for calling. I can help you get started with credit repair right now. It only takes about five minutes. Are you near a computer or phone where you can get online?',
+      },
+
+      { type: 'h3', text: 'Step 2: Route Based on Their Answer' },
+      {
+        type: 'p',
+        text:
+          'If YES (near a computer or phone): go to Step 3 (walk through enrollment).\n\nIf NO (not near a computer): go to Step 4 (book a follow up).',
+      },
+
+      { type: 'h3', text: 'Step 3: Walk Through Enrollment' },
+      {
+        type: 'p',
+        text: 'Say this, then walk them through each step of the Get Started form.',
+      },
+      {
+        type: 'blockquote',
+        text:
+          'Perfect. Here is what we will do. Go to homereadyscores.com. Once you are there, click the Get Started button. I will walk you through the form, it is super quick. It is four steps: your information, your goal, your plan and credit reports, and confirmation. I will stay on the line the whole time.',
+      },
+      {
+        type: 'p',
+        text:
+          'Walk them through each step. Be encouraging. Say things like: you are doing great, almost there, perfect. If they hesitate at the plan selection, remind them: Single Enrollment is $184.99 due today, then $114 a month. Couple Enrollment is $304.99 due today, then $190 a month. If they hesitate at the credit card step, remind them: Remember, we have a 100% Satisfaction Guarantee. If we cannot help, you are not stuck with us. Your card data is secured by Clover, it never touches our server.',
+      },
+
+      { type: 'h3', text: 'Step 4: If They Cannot Enroll Right Now' },
+      {
+        type: 'p',
+        text:
+          'If they are driving, at work, or not near a computer, do not force it. Book a time to call them back and send the link.',
+      },
+      {
+        type: 'blockquote',
+        text:
+          'No worries. When you are ready, just go to homereadyscores.com and click Get Started. It only takes five minutes and we have a 100% Satisfaction Guarantee. Do not wait too long, every day matters with credit. I will follow up with you tomorrow at [TIME] to see if you need any help getting through it. Does that work?',
+      },
+      {
+        type: 'p',
+        text:
+          'Tag the lead WARM. Set a follow up task for the next business day. Text them the link so they have it in writing.',
+      },
+
+      { type: 'h3', text: 'Step 5: The Enrollment Confirmation' },
+      {
+        type: 'p',
+        text: 'When they complete the form and the setup fee charges, confirm the enrollment warmly.',
+      },
+      {
+        type: 'blockquote',
+        text:
+          'Awesome, you are all set. Our team will reach out within 24 hours to get your documents and start working on your credit immediately. You just took the first step toward owning your home. Do you have any questions for me before we wrap up?',
+      },
+      {
+        type: 'p',
+        text:
+          'Answer any questions. Then close warmly: Welcome to Home Ready Scores. We are here for you. Talk soon.',
+      },
+
+      { type: 'h3', text: 'PLAYBOOK 3 — The Follow Up Call (warm lead)' },
+      {
+        type: 'p',
+        text:
+          'Use this when calling back a lead who showed interest but did not enroll on the first contact. They are tagged WARM in the admin. The goal is to get them enrolled or get a clear no.',
+      },
+
+      { type: 'h3', text: 'Step 1: The Follow Up Opening' },
+      {
+        type: 'blockquote',
+        text:
+          'Hey [NAME], this is [YOUR NAME] with Home Ready Scores. We talked on [DAY] about getting your credit on track for a home purchase. I am following up like I promised. Have you had a chance to look at the Get Started page?',
+      },
+      {
+        type: 'p',
+        text: 'Listen. Their answer tells you where they are.',
+      },
+
+      { type: 'h3', text: 'Step 2: If They Looked at the Page' },
+      {
+        type: 'p',
+        text:
+          'If yes: What did you think? Do you have any questions I can answer? Then answer the questions and go back to the close: So are you ready to get started? I can walk you through it right now if you are near a computer.\n\nIf they have questions: answer them using the FAQ scripts from Section 9 of this training. Then return to the close.',
+      },
+
+      { type: 'h3', text: 'Step 3: If They Have Not Looked' },
+      {
+        type: 'p',
+        text:
+          'If no, or they forgot, or they have been busy, do not guilt trip them. Just re state the value and move to the close.',
+      },
+      {
+        type: 'blockquote',
+        text:
+          'No worries, I know you are busy. Here is where things stand. You want to buy a home, your credit is the blocker, and we can fix it. We dispute inaccurate items on all three bureaus, we work with your loan officer and realtor so everyone stays aligned, and we have a 100% Satisfaction Guarantee. Single Enrollment is $184.99 today, then $114 a month. Couple is $304.99 today, then $190 a month. Most clients see real movement in about 45 days. Are you ready to get started?',
+      },
+
+      { type: 'h3', text: 'Step 4: The Close or the Tag' },
+      {
+        type: 'p',
+        text:
+          'If yes: walk them through enrollment right now. If hesitation: handle objections (Playbook 1, Step 7). If still no: tag WARM and set the next follow up. If they say stop calling: respect it, document it, cease outreach.',
+      },
+
+      { type: 'h3', text: 'PLAYBOOK 4 — The Referral Partner Call' },
+      {
+        type: 'p',
+        text:
+          'Use this when calling a realtor or mortgage banker who has buyers that cannot qualify because of their credit. The goal is to get them to refer their unqualified buyers to Home Ready Scores.',
+      },
+
+      { type: 'h3', text: 'Step 1: The Partner Opening' },
+      {
+        type: 'p',
+        text: 'To a realtor:',
+      },
+      {
+        type: 'blockquote',
+        text:
+          'Hi [REALTOR NAME], this is [YOUR NAME] with Home Ready Scores. I know you run into buyers every week who cannot qualify because their credit is not there yet. Right now those are dead deals for you. We turn them into closed deals in four to five months. You keep the relationship, you keep the listing, you keep the commission. We just delay the close, not cancel it. Do you have five minutes to hear how it works?',
+      },
+      {
+        type: 'p',
+        text: 'To a mortgage banker:',
+      },
+      {
+        type: 'blockquote',
+        text:
+          'Hi [LO NAME], this is [YOUR NAME] with Home Ready Scores. You run a credit pull on a prospect, the score comes back under 640, and you cannot write the loan. Without us, that is a lost pipeline lead. With us, you refer the buyer to Home Ready Scores, you get real time visibility into their credit progress, you do not have to manage the credit fix yourself, and you get the buyer back ready to close in four to five months. You fund the loan you otherwise would have lost. Do you have five minutes to hear how it works?',
+      },
+
+      { type: 'h3', text: 'Step 2: The Value Pitch' },
+      {
+        type: 'blockquote',
+        text:
+          'Here is how it works. You refer the buyer to us. We enroll them, pull their credit reports, build a custom dispute strategy, and run multi round disputes across all three bureaus. We keep you updated on their progress the whole way. When their credit is mortgage ready, we hand them back to you so you can reactivate the deal. You do not lose the deal, you delay it four to five months and bring it back funded.',
+      },
+
+      { type: 'h3', text: 'Step 3: The Partner Close' },
+      {
+        type: 'blockquote',
+        text:
+          'Here is how we start. Next time you have a buyer who cannot qualify because of their credit, refer them to us. We will enroll them, fix the credit, and hand them back to you ready to close. You will see their progress the whole way. Sound fair?',
+      },
+      {
+        type: 'p',
+        text:
+          'If yes: get their contact info, add them as an Affiliate or Broker in the admin, and set up the referral workflow. If they want to think about it: follow up in one week. If no: leave the door open and move on.',
+      },
+
+      { type: 'h3', text: 'PLAYBOOK 5 — The Daily Cadence' },
+      {
+        type: 'p',
+        text:
+          'This is not a single call playbook. This is how you structure every day so outreach and follow up never slip. Follow this cadence or you will lose leads.',
+      },
+
+      { type: 'h3', text: 'Before 9:00 AM — The Close List' },
+      {
+        type: 'p',
+        text:
+          'Write the names of the people most likely to enroll today. Keep that list visible all day. These are priority one.',
+      },
+
+      { type: 'h3', text: '9:00 to 9:10 AM — The NO ANSWER Blast' },
+      {
+        type: 'p',
+        text:
+          'In the CRM, everyone tagged NO ANSWER gets a mass text to reschedule. Repeat every 2 hours: 9:00, 11:00, 1:00, 3:00, 5:00. Remove the tag when they reschedule or opt out.',
+      },
+
+      { type: 'h3', text: '9:15 to 9:20 AM — The HOT List' },
+      {
+        type: 'p',
+        text:
+          'These are people one conversation from enrolling. Not a mass text. Each message is personal and speaks to their specific goal. Repeat every 2 hours: 9:15, 11:15, 1:15, 3:15, 5:15.',
+      },
+
+      { type: 'h3', text: '9:30 to 9:40 AM — The WARM Leads' },
+      {
+        type: 'p',
+        text:
+          'Friendly mass style outreach to warm leads. Ask to schedule a call. Repeat: 9:30, 11:30, 1:30, 3:30, 5:00.',
+      },
+
+      { type: 'h3', text: 'Between Waves — CALL' },
+      {
+        type: 'p',
+        text:
+          'Minimum 20 to 30 dials per day between text blasts. Texts open doors. Calls close them. Use Playbook 1 for cold calls and Playbook 3 for follow ups.',
+      },
+
+      { type: 'h3', text: 'Missed Scheduled Call' },
+      {
+        type: 'ol',
+        items: [
+          'Call at the scheduled time.',
+          'Text immediately with the next step or the enrollment link.',
+          'Reschedule follow ups for several days out.',
+          'Tag NO ANSWER and restart the cadence next business morning if needed.',
+        ],
+      },
+
+      { type: 'h3', text: 'PLAYBOOK 6 — What Never to Do' },
+      {
+        type: 'p',
+        text:
+          'These are the hard rules. Violating any of these is a compliance issue, a lost sale, or both.',
+      },
+      {
+        type: 'ul',
+        items: [
+          'Never quote a price other than Single $184.99 / $114 or Couple $304.99 / $190 unless you have confirmed the live price on the website.',
+          'Never promise a specific deletion, a specific score increase, or a specific close date.',
+          'Never invent guarantee or refund terms. Point to the legal pages on the site and check with leadership for anything beyond the 100% Satisfaction language.',
+          'Never mention Legacy Credits, Legacy Prime Lending, or any other company name. Even as a negation. Even to say we do not work with them.',
+          'Never tell a client we are a debt settlement company, a loan, or a consolidation service. We are not.',
+          'Never refer to yourself as a bot or a call center. You are a Home Ready Scores specialist.',
+          'Never leave a failed payment unanswered. NSF turns into a cancellation fast.',
+          'Never leave a client in silence during the bureau investigation window. Silence is the single biggest reason clients cancel.',
+          'Never send a third party link to a 640+ lead. Always book a phone consultation.',
+          'Never skip the post call documentation. Every call gets a note in the admin. No exceptions.',
+          'Never say we can remove anything. We dispute inaccurate, unverifiable, or unfair items. That is different.',
+          'Never say a score is guaranteed to go up by X points. Outcomes vary by file.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'roadmap',
+    number: 13,
     title: 'What still needs to be built',
     blocks: [
       {

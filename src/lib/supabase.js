@@ -3,7 +3,9 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Brand-wide Supabase consolidation (2026-09-07): this app lives in schema home_ready of the
+// shared brand-core project. Every query is scoped there; nothing else about queries changes.
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, { db: { schema: 'home_ready' } });
 
 /**
  * Fetch wrapper for portal API calls that includes the authenticated

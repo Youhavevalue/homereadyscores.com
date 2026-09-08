@@ -17,9 +17,9 @@ export default function AdminDocumentList({ clientId, documents, onReload, showT
     const timestamp = Date.now();
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
     const filePath = `${clientId}/${timestamp}_${safeName}`;
-    const { error: uploadError } = await supabase.storage.from('client-documents').upload(filePath, file);
+    const { error: uploadError } = await supabase.storage.from('home-ready-client-documents').upload(filePath, file);
     if (uploadError) throw new Error(uploadError.message);
-    const { data: urlObj } = supabase.storage.from('client-documents').getPublicUrl(filePath);
+    const { data: urlObj } = supabase.storage.from('home-ready-client-documents').getPublicUrl(filePath);
     await supabase.from('documents').insert({
       client_id: clientId,
       name: file.name,
@@ -63,7 +63,7 @@ export default function AdminDocumentList({ clientId, documents, onReload, showT
         body: file,
       });
       if (!uploadRes.ok) throw new Error('Upload failed');
-      const { data: urlObj } = supabase.storage.from('client-documents').getPublicUrl(urlData.filePath);
+      const { data: urlObj } = supabase.storage.from('home-ready-client-documents').getPublicUrl(urlData.filePath);
       await supabase.from('documents').insert({
         client_id: clientId,
         name: file.name,
@@ -98,7 +98,7 @@ export default function AdminDocumentList({ clientId, documents, onReload, showT
       });
       const contentType = res.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
-        if (doc.file_path) await supabase.storage.from('client-documents').remove([doc.file_path]);
+        if (doc.file_path) await supabase.storage.from('home-ready-client-documents').remove([doc.file_path]);
         await supabase.from('documents').delete().eq('id', doc.id);
       }
       showToast('Deleted.', 'success');

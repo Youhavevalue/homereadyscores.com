@@ -517,7 +517,7 @@ const DocumentUploadTab = ({ documents, clientId, docType, title, icon, onReload
       if (!uploadRes.ok) throw new Error('Upload failed');
 
       // 3. Get public URL
-      const { data: urlObj } = supabase.storage.from('client-documents').getPublicUrl(urlData.filePath);
+      const { data: urlObj } = supabase.storage.from('home-ready-client-documents').getPublicUrl(urlData.filePath);
 
       // 4. Save document record
       await supabase.from('documents').insert({
@@ -547,7 +547,7 @@ const DocumentUploadTab = ({ documents, clientId, docType, title, icon, onReload
       const filePath = `${clientId}/${timestamp}_${safeName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('client-documents')
+        .from('home-ready-client-documents')
         .upload(filePath, file);
 
       if (uploadError) {
@@ -556,7 +556,7 @@ const DocumentUploadTab = ({ documents, clientId, docType, title, icon, onReload
         return;
       }
 
-      const { data: urlObj } = supabase.storage.from('client-documents').getPublicUrl(filePath);
+      const { data: urlObj } = supabase.storage.from('home-ready-client-documents').getPublicUrl(filePath);
 
       await supabase.from('documents').insert({
         client_id: clientId,
@@ -588,7 +588,7 @@ const DocumentUploadTab = ({ documents, clientId, docType, title, icon, onReload
         // Dev fallback
         const doc = documents.find(d => d.id === docId);
         if (doc?.file_path) {
-          await supabase.storage.from('client-documents').remove([doc.file_path]);
+          await supabase.storage.from('home-ready-client-documents').remove([doc.file_path]);
         }
         await supabase.from('documents').delete().eq('id', docId);
       }

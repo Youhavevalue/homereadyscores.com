@@ -32,7 +32,7 @@ test('privacy and search metadata match live card collection',async()=>{
  assert.doesNotMatch(renderHead('/'),internal);
 });
 
-const {ui,walk,text,click,fill,readyCardPreview}=require('./fixtures/enrollment-ui.cjs');
+const {ui,walk,text,click,fill,readyCardPreview}=require('./enrollment-copy-ui.cjs');
 test('live-capability enrollment steps and confirmation use customer language',async()=>{
  const h=ui(undefined,{ok:true,capability:{enabled:true,syntheticOnly:false,securityCodeRequired:true},data:{billingMode:'manual',status:'pending_manual_review',requestId:'FICTIONAL_REFERENCE',cardSaved:true}});
  h.render();h.effects[0]();await new Promise(setImmediate);

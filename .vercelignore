@@ -8,9 +8,7 @@ dist
 tests/*
 !tests/customer-copy-release.test.cjs
 !tests/public-copy.test.cjs
-!tests/fixtures/
-tests/fixtures/*
-!tests/fixtures/enrollment-ui.cjs
+!tests/enrollment-copy-ui.cjs
 review-runtime
 preview-runtime
 supabase

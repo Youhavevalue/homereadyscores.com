@@ -16,7 +16,7 @@ function ui(rel='src/pages/GetStarted.jsx', response={ok:true,data:{billingMode:
     if(name==='../lib/supabase')return {portalFetch:async()=>{throw new Error('Unexpected portal billing call');}};
     throw new Error(`Blocked import ${name}`);
   },fetch:async(url,init)=>{if(url.includes('action=capability'))return {ok:true,json:async()=>response.capability||{enabled:false}};calls.push({url,body:JSON.parse(init.body)});if(response.throw)throw new Error('MOCK_NETWORK');return {ok:response.ok,json:async()=>response.data};}};
-  const built=esbuild.buildSync({entryPoints:[path.resolve(__dirname,'../..',rel)],bundle:true,define:{'import.meta.env':'{}'},platform:'node',format:'cjs',packages:'external',external:['../lib/supabase'],write:false,jsx:'automatic'});
+  const built=esbuild.buildSync({entryPoints:[path.resolve(__dirname,'..',rel)],bundle:true,define:{'import.meta.env':'{}'},platform:'node',format:'cjs',packages:'external',external:['../lib/supabase'],write:false,jsx:'automatic'});
   vm.runInNewContext(built.outputFiles[0].text,context,{filename:rel,timeout:1000});
   return {calls,effects,render(){cursor=0;refCursor=0;return context.module.exports.default({client:{first_name:'Fictional'},onClose(){},...props});}};
 }

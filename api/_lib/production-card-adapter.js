@@ -26,7 +26,7 @@ const card=validateCard(securityCodeEnabled?withoutCardSecurityCode(input).card:
   async modifySecurityCode({requestId,request,action,cvv}={}){
    if(!securityCodeEnabled||!UUID.test(requestId||'')||!['updateCVV','clearCVV'].includes(action))throw new Error('Card update unavailable.');
    if(action==='updateCVV'&&(typeof cvv!=='string'||!/^\d{3,4}$/.test(cvv)))throw new Error('Enter a three- or four-digit security code.');
-   const authRequest={...request,body:{requestId,password:request?.body?.password}};
+   const authRequest=sessionAccess?request:{...request,method:request?.method,headers:request?.headers,socket:request?.socket,body:{requestId,password:request?.body?.password}};
    const proof=await (action==='clearCVV'&&revealGuard.authorizeRemoval?revealGuard.authorizeRemoval(authRequest,requestId):revealGuard.authorize(authRequest,requestId));
    if(!UUID.test(proof?.memberId||'')||proof.enrollmentId!==requestId||proof.sessionBinding!==staffSessionBinding(request)||!/^[a-f0-9]{64}$/.test(proof.credentialVersion||'')||(!sessionAccess&&action==='updateCVV'&&!/^[a-f0-9]{64}$/.test(proof.grantHash||'')))throw new Error('Card update access could not be confirmed.');
    // Encrypt with enrollment ID for staff updates; original customer capture uses submission key.

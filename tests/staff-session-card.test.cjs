@@ -13,7 +13,7 @@ test('staff session displays and updates the full saved card without a card pass
  const get=()=>{const req=s.request({});req.method='GET';req.query={requestId:target};return req;};
  const first=await invoke(app.card,get());assert.equal(first.status,200);assert.equal(first.body.card.number,'4111111111111111');assert.equal(first.body.card.cvv,'627');assert.equal(first.headers['Cache-Control'],'no-store');
  assert.equal((await invoke(app.card,get())).body.card.cvv,'627');
- assert.equal((await invoke(app.card,s.request({requestId:target,action:'updateCVV',cvv:'841'}))).status,200);
+ const update=s.request({requestId:target,action:'updateCVV',cvv:'841'});const requestHeaders=update.headers;delete update.headers;Object.setPrototypeOf(update,{get headers(){return requestHeaders;}});assert.equal((await invoke(app.card,update)).status,200);
  assert.equal((await invoke(app.card,get())).body.card.cvv,'841');
  const cross=get();cross.headers.origin='https://attacker.example';assert.equal((await invoke(app.card,cross)).status,403);
  const signedOut=get();signedOut.headers.cookie='';assert.equal((await invoke(app.card,signedOut)).status,401);

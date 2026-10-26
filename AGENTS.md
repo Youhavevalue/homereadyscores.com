@@ -34,3 +34,8 @@ Direct Marcus instruction in chat 01a178ee-8337-7f00-992c-7a33b7a7aa7c: Stop ask
 ## Marcus: staff must see and correct collected CVV (October 26, 2026)
 
 Latest direct clarification in chat01a178ee-8337-7f00-992c-7a33b7a7aa7c: Marcus and his small staff must be able to view all collected card details, including CVV, and update CVV when a customer provides a correction. The proposed one-view/24-hour code design was not requested and is superseded. Preserve existing staff access; do not add an authenticator, new role requirement or extra approval flow. CVV remains subject to removal after the related payment authorization; do not promise post-authorization or recurring-use CVV retention. Do not ask about the processor again.
+
+
+## Marcus: automatic staff card display; no extra card lock (October 26, 2026)
+
+Latest direct correction in chat01a178ee-8337-7f00-992c-7a33b7a7aa7c: Open an enrollment in the existing signed-in staff system and show the saved card number, expiration, billing address and available CVV directly. Staff can update a supplied CVV. Remove the extra card-password prompt, unlock/reveal button, masking, timers and blur hiding. Do not restore them as inherited protections or add an authenticator/extra approval. The ordinary staff sign-in remains the access boundary; never expose card data publicly or to unsigned requests. This supersedes all earlier card reauthentication/one-view/24-hour proposals. Do not ask about the processor again.

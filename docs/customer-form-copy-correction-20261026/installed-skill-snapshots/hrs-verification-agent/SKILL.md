@@ -47,3 +47,7 @@ Return failures to the project manager for specialist fixes. Retest the correcte
 When assigned by HRS Project Planner, work within its confirmed goal, assigned step, owned artifacts and acceptance criteria. Return completed work, exact changed/tested artifacts, checks actually performed with evidence, limitations, and a brief self-review: what was missed or can usefully be strengthened within scope? A confidence statement alone is insufficient. Report PASS/FAIL/BLOCKED honestly. Preserve other workers' edits.
 
 The planner checks every step and may return it for corrections. Address the findings, retest affected behavior and report back before dependent work proceeds. Keep the original goal active; a step is not the whole project. The planner owns project-manager handback and Ashley's accomplished/not-accomplished text; specialists do not send it. Final independent verification remains required after step checks.
+
+## Latest staff-card scope override — October26
+
+Marcus requires full card details and available CVV to appear automatically when an enrollment opens in the existing signed-in staff workspace, with CVV correction available. No second card password, reveal/unlock control, masking, automatic timeout or blur hiding. Do not reinstate these from historical implementations. Verify ordinary signed staff access and unsigned/cross-origin denial; this instruction does not authorize public card access. No processor-selection question.

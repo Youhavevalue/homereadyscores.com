@@ -1,10 +1,10 @@
 import{serverDb}from'./server-db.js';
 import{loadProductionCardKeys}from'./production-card-keys.js';
 import{createEnvelopeCrypto,createPreparedCardService}from'./production-card-adapter.js';
-import{createStaffCardPassword}from'./staff-card-password.js';
+import{createStaffCardSession}from'./staff-card-session.js';
 import{createControlledCardCapture,createPublicEnrollmentController}from'./public-card-enrollment.js';
 import{createPreparedEnrollmentCardHandler}from'./prepared-enrollment-card.js';
-const disabledAccess=(req,res)=>{res.setHeader('Cache-Control','no-store');return res.status(410).json({enabled:false,error:'Authenticator setup is not available. Re-enter your staff password in the saved-card form.'});};
+const disabledAccess=(req,res)=>{res.setHeader('Cache-Control','no-store');return res.status(410).json({enabled:false,error:'Authenticator setup is not available. Open the enrollment record in the staff workspace.'});};
 export function createProductionCardRuntime({env=process.env,db:providedDb,adminReader}={}){
  let keys;try{keys=loadProductionCardKeys(env);}catch{/* Never expose key/config payloads. */}
  let readyPromise;
@@ -15,10 +15,11 @@ export function createProductionCardRuntime({env=process.env,db:providedDb,admin
     if(error||data?.ready!==true||data.version!=='hrs-card-runtime-v2-password'||data.schema!=='home_ready'||!Array.isArray(data.card_key_ids))return{ready:false,reason:'schema'};
     if(data.card_key_ids.some(id=>typeof id!=='string'||!keys.hasCardKey(id)))return{ready:false,reason:'stored_key_unavailable'};
     const crypto=createEnvelopeCrypto({keyResolver:keys.cardKeyResolver,fingerprintKeyResolver:keys.fingerprintKeyResolver});
-    const guard=createStaffCardPassword({db,...(adminReader?{adminReader}:{})});
+    const sessionReadiness=await db.rpc('card_storage_staff_session_readiness',{});if(sessionReadiness.error||sessionReadiness.data?.ready!==true)return{ready:false,reason:'staff_session_access'};
+    const guard=createStaffCardSession({...(adminReader?{adminReader}:{})});
     const codeReadiness=await db.rpc('enrollment_security_code_readiness',{});const securityCodeEnabled=!codeReadiness.error&&codeReadiness.data?.ready===true&&codeReadiness.data?.version==='hrs-temporary-code-v1';if(!securityCodeEnabled)return{ready:false,reason:'security_code_storage'};
-    const service=createPreparedCardService({db,crypto,revealGuard:guard,securityCodeEnabled}),capture=createControlledCardCapture({service,syntheticOnly:false,securityCodeRequired:securityCodeEnabled});
-    return{ready:true,db,public:createPublicEnrollmentController({db,capture}),card:createPreparedEnrollmentCardHandler({db,capture,service,revealFields:['requestId','password','action','cvv'],...(adminReader?{adminReader}:{})})};
+    const service=createPreparedCardService({db,crypto,revealGuard:guard,securityCodeEnabled,sessionAccess:true}),capture=createControlledCardCapture({service,syntheticOnly:false,securityCodeRequired:securityCodeEnabled});
+    return{ready:true,db,public:createPublicEnrollmentController({db,capture}),card:createPreparedEnrollmentCardHandler({db,capture,service,showFullCard:true,revealFields:['requestId','action','cvv'],...(adminReader?{adminReader}:{})})};
    }catch{return{ready:false,reason:'unavailable'};}
   })();return readyPromise;
  }

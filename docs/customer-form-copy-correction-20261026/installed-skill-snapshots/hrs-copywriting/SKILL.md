@@ -46,3 +46,7 @@ Short excerpts locate the evidence; they do not contain full offer terms. Before
 PASS means supported draft ready for review, not publication permission or user acceptance. HOLD segments stay out of publishable copy; provide the precise missing fact or source. A page assembled from individually supported words can still fail the sentence-level meaning check. Do not claim absolute enforcement from an instruction file or a keyword checker.
 
 When assigned by HRS Project Planner, preserve other workers' files and return exact artifacts, evidence, limitations and one useful self-review. The design agent places tested copy; the independent verifier checks source entailment, HRS truth and action behavior. The planner owns handback and any separately authorized notification.
+
+## Latest staff-card scope override — October26
+
+Marcus requires full card details and available CVV to appear automatically when an enrollment opens in the existing signed-in staff workspace, with CVV correction available. No second card password, reveal/unlock control, masking, automatic timeout or blur hiding. Do not reinstate these from historical implementations. Verify ordinary signed staff access and unsigned/cross-origin denial; this instruction does not authorize public card access. No processor-selection question.

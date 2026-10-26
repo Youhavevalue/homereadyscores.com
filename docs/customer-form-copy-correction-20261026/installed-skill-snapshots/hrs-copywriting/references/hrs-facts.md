@@ -27,3 +27,5 @@ Grounding: HOME-PREP and CONSULT in language-catalog.json, plus Marcus's authori
 ## October 26 collection-only correction
 
 Marcus explicitly prohibits further processor-selection questions. The authorized task is complete card/billing collection and protected staff viewing, without automatic charges/subscriptions. Current corrective work adds temporary encrypted CVV capture separate from persistent card details; staff can repeatedly view and update it before the initial payment is authorized, then must remove it; recording that payment as paid also removes it. Verify current deployed capability and lifecycle evidence before describing this as live. Apply website-release-audit.md; do not infer completion from this record.
+
+Latest staff display correction: card details appear automatically in the existing signed-in staff enrollment record. No second password, reveal button, card mask, timeout or blur hiding. Staff can correct CVV; the authorization-bound CVV removal rule still applies. Verify current hosted behavior before claiming release.

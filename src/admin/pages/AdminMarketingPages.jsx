@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AdminSimplePage, { AdminPlaceholderTable } from './AdminSimplePage';
 import { AdminCard } from '../components/AdminCard';
@@ -10,20 +10,18 @@ export function ProspectsPage() {
   const [q, setQ] = useState('');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      setLoading(true);
-      const data = await fetchProspects();
-      if (!cancelled) {
-        setRows(data);
-        setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
+  const [loadError, setLoadError] = useState('');
+  const load = useCallback(async () => {
+    setLoading(true);
+    setLoadError('');
+    try { setRows(await fetchProspects()); }
+    catch (err) { setLoadError(err.message || 'Prospects could not be loaded.'); }
+    finally { setLoading(false); }
   }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => void load(), 0);
+    return () => clearTimeout(timer);
+  }, [load]);
 
   const filtered = useMemo(() => {
     const s = q.toLowerCase().trim();
@@ -58,12 +56,11 @@ export function ProspectsPage() {
         />
       </AdminCard>
       <AdminCard title="Prospects">
-        {loading ? (
+        {loadError ? <div role="alert" className="rounded-xl border border-red-200 p-4 text-red-800">{loadError} <button type="button" className="font-semibold underline" onClick={load}>Retry loading prospects</button></div> : loading ? (
           <div className="h-24 animate-pulse rounded-xl bg-slate-100" />
         ) : filtered.length === 0 ? (
           <p className="text-sm text-slate-500">
-            No prospects yet. Run <code className="rounded bg-slate-100 px-1">sql/admin_operational_migration.sql</code> then
-            add prospects.
+            No prospects match this view. Add a prospect to record a new lead.
           </p>
         ) : (
           <div className="overflow-x-auto">
@@ -133,13 +130,13 @@ export function ProspectNewPage() {
       showToast('Prospect saved.', 'success');
       navigate('/admin/prospects');
     } catch (err) {
-      showToast(err.message || 'Save failed — run admin migration SQL.', 'error');
+      showToast(err.message || 'Save failed. Your entries are preserved; please retry.', 'error');
     }
     setSaving(false);
   };
 
   return (
-    <AdminSimplePage title="Add prospect" subtitle="Capture lead details and trigger autoresponder sequences when wired.">
+    <AdminSimplePage title="Add prospect" subtitle="Record lead details for internal follow-up. This form does not send customer messages.">
       <form onSubmit={save}>
         <AdminCard title="Prospect form">
           <div className="grid gap-3 md:grid-cols-2">

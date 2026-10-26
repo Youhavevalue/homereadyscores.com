@@ -1,0 +1,22 @@
+import {PGlite} from '@electric-sql/pglite';
+import {readFile} from 'node:fs/promises';
+export async function openCardFixture(directory){
+ const pg=new PGlite(directory);await pg.waitReady;
+ if(!(await pg.query("SELECT to_regclass('home_ready.enrollment_card_vault') present")).rows[0].present){
+ await pg.exec(`create schema home_ready;create role anon;create role authenticated;create role service_role bypassrls;grant usage on schema home_ready to service_role,anon,authenticated;
+ create table home_ready.enrollments(id uuid primary key default gen_random_uuid(),first_name text,last_name text,email text,phone text,goal text,plan text,billing_zip text,credit_report_agreement boolean,setup_fee_amount integer,monthly_amount integer,setup_fee_status text,subscription_status text,enrollment_source text,status text,assigned_to text,next_action text,submission_key uuid unique,submission_fingerprint text,website_session_id uuid,attribution jsonb,created_at timestamptz default now(),updated_at timestamptz default now());
+ create table home_ready.activity_log(id uuid primary key default gen_random_uuid(),entity_type text,entity_id uuid,action text,actor_type text,metadata jsonb,created_at timestamptz default now());
+ create table home_ready.website_rate_limits(key_hash text,purpose text,window_start timestamptz,attempts int,expires_at timestamptz,primary key(key_hash,purpose,window_start));
+ create table home_ready.team_members(id uuid primary key,email text unique,name text,role text,password_hash text);grant all on all tables in schema home_ready to service_role;`);
+ await pg.exec(await readFile(new URL('./existing-inquiry-functions.sql',import.meta.url),'utf8'));
+ await pg.exec(await readFile(new URL('./existing-credit-funnel.sql',import.meta.url),'utf8'));
+ await pg.exec('ALTER DEFAULT PRIVILEGES IN SCHEMA home_ready GRANT ALL ON TABLES TO service_role');
+ await pg.exec(await readFile(new URL('../../supabase/migrations/20261025215621_enrollment_private_card_vault.sql',import.meta.url),'utf8'));
+ await pg.exec(await readFile(new URL('../../supabase/migrations/20261025220727_staff_card_access_mfa.sql',import.meta.url),'utf8'));
+ await pg.exec(await readFile(new URL('../../supabase/migrations/20261025222145_card_entry_staff_metadata.sql',import.meta.url),'utf8'));
+ await pg.exec(await readFile(new URL('../../supabase/migrations/20261026103559_production_card_storage_readiness.sql',import.meta.url),'utf8'));
+ }
+ if(!(await pg.query("SELECT to_regprocedure('home_ready.card_storage_password_readiness()') present")).rows[0].present)await pg.exec(await readFile(new URL('../../supabase/migrations/20261026105858_password_only_card_access.sql',import.meta.url),'utf8'));
+ const names={card_storage_password_readiness:[],issue_password_card_reveal_grant:['p_actor','p_version','p_session','p_enrollment','p_grant'],card_storage_readiness:[],credit_funnel_dispatch:['p_action','p_token','p_payload'],enrollment_card_metadata:['p_id','p_actor'],submit_website_inquiry:['p_key','p_fingerprint','p_request','p_attribution','p_session','p_network'],submit_credit_funnel_enrollment:['p_token','p_key','p_fingerprint','p_request','p_attribution','p_session','p_network'],consume_card_access_budget:['p_actor','p_network','p_scope'],start_card_mfa:['p_actor','p_version','p_seed','p_envelope','p_key_id'],get_card_mfa:['p_actor','p_version'],confirm_card_mfa:['p_actor','p_version','p_seed','p_step'],issue_card_reveal_grant:['p_actor','p_version','p_seed','p_step','p_session','p_enrollment','p_grant'],read_enrollment_card_with_grant:['p_id','p_actor','p_version','p_session','p_grant'],save_enrollment_card:['p_key','p_fingerprint','p_request','p_attribution','p_session','p_network','p_envelope','p_card_fingerprint','p_key_id','p_last4','p_funnel_token'],read_enrollment_card:['p_id','p_actor']};
+ return{pg,async rpc(name,args){const keys=names[name];if(!keys)throw Error('Fixture RPC not allowed');try{const result=await pg.transaction(async tx=>{await tx.exec('SET LOCAL ROLE service_role');return tx.query(`SELECT home_ready.${name}(${keys.map((_,i)=>'$'+(i+1)).join(',')}) result`,keys.map(key=>args[key]??null));});return{data:result.rows[0].result,error:null};}catch(error){return{data:null,error:{code:error.code,message:error.message}};}}};
+}

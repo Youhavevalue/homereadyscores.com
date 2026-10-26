@@ -3,7 +3,7 @@ import { ShieldCheck } from 'lucide-react';
 
 const TermsOfService = () => {
   return (
-    <div className="pt-32 pb-24 bg-surface min-h-screen">
+    <div className="hrs-legal-page pt-32 pb-24 bg-surface min-h-screen">
       <div className="max-w-4xl mx-auto px-6 bg-white p-12 md:p-16 rounded-3xl shadow-[0_10px_40px_rgba(0,45,91,0.05)] border border-gray-100">
         <div className="flex items-center gap-4 mb-8 pb-8 border-b border-gray-100">
             <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
@@ -42,8 +42,8 @@ const TermsOfService = () => {
           <h3 className="text-xl font-bold text-navy mt-8">8. Contact Information</h3>
           <p>For questions or concerns regarding these terms, please contact us at:</p>
           <ul className="list-disc pl-5">
-             <li><strong>Email:</strong> help@homereadyscores.com</li>
-             <li><strong>Text Support:</strong> 972-128-0009</li>
+             <li><strong>Email:</strong> <a href="mailto:help@homereadyscores.com" className="underline">help@homereadyscores.com</a></li>
+             <li><strong>Text Support:</strong> Currently unavailable. Use the published email for questions.</li>
           </ul>
         </div>
       </div>

@@ -1,3 +1,4 @@
+import BrandLogo from '../../components/BrandLogo';
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -67,7 +68,7 @@ const ClientDirectory = () => {
     <div style={styles.page}>
       <header style={styles.header}>
         <div style={styles.headerLeft}>
-          <div style={styles.logoMark}>HRS</div>
+          <BrandLogo reverse width={180} />
           <span style={styles.headerTitle}>Client Portal</span>
         </div>
         <nav style={styles.nav}>

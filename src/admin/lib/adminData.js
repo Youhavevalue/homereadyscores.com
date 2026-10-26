@@ -1,17 +1,10 @@
 import { supabase } from '../../lib/supabase';
 
-/** Open help desk tickets count (badge). Returns 0 if table missing. */
+/** Badge failures stay unknown rather than masquerading as zero open tickets. */
 export async function fetchOpenTicketCount() {
-  try {
-    const { count, error } = await supabase
-      .from('help_tickets')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'open');
-    if (error) return 0;
-    return count ?? 0;
-  } catch {
-    return 0;
-  }
+  const {count,error}=await supabase.from('help_tickets').select('*',{count:'exact',head:true}).eq('status','open');
+  if(error)throw error;
+  return count ?? 0;
 }
 
 export async function fetchHelpTickets({ status = 'all', limit = 100 } = {}) {
@@ -60,7 +53,7 @@ export async function fetchClientNotes(clientId, noteType) {
     .order('created_at', { ascending: false });
   if (noteType) q = q.eq('note_type', noteType);
   const { data, error } = await q;
-  if (error) return [];
+  if (error) throw error;
   return data || [];
 }
 
@@ -92,7 +85,7 @@ export async function fetchStaffHotLinks() {
     .select('*')
     .order('sort_order', { ascending: true })
     .order('created_at', { ascending: true });
-  if (error) return [];
+  if (error) throw error;
   return data || [];
 }
 
@@ -111,23 +104,15 @@ export async function deleteStaffHotLink(id) {
   if (error) throw error;
 }
 
-/** Seed default custom hot links once when table is empty. */
-export async function ensureDefaultStaffHotLinks(defaultLabels) {
-  const { count, error } = await supabase
-    .from('staff_hot_links')
-    .select('*', { count: 'exact', head: true });
-  if (error || (count ?? 0) > 0) return false;
-  const rows = defaultLabels.map((label, i) => ({ label, sort_order: i }));
-  const { error: insErr } = await supabase.from('staff_hot_links').insert(rows);
-  return !insErr;
-}
+/** Reads must not write default rows into the production database. */
+export async function ensureDefaultStaffHotLinks() { return false; }
 
 export async function fetchProspects() {
   const { data, error } = await supabase
     .from('prospects')
     .select('*')
     .order('created_at', { ascending: false });
-  if (error) return [];
+  if (error) throw error;
   return data || [];
 }
 

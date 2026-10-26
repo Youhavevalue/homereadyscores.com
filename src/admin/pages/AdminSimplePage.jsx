@@ -10,7 +10,7 @@ export default function AdminSimplePage({
   actions,
 }) {
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="admin-simple-page mx-auto max-w-4xl space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-black text-[#002D5B]">{title}</h1>

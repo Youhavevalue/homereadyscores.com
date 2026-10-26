@@ -1,65 +1,44 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase, portalFetch } from '../../lib/supabase';
-import { useAdminToast } from '../context/AdminToastContext';
+import { portalFetch } from '../../lib/supabase';
 import AdminSimplePage from './AdminSimplePage';
 import { AdminCard } from '../components/AdminCard';
 
 export default function AdminJointClient() {
   const navigate = useNavigate();
-  const { showToast } = useAdminToast();
   const [a, setA] = useState({ first_name: '', last_name: '', email: '' });
   const [b, setB] = useState({ first_name: '', last_name: '', email: '' });
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   const save = async (e) => {
     e.preventDefault();
-    if (!a.first_name || !a.last_name || !b.first_name || !b.last_name) {
-      alert('Both primary and joint need first and last name.');
+    if (saving) return;
+    if (![a.first_name, a.last_name, b.first_name, b.last_name].every(value => value.trim())) {
+      setSaveError('Both clients need a first and last name.');
       return;
     }
     setSaving(true);
-    const { data: c1, error: e1 } = await supabase
-      .from('clients')
-      .insert({ ...a, status: 'active', notes: 'Joint — primary' })
-      .select()
-      .single();
-    if (e1) {
-      showToast(e1.message, 'error');
-      setSaving(false);
-      return;
-    }
-    const { data: c2, error: e2 } = await supabase
-      .from('clients')
-      .insert({
-        ...b,
-        status: 'active',
-        notes: `Joint with primary client ${c1.id}`,
-      })
-      .select()
-      .single();
-    if (e2) {
-      showToast(e2.message, 'error');
-      setSaving(false);
-      return;
-    }
+    setSaveError('');
     try {
-      await portalFetch('/api/clients/push-to-ghl', {
+      const response = await portalFetch('/api/clients/joint', {
         method: 'POST',
-        body: JSON.stringify({ clientId: c1.id }),
+        body: JSON.stringify({ primary: a, joint: b }),
       });
-    } catch {
-      /* optional */
-    }
-    setSaving(false);
-    navigate(`/admin/clients/${c1.id}?joint=${c2.id}`);
+      const result = await response.json();
+      if (!response.ok || !result.primaryId || !result.jointId) throw new Error(result.error || 'Joint clients could not be saved.');
+      navigate(`/admin/clients/${result.primaryId}?joint=${result.jointId}`);
+    } catch (err) {
+      setSaveError(err.message || 'Joint clients could not be saved. Your entries are preserved; please retry.');
+    } finally { setSaving(false); }
   };
 
   return (
     <AdminSimplePage
       title="Add joint client"
-      subtitle="Creates two linked client records (extend schema with joint_id for full pairing)."
+      subtitle="Creates two pending staff records together, linked by internal notes. No agreement, activation, payment, or customer message is triggered."
     >
+      {saveError && <p role="alert" className="mb-4 rounded-xl border border-red-200 p-3 text-red-700">{saveError}</p>}
       <form onSubmit={save}>
         <AdminCard title="Primary client">
           <div className="grid gap-3 sm:grid-cols-2">

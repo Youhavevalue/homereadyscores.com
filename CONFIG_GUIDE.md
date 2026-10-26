@@ -1,3 +1,5 @@
+> Historical setup guide. See README.md and current release records before configuring or deploying.
+
 # 🔐 Home Ready Scores — Credentials & Integration Guide
 
 This document contains the critical IDs and configuration settings for the Home Ready Scores ecosystem. **Keep this file secure.**
@@ -7,7 +9,7 @@ This document contains the critical IDs and configuration settings for the Home 
 | Setting | Value | Description |
 |---|---|---|
 | **Location ID** | `XKYVuDiB39yJhk1XTMcV` | The unique ID for the "3. LC Client Pod" sub-account. |
-| **GHL API Key** | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2NhdGlvbl9pZCI6IlhLWVZ1RGlCMzl5SmhrMVhUTWNWIiwidmVyc2lvbiI6MSwiaWF0IjoxNzczNzAxODc3NzU2LCJzdWIiOiJlOVRBWFF1a3UxZXFaZnJiSlU0NyJ9.zprMjPjKLuPUA32qQN7i1Kqq468YXyeDZGRMCnUq-rA` | Found in GHL Settings > Business Profile. (Used for API calls). |
+| **GHL API Key** | `<YOUR_SUPABASE_ANON_KEY>` | Found in GHL Settings > Business Profile. (Used for API calls). |
 | **API Version** | `2021-07-28` | The LeadConnector API version used in the code. |
 
 ## 2. Vercel Deployment Settings

@@ -1,95 +1,21 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-
-const AuthContext = createContext(null);
-
-export const useAuth = () => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be inside AuthProvider');
-  return ctx;
-};
-
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const stored = localStorage.getItem('portal_user');
-    if (stored) {
-      try {
-        setUser(JSON.parse(stored));
-      } catch { /* ignore */ }
-    }
-    setLoading(false);
-  }, []);
-
-  const login = async (email, password) => {
-    try {
-      // Try the server-side API route first (works on Vercel)
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      // If we get HTML back (Vite dev server fallback), use direct Supabase auth
-      const contentType = res.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        return await directLogin(email, password);
-      }
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Login failed');
-      const userData = { id: data.id, email: data.email, name: data.name, role: data.role };
-      setUser(userData);
-      localStorage.setItem('portal_user', JSON.stringify(userData));
-      return { success: true };
-    } catch (err) {
-      // Network error or Vite serving HTML — fall back to direct Supabase
-      if (err.message === 'Login failed' || err.message === 'Invalid credentials') {
-        return { success: false, error: err.message };
-      }
-      return await directLogin(email, password);
-    }
-  };
-
-  // Fallback: query Supabase directly (for local dev without Vercel serverless functions)
-  const directLogin = async (email, password) => {
-    try {
-      const { default: bcrypt } = await import('bcryptjs');
-      const { data: member, error } = await supabase
-        .from('team_members')
-        .select('id, email, password_hash, name, role')
-        .eq('email', email.toLowerCase().trim())
-        .single();
-
-      if (error || !member) {
-        return { success: false, error: 'Invalid credentials' };
-      }
-
-      const match = await bcrypt.compare(password, member.password_hash);
-      if (!match) {
-        return { success: false, error: 'Invalid credentials' };
-      }
-
-      const userData = { id: member.id, email: member.email, name: member.name, role: member.role };
-      setUser(userData);
-      localStorage.setItem('portal_user', JSON.stringify(userData));
-      return { success: true };
-    } catch (err) {
-      console.error('Direct login error:', err);
-      return { success: false, error: 'Login failed: ' + err.message };
-    }
-  };
-
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('portal_user');
-  };
-
-  return (
-    <AuthContext.Provider value={{ user, loading, login, logout, isAuthenticated: !!user }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
+import { portalFetch } from '../lib/supabase';
+const AuthContext=createContext(null);
+// eslint-disable-next-line react-refresh/only-export-components -- Preserve the existing shared auth hook API.
+export const useAuth=()=>{const value=useContext(AuthContext);if(!value)throw new Error('useAuth must be inside AuthProvider');return value;};
+export function AuthProvider({children}){
+  const [user,setUser]=useState(null);const [loading,setLoading]=useState(true);const [sessionError,setSessionError]=useState('');
+  useEffect(()=>{
+    let active=true;
+    try{localStorage.removeItem('portal_user');}catch{/* Stored identity is never trusted. */}
+    (async()=>{try{const r=await portalFetch('/api/auth/session');if(r.ok){const current=await r.json();if(active)setUser(current);}else if(r.status!==401&&active)setSessionError('Team access is temporarily unavailable.');}catch{if(active)setSessionError('Team access is temporarily unavailable.');}finally{if(active)setLoading(false);}})();
+    return()=>{active=false;};
+  },[]);
+  async function login(email,password,rememberDevice=false){
+    try{const r=await portalFetch('/api/auth/login',{method:'POST',body:JSON.stringify({email,password,rememberDevice})});const body=await r.json();if(!r.ok)return{success:false,error:body.error||'Sign-in unavailable.'};setUser(body);setSessionError('');return{success:true};}catch{return{success:false,error:'Sign-in unavailable. Please retry; no browser password lookup was attempted.'};}
+  }
+  async function logout(){
+    try{const r=await portalFetch('/api/auth/logout',{method:'POST',body:'{}'});if(!r.ok)throw new Error();setUser(null);setSessionError('');return true;}catch{setSessionError('Sign-out could not be confirmed. Please retry.');return false;}
+  }
+  return <AuthContext.Provider value={{user,loading,sessionError,login,logout,isAuthenticated:user?.role==='admin'}}>{children}</AuthContext.Provider>;
+}

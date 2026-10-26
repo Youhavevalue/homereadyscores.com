@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { portalFetch } from '../lib/supabase';
+import { AUTOMATED_BILLING_ENABLED } from '../../shared/billing-mode.js';
 
 /**
  * CloverPaymentForm — Embeds the Clover iframe for secure card tokenization
@@ -23,6 +24,7 @@ const CloverPaymentForm = ({ client, onPaymentSuccess, onClose }) => {
 
   // Load Clover config from our API
   useEffect(() => {
+    if (!AUTOMATED_BILLING_ENABLED) return;
     async function fetchConfig() {
       try {
         const res = await fetch('/api/clover/config');
@@ -51,6 +53,7 @@ const CloverPaymentForm = ({ client, onPaymentSuccess, onClose }) => {
 
   // Load Clover SDK and mount iframe elements
   useEffect(() => {
+    if (!AUTOMATED_BILLING_ENABLED) return;
     if (!cloverConfig || sdkLoaded.current) return;
 
     const script = document.createElement('script');
@@ -105,12 +108,13 @@ const CloverPaymentForm = ({ client, onPaymentSuccess, onClose }) => {
 
     return () => {
       // Cleanup on unmount
-      try { document.head.removeChild(script); } catch {}
+      try { document.head.removeChild(script); } catch { /* SDK may already be removed. */ }
     };
   }, [cloverConfig]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!AUTOMATED_BILLING_ENABLED) return;
     if (!cloverRef.current || processing) return;
 
     setProcessing(true);
@@ -167,6 +171,18 @@ const CloverPaymentForm = ({ client, onPaymentSuccess, onClose }) => {
       setProcessing(false);
     }
   };
+
+  if (!AUTOMATED_BILLING_ENABLED) {
+    return (
+      <div style={styles.overlay}>
+        <div style={styles.modal} role="status">
+          <h2>Automatic billing is disabled</h2>
+          <p>Payments are handled separately by the team after agreement and billing review. No card information is collected here.</p>
+          <button type="button" style={styles.closeBtn} onClick={onClose}>Close</button>
+        </div>
+      </div>
+    );
+  }
 
   if (success) {
     return (

@@ -1,7 +1,7 @@
 export function AdminCard({ title, subtitle, actions, children, className = '' }) {
   return (
     <section
-      className={`rounded-2xl border border-slate-200/80 bg-white p-6 shadow-[0_4px_24px_rgba(0,45,91,0.06)] ${className}`}
+      className={`admin-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-[0_4px_24px_rgba(0,45,91,0.06)] ${className}`}
     >
       {(title || actions) && (
         <div className="mb-4 flex flex-wrap items-start justify-between gap-3">

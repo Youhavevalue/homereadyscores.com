@@ -85,12 +85,15 @@ const DisputeLetterModal = ({ dispute, client, onSave, onClose }) => {
 
   const handlePrint = () => {
     const win = window.open('', '_blank');
+    if (!win) return;
+    win.opener = null;
+    const printable = letterText.replace(/[&<>"']/g, character => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
     win.document.write(`
       <html><head><title>Dispute Letter</title>
       <style>
         body { font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.6; padding: 1in; white-space: pre-wrap; max-width: 8.5in; }
       </style></head>
-      <body>${letterText}</body></html>
+      <body>${printable}</body></html>
     `);
     win.document.close();
     win.print();

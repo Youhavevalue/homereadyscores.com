@@ -1,25 +1,30 @@
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-// Brand-wide Supabase consolidation (2026-09-07): this app lives in schema home_ready of the
-// shared brand-core project. Every query is scoped there; nothing else about queries changes.
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, { db: { schema: 'home_ready' } });
-
-/**
- * Fetch wrapper for portal API calls that includes the authenticated
- * user ID header so server-side routes can verify the caller.
- */
+// Staff data uses authenticated same-origin server routes, never anonymous database CRUD.
 export function portalFetch(url, options = {}) {
-  const stored = localStorage.getItem('portal_user');
-  const user = stored ? JSON.parse(stored) : null;
-  return fetch(url, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(user?.id ? { 'x-portal-user-id': user.id } : {}),
-      ...options.headers,
-    },
-  });
+  return fetch(url, { ...options, credentials:'same-origin', headers:{'Content-Type':'application/json',...options.headers} });
 }
+function query(table) {
+  const spec={table,operation:'select',columns:'*',filters:[],orders:[]};
+  const builder={
+    select(columns='*',options={}){spec.columns=columns;Object.assign(spec,options);return builder;},
+    eq(column,value){spec.filters.push({op:'eq',column,value});return builder;},
+    neq(column,value){spec.filters.push({op:'neq',column,value});return builder;},
+    order(column,options={}){spec.orders.push({column,...options});return builder;},
+    limit(value){spec.limit=value;return builder;},
+    insert(payload){spec.operation='insert';spec.payload=payload;return builder;},
+    update(payload){spec.operation='update';spec.payload=payload;return builder;},
+    delete(){spec.operation='delete';return builder;},
+    single(){spec.single='single';return builder;},
+    maybeSingle(){spec.single='maybeSingle';return builder;},
+    then(resolve,reject){return execute().then(resolve,reject);},
+  };
+  async function execute(){
+    try{
+      const res=await portalFetch('/api/operations',{method:'POST',body:JSON.stringify(spec)});
+      const body=await res.json();
+      if(!res.ok)return {data:null,count:null,error:{message:body.error||'Staff data unavailable.'}};
+      return body;
+    }catch{return {data:null,count:null,error:{message:'Staff data unavailable. Check your connection and retry.'}};}
+  }
+  return builder;
+}
+export const supabase={from:query};

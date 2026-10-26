@@ -86,10 +86,22 @@
 
 /* Mobile Optimizations */
 @media (max-width: 768px) {
-  h1 { font-size: 3.25rem !important; line-height: 1 !important; }
-  h2 { font-size: 2.25rem !important; }
+  .public-site h1 { font-size: 3.25rem !important; line-height: 1 !important; }
+  .public-site h2 { font-size: 2.25rem !important; }
   .auth-button { @apply w-full; }
-  section { 
+  .public-site section { 
     @apply py-16 px-6; 
   }
 }
+
+/* Reserve room for the approved full C05 logo above the mobile hero. */
+@media (max-width: 768px) {
+  section.home-hero { padding-top: 10rem; }
+}
+
+/* The enrollment flow uses form sizing rather than marketing-hero sizing. */
+.public-site .signup-page{padding-top:128px;background:#f6f8fc}.signup-heading{margin-bottom:28px}.public-site .signup-page h1{font-size:36px!important;font-weight:650;letter-spacing:-.035em;line-height:1.25!important;margin-bottom:12px}.signup-progress{margin-bottom:30px}.signup-progress>div:not(:first-child){height:32px;width:32px;font-size:12px;box-shadow:none}.signup-form-panel{padding:28px;border-radius:16px;box-shadow:0 4px 20px #1d293905}.signup-page .input-field{padding:13px 14px;font-size:16px;border-color:#dce3ee;border-radius:8px;box-shadow:none;min-width:0}.signup-page label{font-size:12px;font-weight:550;text-transform:none;letter-spacing:0;color:#52617a}.signup-page .auth-button,.signup-page .secondary-button{min-height:48px;font-size:14px;font-weight:600;letter-spacing:0;text-transform:none;border-radius:9px;box-shadow:none;padding:12px 20px;transform:none}.signup-page .input-field:focus-visible{outline:3px solid #8aabff;outline-offset:2px}.signup-page .grid>*{min-width:0}.signup-page .text-gray-400{color:#667085}.signup-page .space-y-6{row-gap:20px}
+@media(max-width:640px){.public-site .signup-page{padding:110px 16px 40px}.public-site .signup-page h1{font-size:30px!important}.signup-form-panel{padding:21px}.signup-progress{margin-bottom:24px;max-width:280px}.signup-page>.max-w-4xl>.grid{gap:24px}.signup-page .auth-button{padding:12px 18px;min-width:0}.signup-page .secondary-button{width:auto;padding:12px 16px}.signup-page .space-y-6{gap:20px}.signup-heading{margin-bottom:24px}.signup-page .signup-name-grid{grid-template-columns:minmax(0,1fr)}.signup-page .rounded-\[32px\]{border-radius:16px}}
+
+/* Receipt headings must clear the fixed full C05 header on phones. */
+.public-site section.receipt-page{padding-top:144px}

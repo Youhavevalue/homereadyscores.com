@@ -1,3 +1,5 @@
+> Historical repository notes. Current maintained source and release evidence are identified in README.md and AGENTS.md.
+
 # 🧠 Home Ready Scores — Project Memory & Context
 
 > **Purpose**: This file keeps track of all decisions, progress, and context across chat sessions so we never lose momentum.

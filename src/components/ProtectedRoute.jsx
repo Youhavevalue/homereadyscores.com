@@ -1,3 +1,4 @@
+import BrandLogo from './BrandLogo';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -11,11 +12,14 @@ const ProtectedRoute = ({ children }) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        flexDirection: 'column',
+        gap: '24px',
         background: '#0a0a1a',
         color: 'rgba(255,255,255,0.4)',
         fontFamily: "'Inter', sans-serif",
       }}>
-        Loading...
+        <BrandLogo reverse width={216} />
+        <p role="status">Loading...</p>
       </div>
     );
   }

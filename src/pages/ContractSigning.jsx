@@ -111,7 +111,7 @@ export default function ContractSigning() {
         if (!fileLive(token) || caseIdentity(refreshed) !== token.identity || currentIdentity.current !== token.identity) return;
         const file = { url: URL.createObjectURL(blob), filename: action === 'document' ? `contract-${payload.kind}.pdf` : 'contract-evidence-certificate.json', identity: token.identity };
         prepared.current = file; setReadyFile(file);
-        setNotice('Your file is ready to open. It has not been saved or read for you. A server transfer does not record a human receipt.');
+        setNotice('Your file is ready. Open it, save a copy, and review it before confirming receipt below.');
       } else if (action === 'logout') {
         const response = await portalFetch(`/api/contract-signing?caseId=${encodeURIComponent(expectedCase)}`, { method: 'DELETE' });
         if (!live(token)) return;
@@ -136,7 +136,7 @@ export default function ContractSigning() {
           adoptCase(body.case);
           if (!live(token)) return;
         }
-        setNotice('Server recorded the request. See the confirmed status and timestamps below.');
+        setNotice('Your request has been recorded. Review the status and dates below.');
       }
     } catch (failure) {
       if (live(token)) { if (action === 'load') setFresh(false); setError(failure.message || 'Request failed. Your entries are preserved.'); }
@@ -179,8 +179,8 @@ export default function ContractSigning() {
   return <main className="mx-auto max-w-4xl space-y-5 px-4 py-12 text-slate-800">
     <img src="/brand/c05/logos/logo-horizontal-primary.svg" alt="HomeReady Scores" width="216" height="66" className="max-w-full h-auto" />
     <h1 className="text-3xl font-bold">Review your contract packet</h1>
-    <p className="rounded-lg border border-amber-300 bg-amber-50 p-4">Signing requires the business to adopt and approve this exact packet. Service activation is held even after signature. This page sends no messages or payments.</p>
-    <p>Invite possession is not independent proof of identity. This session accesses only the invited case.</p>
+    <p className="rounded-lg border border-amber-300 bg-amber-50 p-4">Review your documents carefully before signing. Signing here does not start services or charge your card.</p>
+    <p>This private invitation is for the named signer. Do not share your link or access code.</p>
     {error && <p role="alert" className="text-red-800">{error}</p>}
     {notice && <p role="status">{notice}</p>}
     <section className="space-y-3 rounded-xl border p-4">
@@ -195,18 +195,18 @@ export default function ContractSigning() {
         <p>{visibleReadyFile.filename}</p><a className="inline-block rounded-lg bg-blue-700 px-4 py-2 font-semibold text-white" href={visibleReadyFile.url} target="_blank" rel="noopener noreferrer">Open prepared file</a>
         <p>Open the file, then use your browser’s Save as command and choose the intended folder. Check that the file opens and that you can retain it. No file has been saved automatically.</p></> : <h2 className="text-xl font-semibold">Prepare a file to open and save</h2>}
       <button className={buttonClass} type="button" onClick={() => { clearPrepared(); setNotice('Prepared file cleared from this page.'); }}>Clear prepared file</button>
-      <p>Preparing another file replaces this one. Clearing this page does not remove copies you already opened or saved. File transfer and opening are separate from your acknowledgements below.</p>
+      <p>Preparing another file replaces this one. Clearing this page does not remove copies you already opened or saved. Confirm receipt below after you have opened and reviewed the documents.</p>
     </section>}
     {visibleCurrent && <>
       {recoveryOnly ? <p role="status" className="rounded-lg border border-amber-300 p-4">Cancelled contract: retained copies and cancellation record only; cannot sign or restart services.</p> : !signingEnabled && <p role="status" className="rounded-lg border border-amber-300 p-4">New contract signing is currently on hold. Existing cancellation, paper requests, withdrawal requests, and retained-copy access remain available.</p>}
-      <section className="space-y-2 rounded-xl border p-4"><h2 className="text-xl font-semibold">Exact packet</h2>
+      <section className="space-y-2 rounded-xl border p-4"><h2 className="text-xl font-semibold">Your contract documents</h2>
         <p>Status: {record.status}</p>
         {!fresh && <p role="alert">The displayed case may be out of date. Reload the contract before recording any further action.</p>}
         <p>Signer: {record.signerName} · state: {record.clientState}</p><p>Version: {packet.version || 'Not confirmed'}</p>
         <dl className="space-y-2"><dt className="font-semibold">Services</dt><dd className="whitespace-pre-wrap">{packet.services || 'Not confirmed'}</dd><dt className="font-semibold">Total fee</dt><dd>{Number.isSafeInteger(packet.totalFeeCents) ? `$${(packet.totalFeeCents / 100).toFixed(2)}` : 'Not confirmed'}</dd><dt className="font-semibold">Duration</dt><dd>{packet.duration || 'Not confirmed'}{Number.isInteger(packet.durationDays) ? ` (${packet.durationDays} days)` : ''}</dd><dt className="font-semibold">Payment terms</dt><dd className="whitespace-pre-wrap">{packet.paymentTerms || 'Not confirmed'}</dd></dl>
-        <h3 className="font-semibold">Reviewed dates for this exact packet</h3>
-        <dl className="space-y-2"><dt className="font-semibold">Signing date</dt><dd>{packet.dateBinding?.signingDate || 'Not confirmed'}</dd><dt className="font-semibold">Review timezone</dt><dd>{packet.dateBinding?.timeZone || 'Not confirmed'}</dd><dt className="font-semibold">Cancellation deadline stated in the reviewed packet</dt><dd>{packet.dateBinding?.cancellationDeadline || 'Not confirmed'}</dd></dl>
-        <p>An outdated signing date requires a new reviewed packet version before signing. The server checks the reviewed date gate. This page does not guess a business-day or holiday calendar, substitute the current date, or calculate a new deadline. Later copy access and cancellation requests remain available.</p>
+        <h3 className="font-semibold">Important dates</h3>
+        <dl className="space-y-2"><dt className="font-semibold">Signing date</dt><dd>{packet.dateBinding?.signingDate || 'Not confirmed'}</dd><dt className="font-semibold">Time zone</dt><dd>{packet.dateBinding?.timeZone || 'Not confirmed'}</dd><dt className="font-semibold">Cancellation deadline stated in the reviewed packet</dt><dd>{packet.dateBinding?.cancellationDeadline || 'Not confirmed'}</dd></dl>
+        <p>An outdated signing date requires a new reviewed packet version before signing. Ask our team for updated documents if the signing date is out of date. Refer to your documents for the cancellation deadline. Later copy access and cancellation requests remain available.</p>
         {record.signedAt && <p>Signature recorded at {record.signedAt} for {record.signatureName || record.signerName}.</p>}
         {record.cancellationAt && <p>Cancellation recorded at {record.cancellationAt}. Activation remains held.</p>}
         {record.cancellationAt && typeof record.cancellationReason === 'string' && record.cancellationReason && <p>Recorded cancellation reason: {record.cancellationReason}</p>}
@@ -230,20 +230,20 @@ export default function ContractSigning() {
       </section>
       <section className="space-y-3 rounded-xl border p-4"><h2 className="text-xl font-semibold">3. Review and sign</h2>
         {['agreement','cancellation'].map(kind => <button key={kind} className={`${buttonClass} mr-2`} type="button" disabled={!canPrepare || (!copies && !record.disclosureReceiptAt)} onClick={() => run('document', {kind})}>Prepare {kind} PDF</button>)}
-        <p>{recoveryOnly ? 'You may download the four exact packet PDFs for your retained records. This does not record consent, a disclosure acknowledgement, or a signature.' : 'Download all four exact PDFs before signing. Each transfer is recorded separately; your acknowledgements remain separate from transfer records.'}</p>
+        <p>{recoveryOnly ? 'You may download the four exact packet PDFs for your retained records. This does not record consent, a disclosure acknowledgement, or a signature.' : 'Open, review and save all four documents before signing. Confirm receipt only after you have reviewed them.'}</p>
         <label className="block">Type your exact signer name<input className={inputClass} name="typedName" autoComplete="off" value={typedName} onChange={event => setTypedName(event.target.value)} /></label>
         <label className="block"><input type="checkbox" name="signatureIntent" checked={signatureIntent} onChange={event => setSignatureIntent(event.target.checked)} /> I intend this typed name to be my electronic signature on this exact packet.</label>
         <button className={buttonClass} type="button" disabled={!canSign} onClick={() => run('sign', {typedName:typedName.trim(),intent:true})}>Sign exact packet</button>
         {held && <p>Signing is on hold following a paper or withdrawal request.</p>}
       </section>
-      {copies && <section className="space-y-3 rounded-xl border p-4"><h2 className="text-xl font-semibold">{recoveryOnly ? 'Retained packet copies' : 'Your evidence bundle and copy receipt'}</h2>
-        <p>{recoveryOnly ? 'Your cancellation remains recorded above. These are the original packet PDFs. No signature was recorded, and this recovery cannot start services.' : 'The evidence bundle consists of the original four exact PDFs and a JSON signature/evidence certificate. Download each PDF again after signing, save the certificate, and retain them together. No combined signature-stamped document is generated.'}</p>
-        {!recoveryOnly && <button className={buttonClass} type="button" disabled={!canPrepare} onClick={() => run('certificate')}>Prepare evidence certificate (JSON)</button>}
+      {copies && <section className="space-y-3 rounded-xl border p-4"><h2 className="text-xl font-semibold">{recoveryOnly ? 'Retained packet copies' : 'Your documents and signature record'}</h2>
+        <p>{recoveryOnly ? 'Your cancellation is recorded above. You can save the original documents for your records.' : 'Save all four PDFs and your signature certificate together for your records. The certificate is a separate file.'}</p>
+        {!recoveryOnly && <button className={buttonClass} type="button" disabled={!canPrepare} onClick={() => run('certificate')}>Save signature certificate</button>}
         <label className="block"><input type="checkbox" name="copyAcknowledged" checked={copyAcknowledged} onChange={event => setCopyAcknowledged(event.target.checked)} /> {recoveryOnly ? 'I can retain the original packet PDFs.' : 'I received and can retain all four PDFs and the JSON evidence certificate.'}</label>
         <button className={buttonClass} type="button" disabled={!canAct || !signed || !record.certificateServedAt || !kinds.every(kind => hasKind(record.copyServedKinds, kind)) || !copyAcknowledged || Boolean(record.copyReceiptAt)} onClick={() => run('copy_receipt', {acknowledged:true})}>Acknowledge copy receipt</button>
       </section>}
       <section className="space-y-3 rounded-xl border p-4"><h2 className="text-xl font-semibold">Cancellation request</h2>
-        <p>You may submit a cancellation request before or after signing, including after withdrawing electronic consent. This page does not calculate or reject a request using a guessed deadline.</p>
+        <p>You may submit a cancellation request before or after signing, including after withdrawing electronic consent. See your agreement for the cancellation deadline and instructions.</p>
         <label className="block">Cancellation reason (optional)<textarea className={inputClass} name="cancellationReason" value={cancellationReason} onChange={event => setCancellationReason(event.target.value)} /></label>
         <button className={buttonClass} type="button" disabled={!canAct || !['offered','signed'].includes(record.status)} onClick={() => run('cancel', {reason:cancellationReason.trim()})}>Request cancellation</button>
       </section>

@@ -24,3 +24,13 @@ Project instructions and current release evidence live in:
 - `/Users/mac/Documents/Codex/2026-10-19/task-3/secure-card-signup-20261025/CURRENT-HANDOFF-GOAL.md`
 
 Read the relevant current record. Historical files in the repository are reference material, not proof of current approval, configuration or release state. A Git push or pull request does not establish a production release.
+
+
+## Marcus: collection-only card form; do not ask processor again (October 26, 2026)
+
+Direct Marcus instruction in chat 01a178ee-8337-7f00-992c-7a33b7a7aa7c: Stop asking which payment processor he uses. The requested scope is the enrollment form collecting card/billing information and making it visible to him through protected staff access. Do not make processor selection, activation, integration, automatic charges or subscriptions a prerequisite for collection-only work. Do not ask this question again. Respect the latest scope and preserve existing encryption and staff access controls. Identify actual technical/security constraints narrowly; do not claim that all pre-authorization CVV collection is forbidden. CVV must not remain available for future transactions after authorization; do not silently promise indefinite CVV retention or hide an unfinished field behind customer-facing implementation language.
+
+
+## Marcus: staff must see and correct collected CVV (October 26, 2026)
+
+Latest direct clarification in chat01a178ee-8337-7f00-992c-7a33b7a7aa7c: Marcus and his small staff must be able to view all collected card details, including CVV, and update CVV when a customer provides a correction. The proposed one-view/24-hour code design was not requested and is superseded. Preserve existing staff access; do not add an authenticator, new role requirement or extra approval flow. CVV remains subject to removal after the related payment authorization; do not promise post-authorization or recurring-use CVV retention. Do not ask about the processor again.

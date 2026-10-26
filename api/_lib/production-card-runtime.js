@@ -16,14 +16,15 @@ export function createProductionCardRuntime({env=process.env,db:providedDb,admin
     if(data.card_key_ids.some(id=>typeof id!=='string'||!keys.hasCardKey(id)))return{ready:false,reason:'stored_key_unavailable'};
     const crypto=createEnvelopeCrypto({keyResolver:keys.cardKeyResolver,fingerprintKeyResolver:keys.fingerprintKeyResolver});
     const guard=createStaffCardPassword({db,...(adminReader?{adminReader}:{})});
-    const service=createPreparedCardService({db,crypto,revealGuard:guard}),capture=createControlledCardCapture({service,syntheticOnly:false});
-    return{ready:true,db,public:createPublicEnrollmentController({db,capture}),card:createPreparedEnrollmentCardHandler({db,capture,service,revealFields:['requestId','password'],...(adminReader?{adminReader}:{})})};
+    const codeReadiness=await db.rpc('enrollment_security_code_readiness',{});const securityCodeEnabled=!codeReadiness.error&&codeReadiness.data?.ready===true&&codeReadiness.data?.version==='hrs-temporary-code-v1';if(!securityCodeEnabled)return{ready:false,reason:'security_code_storage'};
+    const service=createPreparedCardService({db,crypto,revealGuard:guard,securityCodeEnabled}),capture=createControlledCardCapture({service,syntheticOnly:false,securityCodeRequired:securityCodeEnabled});
+    return{ready:true,db,public:createPublicEnrollmentController({db,capture}),card:createPreparedEnrollmentCardHandler({db,capture,service,revealFields:['requestId','password','action','cvv'],...(adminReader?{adminReader}:{})})};
    }catch{return{ready:false,reason:'unavailable'};}
   })();return readyPromise;
  }
  return{
   async readiness(){const result=await dependencies();return{ready:result.ready,...(!result.ready?{reason:result.reason}:{})};},
-  async enroll(req,res){const result=await dependencies();if(result.ready)return result.public.enroll(req,res);return createPublicEnrollmentController({db:providedDb||serverDb()}).enroll(req,res);},
+  async enroll(req,res){if(req.method!=='POST')return res.status(405).json({error:'Method not allowed'});const result=await dependencies();if(result.ready)return result.public.enroll(req,res);if(!keys&&env.VERCEL!=='1'&&!Object.hasOwn(req.body||{},'card'))return createPublicEnrollmentController({db:providedDb||serverDb()}).enroll(req,res);res.setHeader('Cache-Control','no-store');return res.status(503).json({error:'Enrollment is temporarily unavailable. Please reload and try again.'});},
   async card(req,res){const result=await dependencies();return(result.ready?result.card:createPreparedEnrollmentCardHandler())(req,res);},
   async access(req,res){return disabledAccess(req,res);},
  };

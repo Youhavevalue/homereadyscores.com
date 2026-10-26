@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Quote, UserRound } from 'lucide-react';
-import { approvedReviewPhoto, getPublishableReviews, REVIEW_CAPACITY } from '../../shared/customer-reviews';
+import { approvedReviewPhoto, getPublishableReviews } from '../../shared/customer-reviews';
 import './reviews.css';
 
 const PAGE_SIZE = 6;
@@ -21,39 +21,24 @@ function ReviewCard({ review }) {
   );
 }
 
-function ReviewSpace({ number }) {
-  return (
-    <article className="hrs-voice-card hrs-voice-space" aria-label={`Review layout space ${number}; not a customer testimonial`}>
-      <div className="hrs-voice-space-top"><span>Review space {String(number).padStart(2, '0')}</span><Quote size={24} strokeWidth={1.4} aria-hidden="true" /></div>
-      <div className="hrs-voice-lines" aria-hidden="true"><span /><span /><span /></div>
-      <div className="hrs-voice-person">
-        <span className="hrs-voice-avatar" aria-hidden="true"><UserRound size={26} strokeWidth={1.4} /></span>
-        <div><h3>Customer’s own words</h3><p>Review and photo awaiting approval</p></div>
-      </div>
-      <p className="hrs-voice-placeholder-label">Layout preview · No testimonial supplied</p>
-    </article>
-  );
-}
-
 export default function Reviews() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const reviews = getPublishableReviews();
-  const spaces = Array.from({ length: REVIEW_CAPACITY - reviews.length }, (_, index) => ({ slot: reviews.length + index + 1 }));
-  const entries = [...reviews.map(review => ({ review })), ...spaces];
-  const visible = entries.slice(0, visibleCount);
-  const pending = REVIEW_CAPACITY - reviews.length;
+  const visible = reviews.slice(0, visibleCount);
 
   return (
     <div className="hrs-content-page hrs-reviews-page hrs-voices">
       <section className="hrs-wrap hrs-voices-intro">
-        <div><p className="hrs-kicker">Customer reviews</p><h1>Real experiences.<br />Shared in their own words.</h1><p>Learn about HomeReady Scores through the people who have worked with us. Customer reviews appear here after their source and permission to share have been confirmed.</p></div>
-        {pending > 0 && <aside className="hrs-voices-preview" aria-label="Review page preparation status"><span className="hrs-voices-preview-label">Unpublished design preview</span><h2>Room for 20 customer stories.</h2><p>{reviews.length === 0 ? 'Customer reviews and photos have not been approved for this preview yet.' : `${reviews.length} approved ${reviews.length === 1 ? 'review' : 'reviews'}; ${pending} review spaces awaiting approval.`}</p><p>Empty spaces show the layout only. They are not customer testimonials.</p></aside>}
+        <div><p className="hrs-kicker">Customer reviews</p><h1>Real experiences.<br />Shared in their own words.</h1><p>Learn about HomeReady Scores through the people who have worked with us. </p></div>
+
       </section>
 
       <section className="hrs-wrap hrs-voices-collection" aria-labelledby="hrs-voices-heading">
-        <div className="hrs-voices-collection-heading"><h2 id="hrs-voices-heading">Customer voices</h2><p>{reviews.length > 0 ? `${reviews.length} approved ${reviews.length === 1 ? 'review' : 'reviews'}` : 'Awaiting verified customer reviews'}</p></div>
-        <div className="hrs-voices-grid" id="hrs-voices-list">{visible.map(entry => entry.review ? <ReviewCard key={entry.review.id} review={entry.review} /> : <ReviewSpace key={`space-${entry.slot}`} number={entry.slot} />)}</div>
-        <div className="hrs-voices-more"><p role="status" aria-live="polite">Showing {visible.length} of {REVIEW_CAPACITY} {pending > 0 ? 'review layout spaces' : 'reviews'}.</p>{visibleCount < entries.length && <button type="button" className="hrs-button hrs-button-outline" aria-controls="hrs-voices-list" onClick={() => setVisibleCount(count => Math.min(count + PAGE_SIZE, entries.length))}>Show more {pending > 0 ? 'review spaces' : 'reviews'}<ArrowRight size={16} aria-hidden="true" /></button>}</div>
+        <div className="hrs-voices-collection-heading"><h2 id="hrs-voices-heading">Customer voices</h2></div>
+        {reviews.length === 0 ? <div className="hrs-voice-card"><h3>No customer reviews to share yet.</h3><p>Have questions about getting started? Talk with our team about your credit concerns and enrollment options.</p></div> : <>
+          <div className="hrs-voices-grid" id="hrs-voices-list">{visible.map(review => <ReviewCard key={review.id} review={review} />)}</div>
+          <div className="hrs-voices-more"><p role="status" aria-live="polite">Showing {visible.length} of {reviews.length} reviews.</p>{visibleCount < reviews.length && <button type="button" className="hrs-button hrs-button-outline" aria-controls="hrs-voices-list" onClick={() => setVisibleCount(count => Math.min(count + PAGE_SIZE, reviews.length))}>Show more reviews<ArrowRight size={16} aria-hidden="true" /></button>}</div>
+        </>}
         <p className="hrs-voices-disclosure">Individual experiences vary. A customer review does not guarantee a credit score change, item removal, timeline or mortgage approval.</p>
       </section>
 

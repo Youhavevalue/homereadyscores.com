@@ -7,3 +7,9 @@ export function checkCardFormat({name='',number='',expiry=''},now=new Date()){
  const match=typeof expiry==='string'&&/^(0[1-9]|1[0-2])\s*\/\s*(\d{2})$/.exec(expiry);if(!match)return{ok:false,error:'Enter expiry as MM/YY.'};
  const year=2000+Number(match[2]),month=Number(match[1]);if(year<now.getUTCFullYear()||year===now.getUTCFullYear()&&month<now.getUTCMonth()+1)return{ok:false,error:'Enter a future expiration date.'};return{ok:true};
 }
+
+export function checkSecurityCode(value,number='') {
+ const amex=/^3[47]/.test(String(number).replace(/[ -]/g,''));
+ if(typeof value!=='string'||!(amex?/^\d{4}$/:/^\d{3}$/).test(value))return{ok:false,error:amex?'Enter the four-digit security code on the front of your card.':'Enter the three-digit security code on the back of your card.'};
+ return{ok:true};
+}

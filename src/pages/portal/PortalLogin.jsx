@@ -101,7 +101,7 @@ const PortalLogin = () => {
 
         <details style={styles.help}>
           <summary>Which account do I use?</summary>
-          <p>Use your HomeReady staff account and website password. Your email inbox and Supabase sign-in have separate passwords. Check your saved passwords for homereadyscores.com.</p>
+          <p>Use your HomeReady Scores staff email and website password.</p>
         </details>
         <p style={styles.footerText}>Private access for your team.<br /><Link to="/" style={{ color: '#526d9a', display: 'inline-block', marginTop: 12 }}>← Return to HomeReady Scores</Link></p>
       </div>

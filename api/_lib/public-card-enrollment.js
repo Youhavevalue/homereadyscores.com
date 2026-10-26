@@ -1,15 +1,15 @@
 import{handleManualEnrollment}from'./manual-enrollment.js';
 import{publicJsonBody,websiteNetworkKey}from'./website-guards.js';
 import{funnelToken}from'./credit-funnel.js';
-import{rejectSecurityCode}from'./card-input.js';
+import{rejectSecurityCode,withoutCardSecurityCode}from'./card-input.js';
 import{UUID,validateAttribution}from'../../shared/website-tracking.js';
 const CAPABILITIES=new WeakSet();
 const TEST_CARDS=new Set(['4111111111111111','5555555555554444','371449635398431']);
-export function createControlledCardCapture({service,syntheticOnly=true}={}){
+export function createControlledCardCapture({service,syntheticOnly=true,securityCodeRequired=false}={}){
  if(typeof service?.save!=='function')throw Error('A configured card-storage service is required.');
- const capture=Object.freeze({syntheticOnly:syntheticOnly===true,save:input=>service.save(input)});CAPABILITIES.add(capture);return capture;
+ const capture=Object.freeze({syntheticOnly:syntheticOnly===true,securityCodeRequired:securityCodeRequired===true,save:input=>service.save(input)});CAPABILITIES.add(capture);return capture;
 }
-export function describeCardCapture(capture){return CAPABILITIES.has(capture)?{enabled:true,syntheticOnly:capture.syntheticOnly,staffMfaRequired:false}:{enabled:false};}
+export function describeCardCapture(capture){return CAPABILITIES.has(capture)?{enabled:true,syntheticOnly:capture.syntheticOnly,staffMfaRequired:false,...(capture.securityCodeRequired?{securityCodeRequired:true}:{})}:{enabled:false};}
 const fields=['firstName','lastName','email','phone','goal','plan','billingZip','creditReportAgreement','submissionKey','sessionId','attribution','funnel','card'];
 function normalize(b){
  if(Object.keys(b).some(key=>!fields.includes(key)))throw Error('Unsupported enrollment field.');
@@ -19,7 +19,7 @@ function normalize(b){
 export function createPublicEnrollmentController({db,capture}={}){
  return{
   capability(req,res){res.setHeader('Cache-Control','no-store');if(req.method!=='GET')return res.status(405).json({error:'Method not allowed'});return res.status(200).json(describeCardCapture(capture));},
-  async enroll(req,res){if(!publicJsonBody(req,res,8192))return;try{rejectSecurityCode(req.body);}catch{return res.status(400).json({error:'Do not submit a card security code.'});}
+  async enroll(req,res){if(!publicJsonBody(req,res,8192))return;try{rejectSecurityCode(capture?.securityCodeRequired?withoutCardSecurityCode(req.body):req.body);}catch{return res.status(400).json({error:'Do not submit a card security code.'});}
    if(!Object.hasOwn(req.body,'card')){if(CAPABILITIES.has(capture))return res.status(400).json({error:'Card details are required to complete this enrollment. Reload the form and try again.'});return handleManualEnrollment(req,res,db);}
    if(!CAPABILITIES.has(capture))return res.status(503).json({error:'Card storage is not enabled. No enrollment or card was saved by this request.'});
    let request;try{request=normalize(req.body);}catch(error){return res.status(400).json({error:error.message});}

@@ -9,7 +9,8 @@
     "dev:vercel": "npx vercel dev",
     "build": "vite build && node scripts/public-pages.mjs",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:copy": "node --test tests/customer-copy-release.test.cjs tests/public-copy.test.cjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.99.2",

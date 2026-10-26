@@ -22,7 +22,7 @@ export default function Home() {
           <h1>Don’t let<br /><span className="hrs-gradient-text">bad credit</span><br />put your home<br />plans on hold.</h1>
           <p>Take the first step toward addressing your credit concerns with HomeReady Scores. Understand your options and choose how to get started.</p>
           <div className="hrs-actions"><Start /><a className="hrs-button hrs-button-outline" href="#services">Learn More <ArrowRight size={18} aria-hidden="true" /></a></div>
-          <p className="hrs-hero-note">Enrollment received does not mean a charge has completed. Payment is pending until successfully processed.</p>
+          <p className="hrs-hero-note">You will not be charged when you submit your enrollment request.</p>
         </div>
         <div className="hrs-familiar-visual">
           <aside className="hrs-goals-card" aria-label="Credit concerns you can ask about">
@@ -39,7 +39,7 @@ export default function Home() {
       <h2>Your home plans deserve a next step.</h2>
       <p>HomeReady Scores gives you a place to start: discuss your concerns, learn about credit repair and review your options.</p>
       <a className="hrs-text-link" href={consultationEmail}>Request a free credit consultation <ArrowRight size={17} aria-hidden="true" /></a>
-      <p className="hrs-small">Email request · Appointment confirmed separately</p>
+      <p className="hrs-small">Request a time to discuss your credit concerns.</p>
     </div></section>
 
     <section className="hrs-section" id="services"><div className="hrs-wrap">
@@ -53,7 +53,7 @@ export default function Home() {
         <p className="hrs-kicker">{name}</p><h3>{description}</h3><div className="hrs-price"><strong>${monthly}</strong><span>/ month</span></div>
         <p className="hrs-monthly"><strong>${initial} initial fee</strong><br />Monthly pricing starts 30 days after signup.</p>
         <ul className="hrs-check-list"><li><CheckCircle size={18} aria-hidden="true" />{name === 'Single' ? 'Individual enrollment' : 'Enrollment for you and your partner'}</li><li><CheckCircle size={18} aria-hidden="true" />Share your credit concerns and goals</li><li><CheckCircle size={18} aria-hidden="true" />Review the service agreement before moving forward</li><li><CheckCircle size={18} aria-hidden="true" />Keep your enrollment reference for follow-up</li></ul>
-        <Start /><p className="hrs-small">Enrollment received does not mean a charge has completed. Payment is pending until successfully processed.</p>
+        <Start /><p className="hrs-small">You will not be charged when you submit your enrollment request.</p>
       </article>)}</div>
       <p className="hrs-pricing-note">Have questions first? <a href={consultationEmail}>Request a free credit consultation by email.</a> A request is not a booked appointment.</p>
     </div></section>

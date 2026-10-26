@@ -10,7 +10,7 @@ const AUDIENCE='home-ready-scores:home_ready:contract-signer:v1';
 const TTL=1200;
 const ACTIVATION={enabled:false,reason:'Service activation remains held pending adopted agreement and activation procedures.'};
 function contractMode(){const mode=process.env.HRS_CONTRACTS_MODE;return mode==='prepare'||mode==='sign'?mode:'disabled';}
-const newSigningHold=()=>new ContractError(423,'New signing is paused. Draft preparation and existing-case recovery remain available.');
+const newSigningHold=()=>new ContractError(423,'New signing is paused. You can still access existing documents and submit cancellation requests.');
 function finiteTime(value){return typeof value==='string'&&/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:[.]\d{1,6})?(?:Z|[+-]\d{2}(?::?\d{2})?)$/.test(value)&&Number.isFinite(Date.parse(value));}
 function cancelledRecovery(row){const r=row?.record||{};return r.status==='cancelled'&&r.signedAt==null&&r.signatureName==null&&r.hold===true&&[r.approvedAt,r.offeredAt,r.cancellationAt].every(finiteTime)&&Date.parse(r.approvedAt)<=Date.parse(r.offeredAt)&&Date.parse(r.offeredAt)<=Date.parse(r.cancellationAt);}
 function issuedRecoveryCase(row){const r=row?.record||{};return (r.status==='offered'&&finiteTime(r.offeredAt))||(['signed','cancelled'].includes(r.status)&&finiteTime(r.signedAt))||cancelledRecovery(row);}
@@ -67,7 +67,7 @@ export function contractEndpoint(kind){return async(req,res)=>{
  res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');
  try{
   const mode=contractMode();
-  if(mode==='disabled')throw new ContractError(503,'Online contracts are held while the approved packet and procedures are prepared.');
+  if(mode==='disabled')throw new ContractError(503,'Online signing is not available right now. Contact our team for help with your documents.');
   if(kind==='staff')return await staffEndpoint(req,res,mode);
   if(kind==='signer')return await signerEndpoint(req,res,mode);
   if(kind==='document')return await documentEndpoint(req,res);

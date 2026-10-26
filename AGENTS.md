@@ -39,3 +39,8 @@ Latest direct clarification in chat01a178ee-8337-7f00-992c-7a33b7a7aa7c: Marcus 
 ## Marcus: automatic staff card display; no extra card lock (October 26, 2026)
 
 Latest direct correction in chat01a178ee-8337-7f00-992c-7a33b7a7aa7c: Open an enrollment in the existing signed-in staff system and show the saved card number, expiration, billing address and available CVV directly. Staff can update a supplied CVV. Remove the extra card-password prompt, unlock/reveal button, masking, timers and blur hiding. Do not restore them as inherited protections or add an authenticator/extra approval. The ordinary staff sign-in remains the access boundary; never expose card data publicly or to unsigned requests. This supersedes all earlier card reauthentication/one-view/24-hour proposals. Do not ask about the processor again.
+
+
+## Marcus: card-entry copy correction (October 26, 2026)
+
+Direct instruction: keep the enrollment card screen focused on the cardholder, card number, expiration, CVV and billing fields. Do not add or restore “you will not be charged” banners, repeated no-charge messages, or explanatory payment-process narration in this form. Pricing belongs in plan review; use concise field labels and necessary entry guidance. Do not change charging behavior or staff card access to implement this copy preference.

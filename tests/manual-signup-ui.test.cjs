@@ -26,7 +26,7 @@ function click(h,label){const n=walk(h.render()).find(x=>x.type==='button'&&text
 function fill(h,name,value){const n=walk(h.render()).find(x=>x.type==='input'&&x.props.name===name);assert.ok(n,`Input ${name}`);n.props.onChange({target:{name,value}});}
 function ready(h){for(const [k,v]of Object.entries({firstName:'Fictional',lastName:'Dryrun',email:'dryrun@example.invalid',phone:'5125550100'}))fill(h,k,v);click(h,'Next Step');click(h,'Buy a Home');const p=walk(h.render()).find(n=>n.type==='button'&&text(n).includes('Single Enrollment'));assert.ok(p);p.props.onClick();fill(h,'billingZip','00000');const c=walk(h.render()).find(n=>n.type==='input'&&n.props.id==='creditReportAgreement');c.props.onChange({target:{checked:true}});}
 
-test('public signup completes as a pending request without card entry or SDK effects',async()=>{const h=ui();ready(h);assert.equal(walk(h.render()).some(n=>String(n.props?.id||'').startsWith('clover-card')),false);for(const effect of h.effects)assert.doesNotMatch(String(effect),/clover|createElement|appendChild/i);await click(h,'Get Started Now');assert.equal(h.calls.length,1);assert.equal(h.calls[0].url,'/api/enroll');assert.equal('source' in h.calls[0].body,false);const copy=text(h.render());assert.match(copy,/Enrollment received/);assert.match(copy,/MOCK_REQUEST_ID/);assert.match(copy,/You have not been charged/i);assert.doesNotMatch(copy,/payment has been processed/i);});
+test('public signup completes as a pending request without card entry or SDK effects',async()=>{const h=ui();ready(h);assert.equal(walk(h.render()).some(n=>String(n.props?.id||'').startsWith('clover-card')),false);for(const effect of h.effects)assert.doesNotMatch(String(effect),/clover|createElement|appendChild/i);await click(h,'Get Started Now');assert.equal(h.calls.length,1);assert.equal(h.calls[0].url,'/api/enroll');assert.equal('source' in h.calls[0].body,false);const copy=text(h.render());assert.match(copy,/Enrollment received/);assert.match(copy,/MOCK_REQUEST_ID/);assert.match(copy,/Your enrollment request has been received/i);assert.doesNotMatch(copy,/payment has been processed/i);});
 test('public signup keeps form available on save failure',async()=>{const h=ui(undefined,{ok:false,data:{error:'Unable to save your request.'}});ready(h);await click(h,'Get Started Now');assert.match(text(h.render()),/Unable to save/);assert.ok(walk(h.render()).some(n=>n.type==='button'&&text(n)==='Get Started Now'));assert.doesNotMatch(text(h.render()),/Enrollment received/);});
 test('plan cards show the requested initial and monthly prices with 30-day timing',()=>{
   const h=ui();ready(h);
@@ -42,7 +42,7 @@ test('switching plans updates the initial total and monthly summary without clai
     const card=walk(h.render()).find(n=>n.type==='button'&&text(n).includes(title));card.props.onClick();
     const summary=walk(h.render()).find(n=>n.props?.['aria-label']==='Enrollment summary');assert.ok(summary);
     const copy=text(summary);assert.ok(copy.includes(`Initial total$${initial}`));assert.ok(copy.includes(`$${monthly}/mo`));
-    assert.match(copy,/starting 30 days after signup/i);assert.match(copy,/You will not be charged/i);
+    assert.match(copy,/starting 30 days after signup/i);assert.doesNotMatch(copy,/You will not be charged/i);
     assert.doesNotMatch(copy,/\$0\.00|due today|charged today|paid/i);
   }
   assert.equal(h.calls.length,0);

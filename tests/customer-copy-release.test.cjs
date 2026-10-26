@@ -43,7 +43,7 @@ test('live-capability enrollment steps and confirmation use customer language',a
  for(const [k,v]of Object.entries({billingAddressLine1:'100 Example Way',billingCity:'Austin',billingState:'TX',billingZip:'78701','demoCard-name':'Fictional Example','demoCard-number':'4111111111111111','demoCard-expiry':'12/99','card-cvv':'627'}))fill(h,k,v);
  const submit=walk(h.render()).find(n=>n.type==='button'&&/Save enrollment/.test(text(n)));assert.ok(submit);
  submit.props.onClick();await new Promise(setImmediate);
- assert.match(text(h.render()),/You have not been charged/);assert.doesNotMatch(text(h.render()),internal);
+ assert.match(text(h.render()),/Your enrollment request has been received/);assert.doesNotMatch(text(h.render()),internal);
  assert.equal(h.calls.length,1);assert.equal(h.calls[0].url,'/api/enroll');assert.equal(h.calls[0].body.card.number,'4111111111111111');
 });
 

@@ -222,7 +222,7 @@ const GetStarted = ({ cardStepPreview = false, funnelMode = false } = {}) => {
 
   const selectedPlan = formData.plan ? PLANS[formData.plan] : null;
 
-  if (funnelMode && funnelLead?.status === 'enrollment_submitted') return <div className="signup-page min-h-screen pt-32 pb-24 px-6"><div className="max-w-xl mx-auto"><h1>Enrollment request received</h1><p>Reference: {funnelLead.requestId}</p><p>Our team will review your enrollment request. You have not been charged.</p><Link to="/">Return to HomeReady Scores</Link></div></div>;
+  if (funnelMode && funnelLead?.status === 'enrollment_submitted') return <div className="signup-page min-h-screen pt-32 pb-24 px-6"><div className="max-w-xl mx-auto"><h1>Enrollment request received</h1><p>Reference: {funnelLead.requestId}</p><p>Our team will review your enrollment request.</p><Link to="/">Return to HomeReady Scores</Link></div></div>;
 
   if (funnelMode && (funnelLoading || funnelError)) return <div className="signup-page min-h-screen pt-32 pb-24 px-6"><div className="max-w-xl mx-auto">{funnelLoading ? <p role="status">Loading your saved details…</p> : <><p role="alert">{funnelError}</p><button className="auth-button" onClick={() => setFunnelReload(n => n + 1)}>Retry loading request</button><p><Link to="/credit-help">Return to credit help</Link></p></>}</div></div>;
 
@@ -395,7 +395,6 @@ const GetStarted = ({ cardStepPreview = false, funnelMode = false } = {}) => {
                         <span>Initial total</span>
                         <span className="text-primary">${selectedPlan.price.toFixed(2)}</span>
                       </div>
-                      <p className="text-xs text-gray-600 leading-relaxed pt-2">You will not be charged when you submit your enrollment request.</p>
                     </div>
                   )}
 
@@ -417,8 +416,7 @@ const GetStarted = ({ cardStepPreview = false, funnelMode = false } = {}) => {
                 <div className="space-y-6">
                   <p className="text-sm text-navy font-bold">{cardIntakeEnabled ? (syntheticCardMode ? 'Synthetic database review — use sample details only.' : 'Card and billing details') : 'Local preparation only — card collection is not enabled.'}</p>
                   <h2 className="text-2xl font-bold text-navy">Card & billing address</h2>
-                  <p className="text-sm text-gray-600">{selectedPlan?.title}: ${selectedPlan?.price.toFixed(2)} initial; ${selectedPlan?.monthly.toFixed(2)}/month starting 30 days after signup. You will not be charged when you submit this form.</p>
-                  <div role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-navy">{cardIntakeEnabled ? (syntheticCardMode ? 'This local review saves the sample enrollment and encrypted sample card together. Use a .test email and a fictional 555-01xx phone number. Never enter real personal or card information.' : 'Enter your card and billing details to complete your enrollment request. You will not be charged when you submit this form.') : 'Live secure card entry is unavailable. This preview accepts only the fictional test numbers shown below. Nothing will be submitted or saved.'}</div>
+                  {(!cardIntakeEnabled || syntheticCardMode) && <div role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-navy">{syntheticCardMode ? 'Use fictional enrollment and card details for this local review.' : 'Live secure card entry is unavailable. This preview accepts fictional test details only. Nothing will be submitted or saved.'}</div>}
                   <fieldset className="space-y-4 min-w-0"><legend className="font-bold text-navy">{cardIntakeEnabled && !syntheticCardMode ? 'Card details' : 'Fictional test card only'}</legend><p className="text-sm text-gray-600" id="demo-card-help">{cardIntakeEnabled && !syntheticCardMode ? 'Enter your name as it appears on the card, your card number and expiration date.' : 'Use 4111 1111 1111 1111 (Visa), 5555 5555 5555 4444 (Mastercard), or 3714 496353 98431 (Amex). Never enter real card details. CVV is not collected.'}</p>{[['name','Cardholder name',80],['number',cardIntakeEnabled && !syntheticCardMode ? 'Card number' : 'Test card number',24],['expiry','Expiry (MM/YY)',7]].map(([key,label,maxLength])=><div className="space-y-2" key={key}><label htmlFor={`demo-card-${key}`}>{label}</label><input id={`demo-card-${key}`} name={`demoCard-${key}`} value={demoCard[key]} autoComplete="off" inputMode={key==='name'?'text':'numeric'} maxLength={maxLength} aria-describedby="demo-card-help" onChange={event=>{setDemoNotice('');setDemoCard(previous=>({...previous,[key]:event.target.value}));}} className="input-field"/></div>)}</fieldset>
                   {securityCodeRequired&&<div className="space-y-2"><label htmlFor="inquiry-card-cvv">Security code (CVV)</label><p id="card-cvv-help" className="text-sm text-gray-600">The three-digit code on the back of your card, or four digits on the front of an American Express card.</p><input id="inquiry-card-cvv" name="card-cvv" type="password" inputMode="numeric" autoComplete="off" maxLength={4} required aria-describedby="card-cvv-help" value={securityCode} onChange={event=>setSecurityCode(event.target.value.replace(/[^0-9]/g,''))} className="input-field"/></div>}
                   <fieldset className="space-y-4 min-w-0">
@@ -444,7 +442,7 @@ const GetStarted = ({ cardStepPreview = false, funnelMode = false } = {}) => {
                     <CheckCircle size={48} />
                   </div>
                   <h3 ref={stepHeadingRef} tabIndex={-1} className="text-3xl font-black mb-6 scroll-mt-32">{cardIntakeEnabled ? (syntheticCardMode ? 'Sample enrollment and card saved' : 'Enrollment and card saved') : 'Enrollment received'}</h3>
-                  <p className="text-gray-500 mb-4 max-w-sm mx-auto text-lg">{cardIntakeEnabled ? (syntheticCardMode ? 'Your sample information and encrypted test card are saved in the local review database. Authorized review staff can retrieve the full test card. No payment was attempted.' : 'Thank you. Your enrollment request has been received. Keep your reference below. You have not been charged.') : 'Thank you. Your enrollment request has been received. You have not been charged.'}</p>
+                  <p className="text-gray-500 mb-4 max-w-sm mx-auto text-lg">{cardIntakeEnabled ? (syntheticCardMode ? 'Your sample information and encrypted test card are saved in the local review database. Authorized review staff can retrieve the full test card. No payment was attempted.' : 'Thank you. Your enrollment request has been received. Keep your reference below.') : 'Thank you. Your enrollment request has been received.'}</p>
                   <p className="text-gray-400 mb-8 max-w-sm mx-auto text-sm">Enrollment reference: <strong>{enrollmentResult?.requestId}</strong></p>
                   <div className="flex items-center gap-2 justify-center text-xs text-gray-400 font-bold uppercase tracking-widest">
                     <Shield size={14} className="text-primary" /> Keep your enrollment reference

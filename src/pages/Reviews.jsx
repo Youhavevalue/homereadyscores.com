@@ -29,7 +29,7 @@ export default function Reviews() {
   return (
     <div className="hrs-content-page hrs-reviews-page hrs-voices">
       <section className="hrs-wrap hrs-voices-intro">
-        <div><p className="hrs-kicker">Customer reviews</p><h1>Real experiences.<br />Shared in their own words.</h1><p>Learn about HomeReady Scores through the people who have worked with us. </p></div>
+        <div><p className="hrs-kicker">Customer reviews</p><h1>{reviews.length ? <>Real experiences.<br />Shared in their own words.</> : 'Customer reviews'}</h1><p>{reviews.length ? 'Learn about HomeReady Scores through the people who have worked with us.' : 'Have questions about HomeReady Scores? Our team can help you understand your enrollment options.'}</p></div>
 
       </section>
 

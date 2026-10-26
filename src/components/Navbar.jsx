@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, ArrowRight } from 'lucide-react';
 import BrandLogo from './BrandLogo';
 
-const links=[["Home", "/"], ["Reviews", "/reviews"], ["Get Started Now", "/get-started"], ["Articles", "/articles"], ["Get Your Credit Score", "/get-your-credit-score"], ["Client Login", "/client-login"], ["Resources", "/resources"], ["Privacy", "/privacy-policy"]];
+const links=[["Home", "/"], ["Reviews", "/reviews"], ["Get Started Now", "/get-started"], ["Articles", "/articles"], ["Credit Score Information", "/get-your-credit-score"], ["Client Help", "/client-login"], ["Resources", "/resources"], ["Privacy", "/privacy-policy"]];
 export default function Navbar(){
  const {pathname,hash,key:locationKey}=useLocation();const[openPath,setOpenPath]=useState(null);const open=openPath===pathname;const setOpen=value=>setOpenPath(value?pathname:null);const toggle=useRef(null);const panel=useRef(null);const closeButton=useRef(null);
  useEffect(()=>{if(hash){requestAnimationFrame(()=>document.getElementById(hash.slice(1))?.scrollIntoView());}},[pathname,hash,locationKey]);

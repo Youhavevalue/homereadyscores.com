@@ -4,7 +4,7 @@ import { ChevronDown, MessageCircleQuestion } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const faqs = [
-  { question: "How do I get started?", answer: "Select Get Started Now, enter your contact details and credit goal, and choose Single or Couple enrollment. Review the pricing and confirm your details. A confirmation appears only after your enrollment information has been successfully saved. Payment remains pending until successfully processed." },
+  { question: "How do I get started?", answer: "Select Get Started Now, enter your contact details and credit goal, and choose Single or Couple enrollment. Review the pricing, enter your card and billing details, and select Save enrollment and card. Keep the enrollment reference shown after your request is saved. You will not be charged when you submit the form." },
   { question: "How long does it take to see results?", answer: "Timing depends on the information involved and the review process. We do not promise a particular change or timeline." },
   { question: "Which enrollment plan should I choose?", answer: "Single enrollment is for one person: $189.99 initially, then $100.00 per month. Couple enrollment is for you and your spouse or partner: $379.99 initially, then $160.00 per month. Monthly pricing starts 30 days after signup." },
   { question: "Can you guarantee that my score will go up?", answer: "Every credit profile is different, so we can’t promise a specific score increase or outcome. Our focus is helping you understand your credit report and address information that may be inaccurate or incomplete. Your results also depend on your credit history and ongoing payment habits. We’ll explain your options and next steps clearly." },

@@ -348,7 +348,7 @@ const GetStarted = ({ cardStepPreview = false, funnelMode = false } = {}) => {
                     </div>
                     <div className="p-6 bg-white">
                       <p className="text-gray-700 text-[15px] mb-6 leading-relaxed">
-                        {funnelMode ? 'You need to obtain your credit reports to begin the process. Review this requirement before submitting your request.' : <>Upon signup we will assist you in getting your <strong>free credit reports</strong>. Credit reports are from third-party providers, and getting them will never harm your scores.</>}
+                        You need to obtain your credit reports to begin the process. Review this requirement before submitting your request.
                       </p>
                       <div>
                         <p className="text-xs font-bold text-red-600 mb-2 tracking-wide uppercase">Required</p>
@@ -452,7 +452,7 @@ const GetStarted = ({ cardStepPreview = false, funnelMode = false } = {}) => {
                 </div>
               )}
             </div>
-            <p className="text-center mt-8 text-xs text-gray-400 font-medium">By clicking, you agree to our <a href="/terms-of-service" target="_blank" rel="noopener noreferrer" className="underline">Terms of Use</a> and <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="underline">Privacy Policy</a>. These links open in a new tab so your enrollment stays here.</p>
+            <p className="text-center mt-8 text-xs text-gray-400 font-medium">By clicking, you agree to our <a href="/terms-of-service" target="_blank" rel="noopener noreferrer" className="underline">Terms of Service</a> and <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="underline">Privacy Policy</a>. These links open in a new tab so your enrollment stays here.</p>
           </div>
 
           {/* Sidebar */}

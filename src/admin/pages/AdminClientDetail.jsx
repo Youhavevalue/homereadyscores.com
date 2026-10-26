@@ -1,26 +1,22 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 import { useAdminToast } from '../context/AdminToastContext';
 import DisputeLetterModal from '../../components/DisputeLetterModal';
-import CloverPaymentForm from '../../components/CloverPaymentForm';
 import { AdminCard } from '../components/AdminCard';
+import ClientFollowUp from '../components/ClientFollowUp';
 import AdminDocumentList from '../components/AdminDocumentList';
 import {
   HARD_CODED_HOT_LINKS,
-  CUSTOM_HOT_LINKS_DEFAULT,
   BEGINNING_STATUSES_SAMPLE,
   TAIL_ENDS_SAMPLE,
 } from '../constants/hotLinks';
 import { BUREAU_LETTER_ROUNDS, CREDITOR_LETTER_TYPES } from '../constants/letterRounds';
 import {
-  fetchClientNotes,
   insertClientNote,
-  fetchStaffHotLinks,
   insertStaffHotLink,
   deleteStaffHotLink,
-  ensureDefaultStaffHotLinks,
 } from '../lib/adminData';
 
 const TABS = [
@@ -30,18 +26,6 @@ const TABS = [
   { id: 'letters', label: 'Letters' },
   { id: 'billing', label: 'Billing' },
 ];
-
-const addOneMonth = (dateStr) => {
-  if (!dateStr) return '';
-  const d = new Date(dateStr + 'T00:00:00');
-  d.setMonth(d.getMonth() + 1);
-  return d.toISOString().split('T')[0];
-};
-
-const MOCK_CREDITORS = Array.from({ length: 24 }, (_, i) => ({
-  id: i + 1,
-  name: `Sample Creditor ${String.fromCharCode(65 + (i % 26))}${i}`,
-}));
 
 const CLOSED_DISPUTE = new Set(['resolved', 'deleted']);
 
@@ -56,10 +40,17 @@ export default function AdminClientDetail() {
   const [payment, setPayment] = useState(null);
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [disputes, setDisputes] = useState([]);
-  const [documents, setDocuments] = useState([]);
   const [clientNotes, setClientNotes] = useState([]);
   const [staffHotRows, setStaffHotRows] = useState([]);
   const [loading, setLoading] = useState(true);
+  const loadVersion = useRef(0);
+  const [notesLoading, setNotesLoading] = useState(true);
+  const [savingDispute, setSavingDispute] = useState(false);
+  const [loadError, setLoadError] = useState('');
+  const [notesError, setNotesError] = useState('');
+  const [hotLinksError, setHotLinksError] = useState('');
+  const [showFollowUp, setShowFollowUp] = useState(false);
+  const [savingStatus, setSavingStatus] = useState(false);
   const [tab, setTab] = useState('status');
   const [notesSub, setNotesSub] = useState('notes');
   const [panel, setPanel] = useState('actions');
@@ -67,21 +58,10 @@ export default function AdminClientDetail() {
   const [showSSN, setShowSSN] = useState(false);
   const [extraFields, setExtraFields] = useState(false);
   const [modalDispute, setModalDispute] = useState(null);
-  const [creditorQ, setCreditorQ] = useState('');
-  const [selectedCreditorName, setSelectedCreditorName] = useState('');
   const [newNote, setNewNote] = useState({ received: '', action: '' });
   const [newHot, setNewHot] = useState('');
   const [resultsDate, setResultsDate] = useState('');
-  const [clientStatus, setClientStatus] = useState('active');
-  const [showPayForm, setShowPayForm] = useState(false);
-  const [paymentEdit, setPaymentEdit] = useState(false);
-  const [payForm, setPayForm] = useState({
-    setup_fee_amount: '',
-    setup_fee_date: '',
-    monthly_amount: '',
-    monthly_start_date: '',
-  });
-  const [savingPay, setSavingPay] = useState(false);
+  const [clientStatus, setClientStatus] = useState('');
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingNote, setSavingNote] = useState(false);
   const [profile, setProfile] = useState({
@@ -105,76 +85,83 @@ export default function AdminClientDetail() {
   });
   const [dfrDays, setDfrDays] = useState('—');
 
+  const readNotes = async () => {
+    const result = await supabase.from('client_notes').select('*').eq('client_id', id)
+      .eq('note_type', notesSub).order('created_at', { ascending: false }).limit(200);
+    if (result.error) throw new Error(result.error.message);
+    return result.data || [];
+  };
+
+  const readHotLinks = async () => {
+    const result = await supabase.from('staff_hot_links').select('*')
+      .order('sort_order', { ascending: true }).order('created_at', { ascending: true }).limit(200);
+    if (result.error) throw new Error(result.error.message);
+    return result.data || [];
+  };
+
   const load = async () => {
+    const version = ++loadVersion.current;
     setLoading(true);
-    const [cr, pr, hr, dr, docr, intakeRes] = await Promise.all([
-      supabase.from('clients').select('*').eq('id', id).single(),
-      supabase.from('payments').select('*').eq('client_id', id).maybeSingle(),
-      supabase.from('payment_history').select('*').eq('client_id', id).order('charged_at', { ascending: false }),
-      supabase.from('dispute_letters').select('*').eq('client_id', id).order('created_at', { ascending: false }),
-      supabase.from('documents').select('*').eq('client_id', id).order('created_at', { ascending: false }),
-      supabase.from('intake_forms').select('*').eq('client_id', id).maybeSingle(),
-    ]);
-
-    const c = cr.data;
-    setClient(c);
-    setPayment(pr.data);
-    setPaymentHistory(hr.data || []);
-    setDisputes(dr.data || []);
-    setDocuments(docr.data || []);
-    setIntake(intakeRes.data);
-
-    if (c) {
-      setProfile({
-        first_name: c.first_name || '',
-        last_name: c.last_name || '',
-        email: c.email || '',
-        phone: c.phone || '',
-        address: c.address || '',
-        city: c.city || '',
-        state: c.state || '',
-        zip: c.zip || '',
-        notes: c.notes || '',
-      });
-      setClientStatus(c.status || 'active');
+    setLoadError('');
+    try {
+      const results = await Promise.all([
+        supabase.from('clients').select('*').eq('id', id).single(),
+        supabase.from('payments').select('*').eq('client_id', id).maybeSingle(),
+        supabase.from('payment_history').select('*').eq('client_id', id).order('charged_at', { ascending: false }).limit(200),
+        supabase.from('dispute_letters').select('*').eq('client_id', id).order('created_at', { ascending: false }).limit(200),
+        supabase.from('intake_forms').select('*').eq('client_id', id).maybeSingle(),
+      ]);
+      if (version !== loadVersion.current) return false;
+      const failed = results.find((result) => result.error);
+      if (failed) throw new Error(failed.error.message);
+      const [cr, pr, hr, dr, intakeRes] = results;
+      if (!cr.data) throw new Error('Client not found or unavailable.');
+      const c = cr.data;
+      setClient(c);
+      setPayment(pr.data);
+      setPaymentHistory(hr.data || []);
+      setDisputes(dr.data || []);
+      setIntake(intakeRes.data);
+      setProfile(Object.fromEntries(['first_name', 'last_name', 'email', 'phone', 'address', 'city', 'state', 'zip', 'notes']
+        .map((field) => [field, c[field] || ''])));
+      setClientStatus(c.status || '');
       setResultsDate(c.results_expected_date || '');
-      setDob(intakeRes.data?.dob || '');
+      setDob(intakeRes.data?.form_data?.dob || '');
+      return true;
+    } catch (error) {
+      if (version === loadVersion.current) setLoadError(error.message || 'Client data could not be loaded. Please retry.');
+      return false;
+    } finally {
+      if (version === loadVersion.current) setLoading(false);
     }
-
-    await ensureDefaultStaffHotLinks(CUSTOM_HOT_LINKS_DEFAULT);
-    const links = await fetchStaffHotLinks();
-    setStaffHotRows(links);
-
-    if (pr.data) {
-      setPayForm({
-        setup_fee_amount: pr.data.setup_fee_amount ?? '',
-        setup_fee_date: pr.data.setup_fee_date ?? '',
-        monthly_amount: pr.data.monthly_amount ?? '',
-        monthly_start_date: pr.data.monthly_start_date ?? '',
-      });
-    } else if (c?.created_at) {
-      const sd = new Date(c.created_at).toISOString().split('T')[0];
-      setPayForm({
-        setup_fee_amount: '',
-        setup_fee_date: sd,
-        monthly_amount: '',
-        monthly_start_date: addOneMonth(sd),
-      });
-    }
-    setLoading(false);
   };
 
   useEffect(() => {
-    load();
+    void load();
+    return () => { loadVersion.current += 1; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   useEffect(() => {
-    void (async () => {
-      const n = await fetchClientNotes(id, notesSub);
-      setClientNotes(n);
-    })();
+    let cancelled = false;
+    setNotesError('');
+    setNotesLoading(true);
+    setClientNotes([]);
+    void readNotes().then((rows) => { if (!cancelled) setClientNotes(rows); })
+      .catch((error) => { if (!cancelled) setNotesError(error.message || 'Notes could not be loaded.'); })
+      .finally(() => { if (!cancelled) setNotesLoading(false); });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- refetch for client or note category
   }, [id, notesSub]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setHotLinksError('');
+    setStaffHotRows([]);
+    void readHotLinks().then((rows) => { if (!cancelled) setStaffHotRows(rows); })
+      .catch((error) => { if (!cancelled) setHotLinksError(error.message || 'Custom templates could not be loaded.'); });
+    return () => { cancelled = true; };
+  }, [id]);
 
   useEffect(() => {
     if (!resultsDate) {
@@ -191,80 +178,65 @@ export default function AdminClientDetail() {
     [disputes]
   );
 
-  const filteredCreditors = useMemo(() => {
-    const q = creditorQ.toLowerCase().trim();
-    if (!q) return MOCK_CREDITORS.slice(0, 12);
-    return MOCK_CREDITORS.filter((c) => c.name.toLowerCase().includes(q)).slice(0, 50);
-  }, [creditorQ]);
-
-  const savePaymentConfig = async () => {
-    setSavingPay(true);
-    const payload = {
-      client_id: id,
-      setup_fee_amount: parseInt(payForm.setup_fee_amount, 10) || 0,
-      setup_fee_date: payForm.setup_fee_date || null,
-      monthly_amount: parseInt(payForm.monthly_amount, 10) || 0,
-      monthly_start_date: payForm.monthly_start_date || null,
-    };
-    try {
-      if (payment) await supabase.from('payments').update(payload).eq('id', payment.id);
-      else await supabase.from('payments').insert(payload);
-      showToast('Payment settings saved.', 'success');
-      setPaymentEdit(false);
-      load();
-    } catch (e) {
-      showToast(e.message || 'Save failed', 'error');
-    }
-    setSavingPay(false);
+  const updateClient = async (payload) => {
+    if (!client?.updated_at || !Number.isFinite(Date.parse(client.updated_at))) throw new Error('Client version is unavailable. Reload before saving.');
+    const updatedAt = new Date(Math.max(Date.now(), Date.parse(client.updated_at) + 1)).toISOString();
+    const result = await supabase.from('clients').update({ ...payload, updated_at: updatedAt })
+      .eq('id', id).eq('updated_at', client.updated_at).select('*').single();
+    if (result.error) throw new Error(result.error.message);
+    if (!result.data) throw new Error('Client changed or is unavailable. Reload before saving.');
+    setClient(result.data);
+    return result.data;
   };
 
   const saveProfile = async () => {
+    if (savingProfile) return;
     setSavingProfile(true);
+    let contactSaved = false;
     try {
-      const { error } = await supabase
-        .from('clients')
-        .update({
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-          email: profile.email || null,
-          phone: profile.phone || null,
-          address: profile.address || null,
-          city: profile.city || null,
-          state: profile.state || null,
-          zip: profile.zip || null,
-          notes: profile.notes || null,
-          results_expected_date: resultsDate || null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', id);
-      if (error) throw error;
-
-      if (dob) {
+      if (!profile.first_name.trim() || !profile.last_name.trim()) throw new Error('First and last name are required.');
+      await updateClient({
+        ...Object.fromEntries(Object.entries(profile).map(([key, value]) => [key, value.trim() || null])),
+        results_expected_date: resultsDate || null,
+      });
+      contactSaved = true;
+      if (dob || intake) {
+        const payload = { form_data: { ...(intake?.form_data || {}), dob: dob || null }, updated_at: new Date().toISOString() };
+        let query;
         if (intake?.id) {
-          await supabase.from('intake_forms').update({ dob }).eq('id', intake.id);
+          query = supabase.from('intake_forms').update(payload).eq('id', intake.id);
+          if (intake.updated_at) query = query.eq('updated_at', intake.updated_at);
         } else {
-          await supabase.from('intake_forms').insert({ client_id: id, dob });
+          query = supabase.from('intake_forms').insert({ client_id: id, ...payload });
         }
+        const result = await query.select('*').single();
+        if (result.error) throw new Error(result.error.message);
+        if (!result.data) throw new Error('Intake record changed or is unavailable. Reload before saving.');
+        setIntake(result.data);
       }
       showToast('Client profile updated.', 'success');
-      load();
-    } catch (e) {
-      showToast(e.message || 'Update failed', 'error');
+    } catch (error) {
+      showToast(`${contactSaved ? 'Contact details saved; DOB was not saved. ' : ''}${error.message || 'Update failed.'} Your draft remains available.`, 'error');
+    } finally {
+      setSavingProfile(false);
     }
-    setSavingProfile(false);
   };
 
   const saveStatusOnly = async () => {
+    if (savingStatus) return;
+    setSavingStatus(true);
     try {
-      await supabase.from('clients').update({ status: clientStatus }).eq('id', id);
+      await updateClient({ status: clientStatus });
       showToast('Status updated.', 'success');
-      load();
-    } catch (e) {
-      showToast(e.message || 'Failed', 'error');
+    } catch (error) {
+      showToast(error.message || 'Status could not be saved. Your selection remains available.', 'error');
+    } finally {
+      setSavingStatus(false);
     }
   };
 
   const addNote = async () => {
+    if (savingNote) return;
     if (!newNote.received.trim() && !newNote.action.trim()) {
       showToast('Add received text or action taken.', 'error');
       return;
@@ -279,11 +251,13 @@ export default function AdminClientDetail() {
         counselorName: user?.name || user?.email || 'Staff',
       });
       setNewNote({ received: '', action: '' });
-      const n = await fetchClientNotes(id, notesSub);
-      setClientNotes(n);
       showToast('Note saved.', 'success');
+      try {
+        setClientNotes(await readNotes());
+        setNotesError('');
+      } catch (error) { setNotesError(`Note saved, but the list could not be refreshed: ${error.message}`); }
     } catch (e) {
-      showToast(e.message || 'Run sql/admin_operational_migration.sql for client_notes.', 'error');
+      showToast(e.message || 'Note could not be saved. Your draft remains available.', 'error');
     }
     setSavingNote(false);
   };
@@ -293,7 +267,8 @@ export default function AdminClientDetail() {
     try {
       await insertStaffHotLink(newHot.trim());
       setNewHot('');
-      setStaffHotRows(await fetchStaffHotLinks());
+      setStaffHotRows(await readHotLinks());
+      setHotLinksError('');
       showToast('Hot link added.', 'success');
     } catch (e) {
       showToast(e.message || 'Failed', 'error');
@@ -303,7 +278,8 @@ export default function AdminClientDetail() {
   const removeHotDb = async (hid) => {
     try {
       await deleteStaffHotLink(hid);
-      setStaffHotRows(await fetchStaffHotLinks());
+      setStaffHotRows(await readHotLinks());
+      setHotLinksError('');
       showToast('Removed.', 'success');
     } catch (e) {
       showToast(e.message || 'Failed', 'error');
@@ -318,13 +294,15 @@ export default function AdminClientDetail() {
   };
 
   const addDisputeItem = async () => {
-    const name = selectedCreditorName || disputeForm.accountName;
+    if (savingDispute) return;
+    const name = disputeForm.accountName;
     if (!name?.trim()) {
-      showToast('Select or enter a creditor / account name.', 'error');
+      showToast('Enter the creditor / account name from the reviewed credit report.', 'error');
       return;
     }
+    setSavingDispute(true);
     try {
-      const { error } = await supabase.from('dispute_letters').insert({
+      const { data, error } = await supabase.from('dispute_letters').insert({
         client_id: id,
         bureau: disputeForm.bureau,
         account_name: name.trim(),
@@ -333,28 +311,38 @@ export default function AdminClientDetail() {
         status: 'draft',
         notes: disputeForm.tailEnd,
         round_number: 1,
-      });
+      }).select('*').single();
       if (error) throw error;
+      if (!data) throw new Error('Could not confirm the dispute item was saved.');
+      setDisputes((rows) => [data, ...rows]);
       showToast('Dispute item added.', 'success');
       setDisputeForm({
         ...disputeForm,
         accountName: '',
         accountLast4: '',
       });
-      setSelectedCreditorName('');
-      load();
     } catch (e) {
-      showToast(e.message || 'Insert failed', 'error');
-    }
+      showToast(e.message || 'Insert failed. Your draft remains available.', 'error');
+    } finally { setSavingDispute(false); }
   };
 
   const formatCents = (cents) => (cents ? `$${(cents / 100).toFixed(2)}` : '$0.00');
 
   const saveLetterText = async (letterText) => {
     if (!modalDispute) return;
-    await supabase.from('dispute_letters').update({ letter_text: letterText }).eq('id', modalDispute.id);
-    setModalDispute(null);
-    load();
+    try {
+      let query = supabase.from('dispute_letters').update({ letter_text: letterText, updated_at: new Date().toISOString() })
+        .eq('id', modalDispute.id);
+      if (modalDispute.updated_at) query = query.eq('updated_at', modalDispute.updated_at);
+      const result = await query.select('*').single();
+      if (result.error) throw new Error(result.error.message);
+      if (!result.data) throw new Error('Letter changed or is unavailable. Reload before saving.');
+      setDisputes((rows) => rows.map((row) => row.id === result.data.id ? result.data : row));
+      setModalDispute(null);
+      showToast('Letter draft saved.', 'success');
+    } catch (error) {
+      showToast(error.message || 'Letter could not be saved. Your draft remains open.', 'error');
+    }
   };
 
   if (loading) {
@@ -364,6 +352,11 @@ export default function AdminClientDetail() {
         <p className="text-sm">Loading client…</p>
       </div>
     );
+  }
+
+  if (loadError) {
+    return <div className="space-y-3"><p role="alert" className="rounded bg-red-50 p-3 text-red-800">{loadError}</p>
+      <button type="button" onClick={load} className="rounded border px-4 py-2">Reload client</button></div>;
   }
 
   if (!client) {
@@ -403,7 +396,7 @@ export default function AdminClientDetail() {
         </div>
         <div className="flex flex-wrap gap-2">
           <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold capitalize text-slate-700">
-            {clientStatus}
+            {client.status || 'Status not recorded'}
           </span>
           <button
             type="button"
@@ -432,8 +425,7 @@ export default function AdminClientDetail() {
         ))}
       </div>
 
-      {tab === 'status' && (
-        <div className="space-y-6">
+        <div hidden={tab !== 'status'} className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-12">
             <div className="space-y-4 lg:col-span-4">
               <AdminCard title="Personal info">
@@ -498,14 +490,14 @@ export default function AdminClientDetail() {
                   <Field label="SSN (intake)">
                     <div className="flex items-center gap-2">
                       <span className="font-mono text-sm">
-                        {showSSN && intake?.ssn_last4 ? `***-**-${intake.ssn_last4}` : '••••••••'}
+                        {showSSN && intake?.form_data?.ssn_last4 ? `***-**-${intake.form_data.ssn_last4}` : '••••••••'}
                       </span>
                       <button
                         type="button"
                         className="text-xs font-semibold text-[#2562FF]"
                         onClick={() => setShowSSN(!showSSN)}
                       >
-                        {intake?.ssn_last4 ? 'Toggle' : '—'}
+                        {intake?.form_data?.ssn_last4 ? 'Toggle' : '—'}
                       </button>
                     </div>
                   </Field>
@@ -522,9 +514,9 @@ export default function AdminClientDetail() {
                   <button
                     type="button"
                     className="rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-semibold text-slate-700"
-                    onClick={() => showToast('Connect email provider for welcome emails.', 'info')}
+                    disabled title="Customer messaging is paused."
                   >
-                    Resend welcome email
+                    Welcome email paused
                   </button>
                   <button
                     type="button"
@@ -536,7 +528,7 @@ export default function AdminClientDetail() {
                 </div>
                 {extraFields && (
                   <div className="mt-3 grid gap-2 rounded-xl bg-slate-50 p-3 text-sm text-slate-600">
-                    Portal credentials can be stored when you add dedicated columns or auth integration.
+                    Additional client portal fields are unavailable. Do not place credentials or identity/report originals in notes.
                   </div>
                 )}
                 <textarea
@@ -558,6 +550,8 @@ export default function AdminClientDetail() {
             </div>
 
             <div className="space-y-4 lg:col-span-5">
+              {notesError && <p role="alert" className="rounded bg-red-50 p-3 text-sm text-red-800">{notesError}</p>}
+              {hotLinksError && <p role="alert" className="rounded bg-red-50 p-3 text-sm text-red-800">{hotLinksError}</p>}
               <AdminCard
                 title="Notes & communication"
                 actions={
@@ -567,6 +561,7 @@ export default function AdminClientDetail() {
                         key={n}
                         type="button"
                         onClick={() => setNotesSub(n)}
+                        disabled={savingNote}
                         className={`rounded-lg px-2 py-1 text-xs font-semibold capitalize ${
                           notesSub === n ? 'bg-[#002D5B] text-white' : 'bg-slate-100 text-slate-600'
                         }`}
@@ -578,7 +573,14 @@ export default function AdminClientDetail() {
                 }
               >
                 <div className="max-h-56 space-y-2 overflow-auto text-sm text-slate-600">
-                  {notesForTab.length === 0 ? (
+                  {notesLoading ? <p className="text-xs text-slate-500">Loading notes…</p> : notesError ? (
+                    <button type="button" className="text-xs underline" onClick={async () => {
+                      setNotesLoading(true);
+                      try { setClientNotes(await readNotes()); setNotesError(''); }
+                      catch (error) { setNotesError(error.message || 'Notes could not be loaded.'); }
+                      finally { setNotesLoading(false); }
+                    }}>Reload notes</button>
+                  ) : notesForTab.length === 0 ? (
                     <p className="text-xs text-slate-400">No notes in this channel yet.</p>
                   ) : (
                     notesForTab.map((n) => (
@@ -601,10 +603,11 @@ export default function AdminClientDetail() {
                   )}
                 </div>
                 {notesSub === 'sms' && (
-                  <p className="text-xs text-slate-500">Log SMS-style updates here; full SMS gateway is separate.</p>
+                  <p className="text-xs text-slate-500">Record an SMS contact note here. Saving a note does not send a message.</p>
                 )}
                 <div className="mt-4 grid gap-2 border-t border-slate-100 pt-4">
                   <p className="text-xs font-bold uppercase text-slate-500">Add new note</p>
+                  <p className="text-xs text-slate-500">Private case log only. Saving does not contact the client.</p>
                   <textarea
                     className="rounded-lg border border-slate-200 p-2 text-sm"
                     placeholder="Received"
@@ -628,7 +631,8 @@ export default function AdminClientDetail() {
                 </div>
 
                 <div className="mt-6">
-                  <p className="text-xs font-bold uppercase text-slate-500">Hard-coded hot links</p>
+                  <p className="text-xs font-bold uppercase text-slate-500">Note shortcuts</p>
+                  <p className="mt-1 text-xs text-slate-500">Shortcuts insert text into the note draft; they do not perform the described action.</p>
                   <div className="mt-2 flex max-h-36 flex-wrap gap-1 overflow-auto">
                     {HARD_CODED_HOT_LINKS.map((h) => (
                       <button
@@ -643,7 +647,7 @@ export default function AdminClientDetail() {
                   </div>
                 </div>
                 <div className="mt-4">
-                  <p className="text-xs font-bold uppercase text-slate-500">Custom hot links (shared)</p>
+                  <p className="text-xs font-bold uppercase text-slate-500">Shared note templates</p>
                   <div className="mt-2 flex max-h-40 flex-wrap gap-1 overflow-auto">
                     {staffHotRows.map((row) => (
                       <span
@@ -700,8 +704,8 @@ export default function AdminClientDetail() {
                   </div>
                 }
               >
-                {panel === 'actions' && (
-                  <>
+                  <div hidden={panel !== 'actions'}>
+                    <button type="button" className="mb-3 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-semibold" onClick={() => navigate(`/admin/contracts?clientId=${id}`)}>Prepare client contract</button>
                     <label className="text-xs font-bold uppercase text-slate-500">Status</label>
                     <div className="mt-1 flex flex-wrap gap-2">
                       <select
@@ -709,7 +713,7 @@ export default function AdminClientDetail() {
                         value={clientStatus}
                         onChange={(e) => setClientStatus(e.target.value)}
                       >
-                        {['scheduled', 'pending', 'active', 'contact1', 'contact2', 'contact3', 'complete', 'nsf', 'cancelled', 'expired'].map(
+                        {[...new Set([clientStatus, 'scheduled', 'pending', 'active', 'contact1', 'contact2', 'contact3', 'complete', 'nsf', 'cancelled', 'expired'])].map(
                           (s) => (
                             <option key={s} value={s}>
                               {s}
@@ -721,6 +725,8 @@ export default function AdminClientDetail() {
                         type="button"
                         className="rounded-lg bg-[#2562FF] px-3 py-1.5 text-sm font-semibold text-white"
                         onClick={saveStatusOnly}
+                        title="Service activation remains paused pending the approved agreement and procedure."
+                        disabled={savingStatus}
                       >
                         Update
                       </button>
@@ -738,39 +744,27 @@ export default function AdminClientDetail() {
                     <button
                       type="button"
                       className="mt-3 w-full rounded-xl border border-slate-200 py-2 text-sm font-semibold shadow-sm"
-                      onClick={() => navigate('/admin/appointments')}
+                      onClick={() => setShowFollowUp((value) => !value)}
                     >
                       Set follow-up
                     </button>
                     <div className="mt-4 border-t border-slate-100 pt-4">
-                      <p className="mb-2 text-xs font-bold uppercase text-slate-500">Secure documents</p>
-                      <AdminDocumentList
-                        clientId={id}
-                        documents={documents}
-                        onReload={load}
-                        showToast={showToast}
-                      />
+                      <p className="mb-2 text-xs font-bold uppercase text-slate-500">Private documents</p>
+                      <AdminDocumentList key={client.id} clientId={client.id} showToast={showToast} />
                     </div>
-                  </>
-                )}
+                  </div>
                 {panel === 'results' && (
                   <p className="text-sm text-slate-600">
-                    Track bureau responses and scores here. Connect credit monitoring or import bureau PDFs under
-                    Documents.
+                    Stored dispute statuses appear in All items. Automatic credit-monitoring imports are paused. Staff can upload private files from Actions.
                   </p>
                 )}
               </AdminCard>
             </div>
           </div>
 
-          <AdminCard title="Assignments">
-            <p className="text-sm text-slate-600">
-              Affiliate / broker / sales / counselor assignment fields can be added to `clients` or a junction table when
-              you define your CRM model.
-            </p>
-          </AdminCard>
+          {showFollowUp && <ClientFollowUp key={client.id} client={client}
+            showToast={showToast} onSaved={(savedClient) => { setClient(savedClient); setShowFollowUp(false); }} />}
         </div>
-      )}
 
       {tab === 'all' && (
         <div className="space-y-4">
@@ -829,33 +823,10 @@ export default function AdminClientDetail() {
                   <option>TransUnion</option>
                 </select>
               </label>
-              <label className="text-sm sm:col-span-2">
-                Creditor (search sample list)
-                <input
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5"
-                  placeholder="Search creditors"
-                  value={creditorQ}
-                  onChange={(e) => setCreditorQ(e.target.value)}
-                />
-                <div className="mt-1 max-h-24 overflow-auto rounded border border-slate-100 bg-white text-xs">
-                  {filteredCreditors.map((c) => (
-                    <button
-                      key={c.id}
-                      type="button"
-                      className="block w-full px-2 py-1 text-left hover:bg-slate-50"
-                      onClick={() => {
-                        setSelectedCreditorName(c.name);
-                        setDisputeForm({ ...disputeForm, accountName: c.name });
-                      }}
-                    >
-                      {c.name}
-                    </button>
-                  ))}
-                </div>
-              </label>
               <label className="text-sm">
                 Account name
                 <input
+                  name="account_name"
                   className="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5"
                   value={disputeForm.accountName}
                   onChange={(e) => setDisputeForm({ ...disputeForm, accountName: e.target.value })}
@@ -904,8 +875,9 @@ export default function AdminClientDetail() {
                 type="button"
                 className="rounded-lg bg-[#2562FF] px-4 py-2 text-sm font-semibold text-white"
                 onClick={addDisputeItem}
+                disabled={savingDispute}
               >
-                Add dispute
+                {savingDispute ? 'Saving…' : 'Add dispute'}
               </button>
               <button
                 type="button"
@@ -918,9 +890,7 @@ export default function AdminClientDetail() {
                     beginningStatus: BEGINNING_STATUSES_SAMPLE[0],
                     tailEnd: TAIL_ENDS_SAMPLE[0],
                   });
-                  setSelectedCreditorName('');
-                  setCreditorQ('');
-                }}
+                            }}
               >
                 Clear
               </button>
@@ -965,7 +935,7 @@ export default function AdminClientDetail() {
                 <div key={round} className="rounded-xl border border-slate-200 p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="font-semibold text-[#002D5B]">{round}</span>
-                    <span className="text-xs text-slate-400">Template library</span>
+                    <span className="text-xs text-slate-400">Template library editing unavailable</span>
                   </div>
                   <div className="mt-2 flex flex-wrap gap-2 text-sm">
                     {['Equifax', 'Experian', 'TransUnion', '3-Bureau'].map((b) => (
@@ -973,7 +943,7 @@ export default function AdminClientDetail() {
                         key={b}
                         type="button"
                         className="rounded-lg bg-slate-100 px-2 py-1 font-medium hover:bg-slate-200"
-                        onClick={() => showToast(`Open template editor: ${round} · ${b}`, 'info')}
+                        disabled title="Template library editing is not available. Open a stored dispute letter instead."
                       >
                         {b}
                       </button>
@@ -991,7 +961,7 @@ export default function AdminClientDetail() {
                   <button
                     type="button"
                     className="text-xs font-semibold text-[#2562FF]"
-                    onClick={() => showToast(`Template: ${t}`, 'info')}
+                    disabled title="Template library editing is not available."
                   >
                     Open
                   </button>
@@ -1004,150 +974,16 @@ export default function AdminClientDetail() {
 
       {tab === 'billing' && (
         <div className="space-y-6">
-          {showPayForm && (
-            <CloverPaymentForm
-              client={client}
-              onPaymentSuccess={() => {
-                setShowPayForm(false);
-                load();
-              }}
-              onClose={() => setShowPayForm(false)}
-            />
-          )}
-          <AdminCard
-            title="Subscriptions & payments"
-            actions={
-              <div className="flex gap-2">
-                {(!payment || !payment.clover_customer_id) && (
-                  <button
-                    type="button"
-                    onClick={() => setShowPayForm(true)}
-                    className="rounded-lg bg-[#2562FF] px-3 py-1.5 text-sm font-semibold text-white"
-                  >
-                    Set up payment
-                  </button>
-                )}
-                {payment && !paymentEdit && (
-                  <button
-                    type="button"
-                    onClick={() => setPaymentEdit(true)}
-                    className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm"
-                  >
-                    Edit
-                  </button>
-                )}
-              </div>
-            }
-          >
-            {paymentEdit ? (
-              <div className="grid gap-3 md:grid-cols-2">
-                <label className="text-sm">
-                  Setup fee (cents)
-                  <input
-                    className="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5"
-                    type="number"
-                    value={payForm.setup_fee_amount}
-                    onChange={(e) => setPayForm({ ...payForm, setup_fee_amount: e.target.value })}
-                  />
-                </label>
-                <label className="text-sm">
-                  Setup fee date
-                  <input
-                    className="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5"
-                    type="date"
-                    value={payForm.setup_fee_date || ''}
-                    onChange={(e) => {
-                      const v = e.target.value;
-                      setPayForm({
-                        ...payForm,
-                        setup_fee_date: v,
-                        monthly_start_date: addOneMonth(v),
-                      });
-                    }}
-                  />
-                </label>
-                <label className="text-sm">
-                  Monthly (cents)
-                  <input
-                    className="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5"
-                    type="number"
-                    value={payForm.monthly_amount}
-                    onChange={(e) => setPayForm({ ...payForm, monthly_amount: e.target.value })}
-                  />
-                </label>
-                <label className="text-sm">
-                  Monthly start
-                  <input
-                    className="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5"
-                    type="date"
-                    value={payForm.monthly_start_date || ''}
-                    readOnly
-                  />
-                </label>
-                <div className="flex justify-end gap-2 md:col-span-2">
-                  <button
-                    type="button"
-                    className="rounded-lg border border-slate-200 px-4 py-2 text-sm"
-                    onClick={() => setPaymentEdit(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    className="rounded-lg bg-[#002D5B] px-4 py-2 text-sm font-semibold text-white"
-                    onClick={savePaymentConfig}
-                    disabled={savingPay}
-                  >
-                    {savingPay ? 'Saving…' : 'Save'}
-                  </button>
-                </div>
-              </div>
-            ) : payment ? (
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="rounded-xl bg-slate-50 p-4">
-                  <div className="text-xs font-bold uppercase text-slate-500">Setup fee</div>
-                  <div className="font-display text-xl font-bold">{formatCents(payment.setup_fee_amount)}</div>
-                  <div className="text-xs text-slate-500">Status: {payment.setup_fee_status || '—'}</div>
-                </div>
-                <div className="rounded-xl bg-slate-50 p-4">
-                  <div className="text-xs font-bold uppercase text-slate-500">Monthly</div>
-                  <div className="font-display text-xl font-bold">{formatCents(payment.monthly_amount)}/mo</div>
-                  <div className="text-xs text-slate-500">Start: {payment.monthly_start_date || '—'}</div>
-                </div>
-              </div>
-            ) : (
-              <p className="text-sm text-slate-600">No payment record — add configuration.</p>
-            )}
+          <p className="rounded-xl bg-amber-50 p-4 text-sm text-amber-900">Billing is read-only. Card setup, charges, payment editing and check drafting are paused.</p>
+          <AdminCard title="Stored payment reference">
+            {payment ? <div className="grid gap-4 sm:grid-cols-2">
+              <div><p className="text-xs uppercase text-slate-500">Initial fee reference</p><strong>{formatCents(payment.setup_fee_amount)}</strong><p>{payment.setup_fee_status || 'Status not recorded'}</p></div>
+              <div><p className="text-xs uppercase text-slate-500">Monthly reference</p><strong>{formatCents(payment.monthly_amount)}</strong><p>{payment.monthly_status || 'Status not recorded'}</p></div>
+            </div> : <p>No stored payment record.</p>}
           </AdminCard>
-
-          <AdminCard title="Transactions">
-            {paymentHistory.length === 0 ? (
-              <p className="text-sm text-slate-500">No transactions yet.</p>
-            ) : (
-              <ul className="divide-y divide-slate-100">
-                {paymentHistory.map((h) => (
-                  <li key={h.id} className="flex justify-between py-2 text-sm">
-                    <span>{h.description || h.type}</span>
-                    <span className="font-semibold">{formatCents(h.amount)}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </AdminCard>
-
-          <AdminCard title="Demand draft">
-            <p className="text-sm text-slate-600">
-              Check drafting integrates with your bank / processor. Clover card-on-file is shown above when connected.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <button
-                type="button"
-                className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm"
-                onClick={() => showToast('Connect ACH / check printing provider.', 'info')}
-              >
-                Draft check
-              </button>
-            </div>
+          <AdminCard title="Stored transactions">
+            {paymentHistory.length ? <ul className="divide-y divide-slate-100">{paymentHistory.map((history) => <li key={history.id} className="flex justify-between py-2 text-sm"><span>{history.description || history.type} · {history.status || 'Status not recorded'}</span><span>{formatCents(history.amount)}</span></li>)}</ul> : <p>No stored transactions.</p>}
+            <p className="mt-3 text-xs text-slate-500">Newest 200 stored transactions.</p>
           </AdminCard>
         </div>
       )}

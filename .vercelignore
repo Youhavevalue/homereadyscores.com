@@ -1,0 +1,34 @@
+.env*
+**/.env*
+node_modules
+**/node_modules
+.vercel
+dist
+# Only the isolated, fictional copy-release checks are needed by the build gate.
+tests/*
+!tests/customer-copy-release.test.cjs
+!tests/public-copy.test.cjs
+!tests/enrollment-copy-ui.cjs
+review-runtime
+preview-runtime
+supabase
+scripts/**
+!scripts/public-pages.mjs
+docs
+evidence
+**/*private-guide*
+**/*private_guide*
+*.log
+api/_lib/enrollment-card-store.js
+api/_lib/enrollment-card-intake.js
+
+# Retained repository history and contributor guidance are not deployment assets.
+.agent
+.cursor
+Home Ready Scores Agency Agents
+marketing
+sql
+README.md
+CONFIG_GUIDE.md
+PROJECT_MEMORY.md
+AGENTS.md

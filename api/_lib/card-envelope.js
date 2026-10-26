@@ -1,0 +1,6 @@
+// Shared authenticated encryption. No production key source or activation is configured here.
+import {createCipheriv,createDecipheriv,createHmac,randomBytes}from'node:crypto';
+const CONTEXT='home_ready:enrollment-card:v1:';
+export function sealCardEnvelope(key,context,card){const iv=randomBytes(12),cipher=createCipheriv('aes-256-gcm',key,iv);cipher.setAAD(Buffer.from(CONTEXT+context));const ciphertext=Buffer.concat([cipher.update(JSON.stringify(card),'utf8'),cipher.final()]);return{v:1,iv:iv.toString('base64'),tag:cipher.getAuthTag().toString('base64'),ciphertext:ciphertext.toString('base64')};}
+export function openCardEnvelope(key,context,envelope){try{if(envelope?.v!==1)throw Error();const decipher=createDecipheriv('aes-256-gcm',key,Buffer.from(envelope.iv,'base64'));decipher.setAAD(Buffer.from(CONTEXT+context));decipher.setAuthTag(Buffer.from(envelope.tag,'base64'));return JSON.parse(Buffer.concat([decipher.update(Buffer.from(envelope.ciphertext,'base64')),decipher.final()]).toString());}catch{throw new Error('Saved card cannot be read. Nothing was revealed.');}}
+export function keyedCardFingerprint(key,context,value){return createHmac('sha256',key).update(CONTEXT+'fingerprint:'+context+':'+JSON.stringify(value)).digest('hex');}

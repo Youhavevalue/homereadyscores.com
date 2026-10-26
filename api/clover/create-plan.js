@@ -2,10 +2,13 @@
 // Creates a recurring billing plan in Clover
 // Body: { name, amount (in cents), interval (MONTH/WEEK/DAY/YEAR), intervalCount, note }
 
+import { requireAutomatedBilling } from '../_lib/billing-mode.js';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+  if (!requireAutomatedBilling(res)) return;
 
   const { name, amount, interval = 'MONTH', intervalCount = 1, note } = req.body;
 

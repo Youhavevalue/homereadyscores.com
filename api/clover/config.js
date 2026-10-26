@@ -1,10 +1,14 @@
 // GET /api/clover/config
-// Returns the public Clover API key and merchant ID needed for the iframe tokenization
-// This endpoint is safe to expose to the frontend — it only returns public keys
+// Manual launch returns mode/status only. Tokenization configuration stays disabled.
+
+import { BILLING_MODE, AUTOMATED_BILLING_ENABLED } from '../../shared/billing-mode.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+  if (!AUTOMATED_BILLING_ENABLED) {
+    return res.status(200).json({ billingMode: BILLING_MODE, automatedBillingEnabled: false });
   }
 
   const apiAccessKey = process.env.CLOVER_API_ACCESS_KEY;

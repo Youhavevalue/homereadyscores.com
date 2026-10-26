@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import {
   BrowserRouter as Router,
   Routes,
@@ -8,11 +8,18 @@ import {
   useParams,
 } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import './public-site.css';
+import BrandLogo from './components/BrandLogo';
+import PageMetadata from './components/PageMetadata';
+import WebsiteTracking from './components/WebsiteTracking';
+import NotFound from './pages/NotFound';
+import ThankYou from './pages/ThankYou';
 import Footer from './components/Footer';
 import Home from './pages/Home';
-import HowItWorks from './pages/HowItWorks';
+import { Articles, ArticleDetail, Resources, CreditScore, ClientLogin } from './pages/PublicResources';
 import Reviews from './pages/Reviews';
 import GetStarted from './pages/GetStarted';
+import CreditFunnel from './pages/CreditFunnel';
 import FAQ from './pages/FAQ';
 
 // Legal Imports
@@ -21,56 +28,34 @@ import TermsOfService from './pages/legal/TermsOfService';
 import FCRARights from './pages/legal/FCRARights';
 import CROADisclosure from './pages/legal/CROADisclosure';
 
-// Portal imports
 import { AuthProvider } from './context/AuthContext';
 import { AdminToastProvider } from './admin/context/AdminToastContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import PortalLogin from './pages/portal/PortalLogin';
-import AddClient from './pages/portal/AddClient';
+import RouteLoadBoundary from './components/RouteLoadBoundary';
+// Private workflow code is fetched only when its route is opened.
+const PortalLogin = lazy(() => import('./pages/portal/PortalLogin'));
+const AddClient = lazy(() => import('./pages/portal/AddClient'));
+const AdminJointClient = lazy(() => import('./admin/pages/AdminJointClient'));
+const ProspectsPage = lazy(() => import('./admin/pages/AdminMarketingPages').then(module => ({ default: module.ProspectsPage })));
+const ProspectNewPage = lazy(() => import('./admin/pages/AdminMarketingPages').then(module => ({ default: module.ProspectNewPage })));
+const HelpDeskPage = lazy(() => import('./admin/pages/AdminOpsPages').then(module => ({ default: module.HelpDeskPage })));
+const HelpDeskAllPage = lazy(() => import('./admin/pages/AdminOpsPages').then(module => ({ default: module.HelpDeskAllPage })));
+const AdminLayout = lazy(() => import('./admin/AdminLayout'));
+const AdminRequests = lazy(() => import('./admin/pages/AdminRequests'));
+const AdminClientsList = lazy(() => import('./admin/pages/AdminClientsList'));
+const AdminClientDetail = lazy(() => import('./admin/pages/AdminClientDetail'));
+const AdminTrainingPage = lazy(() => import('./admin/pages/AdminTrainingPage'));
+const AdminDeferred = lazy(() => import('./admin/pages/AdminDeferred'));
+const AdminReports = lazy(() => import('./admin/pages/AdminReports'));
+const AdminGuide = lazy(() => import('./admin/pages/AdminGuide'));
+const AdminFunnel = lazy(() => import('./admin/pages/AdminFunnel'));
+const AdminContracts = lazy(() => import('./admin/pages/AdminContracts'));
+const ContractSigning = lazy(() => import('./pages/ContractSigning'));
 
-// Admin shell
-import AdminLayout from './admin/AdminLayout';
-import AdminHome from './admin/pages/AdminHome';
-import AdminClientsList from './admin/pages/AdminClientsList';
-import AdminClientDetail from './admin/pages/AdminClientDetail';
-import AdminJointClient from './admin/pages/AdminJointClient';
-import AdminSystemHub from './admin/pages/AdminSystemHub';
-import AdminTrainingPage from './admin/pages/AdminTrainingPage';
-import AdminAutorespondersPage from './admin/pages/AdminAutorespondersPage';
-import AdminAPIPage from './admin/pages/AdminAPIPage';
-import {
-  ProspectsPage,
-  ProspectNewPage,
-  AffiliatesPage,
-  AffiliateNewPage,
-  AffiliateReferralsPage,
-  BrokersPage,
-  BrokerNewPage,
-  BrokerGlobalPage,
-  BrokerReferralReportPage,
-  BrokerCreationReportPage,
-} from './admin/pages/AdminMarketingPages';
-import {
-  FAQAdminPage,
-  HelpDeskPage,
-  HelpDeskAllPage,
-  AppointmentsPage,
-} from './admin/pages/AdminOpsPages';
-import {
-  CMSPage,
-  LettersHubPage,
-  LetterMenuPage,
-  HotlinksPage,
-} from './admin/pages/AdminContentPages';
-import {
-  ContractsPage,
-  InvoicesPage,
-  SettingsPage,
-  SystemEmailsPage,
-  UsersPage,
-  ReportsPage,
-  CommunicationPage,
-} from './admin/pages/AdminSystemPages';
+function EnrollmentPage() {
+  const {search} = useLocation();
+  return <GetStarted funnelMode={new URLSearchParams(search).get('funnel') === '1'} cardStepPreview={import.meta.env.DEV && import.meta.env.VITE_HRS_CARD_STEP_PREVIEW === 'true'} />;
+}
 
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -89,13 +74,16 @@ function PortalClientRedirect() {
 // Layout wrapper that conditionally hides Navbar/Footer for team / portal pages
 const AppLayout = ({ children }) => {
   const { pathname } = useLocation();
-  const hideChrome = pathname.startsWith('/portal') || pathname.startsWith('/admin');
+  const hideChrome = pathname.startsWith('/portal') || pathname.startsWith('/admin') || pathname === '/sign-contract';
+
+  const isFunnel = pathname === '/credit-help';
+  const Content = hideChrome ? 'div' : 'main';
 
   return (
-    <div className={hideChrome ? '' : 'flex min-h-screen flex-col'}>
-      {!hideChrome && <Navbar />}
-      <main className={hideChrome ? '' : 'flex-grow'}>{children}</main>
-      {!hideChrome && <Footer />}
+    <div className={hideChrome ? 'staff-site' : 'public-site flex min-h-screen flex-col'}>
+      {!hideChrome && !isFunnel && <Navbar />}
+      <Content id={hideChrome ? undefined : "public-main"} className={hideChrome ? '' : 'flex-grow'}><RouteLoadBoundary key={pathname}>{children}</RouteLoadBoundary></Content>
+      {!hideChrome && !isFunnel && <Footer />}
     </div>
   );
 };
@@ -106,13 +94,24 @@ const App = () => {
       <AdminToastProvider>
       <Router>
         <ScrollToTop />
+      <PageMetadata />
+      <WebsiteTracking />
         <AppLayout>
+          <Suspense fallback={<div className="p-8 text-navy"><BrandLogo width={216} /><p role="status" className="mt-4">Loading page…</p></div>}>
           <Routes>
             {/* Public website routes */}
             <Route path="/" element={<Home />} />
-            <Route path="/how-it-works" element={<HowItWorks />} />
+            <Route path="/how-it-works" element={<Navigate to="/get-started" replace />} />
+            <Route path="/articles" element={<Articles/>}/>
+            <Route path="/articles/:slug" element={<ArticleDetail/>}/>
+            <Route path="/resources" element={<Resources/>}/>
+            <Route path="/get-your-credit-score" element={<CreditScore/>}/>
+            <Route path="/client-login" element={<ClientLogin/>}/>
+            <Route path="/about-results" element={<Navigate to="/reviews" replace/>}/>
             <Route path="/reviews" element={<Reviews />} />
-            <Route path="/get-started" element={<GetStarted />} />
+            <Route path="/credit-help" element={<CreditFunnel />} />
+            <Route path="/get-started" element={<EnrollmentPage />} />
+                <Route path="/thank-you" element={<ThankYou />} />
             <Route path="/faq" element={<FAQ />} />
 
             {/* Legal routes */}
@@ -123,6 +122,7 @@ const App = () => {
 
             {/* Auth */}
             <Route path="/portal/login" element={<PortalLogin />} />
+            <Route path="/sign-contract" element={<ContractSigning />} />
 
             {/* Legacy portal paths → admin */}
             <Route
@@ -158,7 +158,7 @@ const App = () => {
               }
             />
 
-            {/* Admin panel (full LegacyCredits-style module map) */}
+            {/* Protected staff operations; unfinished modules have an explicit deferred page. */}
             <Route
               path="/admin"
               element={
@@ -167,56 +167,29 @@ const App = () => {
                 </ProtectedRoute>
               }
             >
-              <Route index element={<AdminHome />} />
+              <Route index element={<AdminRequests />} />
+              <Route path="requests" element={<AdminRequests />} />
+              <Route path="credit-funnel" element={<AdminFunnel />} />
               <Route path="training" element={<AdminTrainingPage />} />
+              <Route path="reports" element={<AdminReports />} />
+              <Route path="guide" element={<AdminGuide />} />
+              <Route path="contracts" element={<AdminContracts />} />
               <Route path="clients" element={<AdminClientsList />} />
               <Route path="clients/new" element={<AddClient />} />
               <Route path="clients/joint" element={<AdminJointClient />} />
               <Route path="clients/:id" element={<AdminClientDetail />} />
-
               <Route path="prospects" element={<ProspectsPage />} />
               <Route path="prospects/new" element={<ProspectNewPage />} />
-
-              <Route path="affiliates" element={<AffiliatesPage />} />
-              <Route path="affiliates/new" element={<AffiliateNewPage />} />
-              <Route path="affiliates/referrals" element={<AffiliateReferralsPage />} />
-
-              <Route path="brokers" element={<BrokersPage />} />
-              <Route path="brokers/new" element={<BrokerNewPage />} />
-              <Route path="brokers/global" element={<BrokerGlobalPage />} />
-              <Route path="brokers/referrals" element={<BrokerReferralReportPage />} />
-              <Route path="brokers/creation-report" element={<BrokerCreationReportPage />} />
-
-              <Route path="faq" element={<FAQAdminPage />} />
               <Route path="help-desk" element={<HelpDeskPage />} />
               <Route path="help-desk/all" element={<HelpDeskAllPage />} />
-              <Route path="appointments" element={<AppointmentsPage />} />
-
-              <Route path="cms" element={<CMSPage />} />
-              <Route path="letters" element={<LettersHubPage />} />
-
-              <Route path="system" element={<AdminSystemHub />} />
-
-              <Route path="autoresponders" element={<Navigate to="/admin/autoresponders/prospect" replace />} />
-              <Route path="autoresponders/:type" element={<AdminAutorespondersPage />} />
-
-              <Route path="api" element={<Navigate to="/admin/api/deferred" replace />} />
-              <Route path="api/:section" element={<AdminAPIPage />} />
-
-              <Route path="contracts" element={<ContractsPage />} />
-              <Route path="invoices" element={<InvoicesPage />} />
-              <Route path="settings" element={<SettingsPage />} />
-              <Route path="system-emails" element={<SystemEmailsPage />} />
-              <Route path="users" element={<UsersPage />} />
-              <Route path="reports" element={<ReportsPage />} />
-              <Route path="communication" element={<CommunicationPage />} />
-              <Route path="letter-menu" element={<LetterMenuPage />} />
-              <Route path="hotlinks" element={<HotlinksPage />} />
+              <Route path="appointments" element={<Navigate to="/admin/requests" replace />} />
+              <Route path="*" element={<AdminDeferred />} />
             </Route>
 
             {/* Fallback */}
-            <Route path="*" element={<Home />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
+          </Suspense>
         </AppLayout>
       </Router>
       </AdminToastProvider>

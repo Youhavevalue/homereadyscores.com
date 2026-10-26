@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import AdminSimplePage, { AdminPlaceholderTable } from './AdminSimplePage';
 import { AdminCard } from '../components/AdminCard';
@@ -25,7 +25,7 @@ function TicketTable({ rows, onToggleStatus, showActions }) {
   if (!rows?.length) {
     return (
       <p className="py-8 text-center text-sm text-slate-500">
-        No tickets. Create one below, or run the SQL migration if the table is missing.
+        No tickets match this view.
       </p>
     );
   }
@@ -104,24 +104,27 @@ export function HelpDeskPage() {
   const { showToast } = useAdminToast();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
+  const [saving, setSaving] = useState(false);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
+    setLoadError('');
     try {
       const data = await fetchHelpTickets({ status: 'open', limit: 100 });
       setRows(data);
-    } catch {
-      setRows([]);
+    } catch (err) {
+      setLoadError(err.message || 'Tickets could not be loaded.');
     }
     setLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
     const t = setTimeout(() => void load(), 0);
     return () => clearTimeout(t);
-  }, []);
+  }, [load]);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -129,6 +132,8 @@ export function HelpDeskPage() {
       showToast('Enter a subject.', 'error');
       return;
     }
+    if (saving) return;
+    setSaving(true);
     try {
       await createHelpTicket({
         subject: subject.trim(),
@@ -140,8 +145,8 @@ export function HelpDeskPage() {
       setBody('');
       await load();
     } catch (err) {
-      showToast(err.message || 'Could not create ticket. Run sql/admin_operational_migration.sql.', 'error');
-    }
+      showToast(err.message || 'Could not create ticket. Your entries are preserved; please retry.', 'error');
+    } finally { setSaving(false); }
   };
 
   const toggle = async (row) => {
@@ -157,7 +162,7 @@ export function HelpDeskPage() {
   return (
     <AdminSimplePage
       title="Help desk"
-      subtitle="Open tickets — create, triage, and close."
+      subtitle="Internal tickets — record, triage, and close. No customer messages are sent."
       actions={
         <Link
           to="/admin/help-desk/all"
@@ -190,16 +195,17 @@ export function HelpDeskPage() {
           <div className="md:col-span-2 flex justify-end">
             <button
               type="submit"
+              disabled={saving}
               className="rounded-xl bg-[#2562FF] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#1d52d8]"
             >
-              Submit ticket
+              {saving ? 'Saving…' : 'Submit ticket'}
             </button>
           </div>
         </form>
       </AdminCard>
 
       <AdminCard title="Open tickets">
-        {loading ? (
+        {loadError ? <div role="alert" className="rounded-xl border border-red-200 p-4 text-red-800">{loadError} <button type="button" onClick={load} className="font-semibold underline">Retry loading tickets</button></div> : loading ? (
           <div className="space-y-2 py-6">
             <div className="h-10 animate-pulse rounded-lg bg-slate-100" />
             <div className="h-10 animate-pulse rounded-lg bg-slate-100" />
@@ -217,26 +223,27 @@ export function HelpDeskAllPage() {
   const [filter, setFilter] = useState('all');
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
+    setLoadError('');
     try {
       const data = await fetchHelpTickets({
         status: filter === 'all' ? 'all' : filter,
         limit: 200,
       });
       setRows(data);
-    } catch {
-      setRows([]);
+    } catch (err) {
+      setLoadError(err.message || 'Tickets could not be loaded.');
     }
     setLoading(false);
-  };
+  }, [filter]);
 
   useEffect(() => {
     const t = setTimeout(() => void load(), 0);
     return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- load is stable; refetch when filter changes
-  }, [filter]);
+  }, [load]);
 
   const toggle = async (row) => {
     try {
@@ -277,7 +284,7 @@ export function HelpDeskAllPage() {
           </div>
         }
       >
-        {loading ? (
+        {loadError ? <div role="alert" className="rounded-xl border border-red-200 p-4 text-red-800">{loadError} <button type="button" onClick={load} className="font-semibold underline">Retry loading tickets</button></div> : loading ? (
           <div className="h-32 animate-pulse rounded-xl bg-slate-100" />
         ) : (
           <TicketTable rows={rows} onToggleStatus={toggle} showActions />

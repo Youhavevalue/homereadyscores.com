@@ -1,0 +1,40 @@
+/* Reviews use the public site's existing C05 tokens and typography. */
+.public-site .hrs-voices .hrs-voices-intro{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:64px;align-items:center}
+.public-site .hrs-voices-intro h1{margin:0 0 24px}
+.public-site .hrs-voices-intro>div>p:last-child{max-width:610px;color:var(--hrs-muted);font-size:17px;line-height:1.85;margin:0}
+.public-site .hrs-voices-preview{background:var(--hrs-light);padding:30px 32px;border:1px solid var(--hrs-line);border-radius:28px;box-shadow:var(--hrs-shadow)}
+.public-site .hrs-voices-preview-label{display:block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:18px;color:var(--hrs-navy)}
+.public-site .hrs-voices-preview h2{font-size:25px!important;margin:0 0 14px}
+.public-site .hrs-voices-preview p{font-size:14px;line-height:1.8;color:var(--hrs-navy);margin:0 0 12px}
+.public-site .hrs-voices-preview p:last-child{margin-bottom:0}
+.public-site .hrs-voices-collection-heading{display:flex;align-items:baseline;justify-content:space-between;gap:18px;padding-bottom:24px;margin-bottom:28px;border-bottom:1px solid var(--hrs-line)}
+.public-site .hrs-voices-collection-heading h2{margin:0}
+.public-site .hrs-voices-collection-heading>p{font-size:13px;line-height:1.7;color:var(--hrs-muted);margin:0}
+.public-site .hrs-voices-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.public-site .hrs-voice-card{display:flex;flex-direction:column;min-width:0;border:1px solid var(--hrs-line);border-radius:28px;background:var(--hrs-white);padding:28px;box-shadow:var(--hrs-shadow)}
+.public-site .hrs-voice-quote-icon{color:var(--hrs-blue);margin-bottom:18px}
+.public-site .hrs-voice-card blockquote{margin:0 0 26px;flex:1}
+.public-site .hrs-voice-card blockquote p{margin:0;font-size:16px;line-height:1.85;color:var(--hrs-navy);white-space:pre-line;overflow-wrap:anywhere}
+.public-site .hrs-voice-person{display:flex;align-items:center;gap:14px;min-width:0;margin-top:auto}
+.public-site .hrs-voice-avatar{width:56px;height:56px;border-radius:50%;object-fit:cover;background:var(--hrs-light);color:var(--hrs-navy);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.public-site .hrs-voice-person>div{min-width:0}
+.public-site .hrs-voice-person h3{font:700 14px/1.5 'HRS Public Sans','Noto Sans',sans-serif;letter-spacing:0;margin:0 0 3px;color:var(--hrs-navy);overflow-wrap:anywhere}
+.public-site .hrs-voice-person a{display:inline-flex;align-items:center;gap:6px;min-height:44px;font-size:12px;line-height:1.6;color:var(--hrs-blue);text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
+.public-site .hrs-voice-person a svg{flex-shrink:0}
+.public-site .hrs-voice-space-top{display:flex;align-items:center;justify-content:space-between;gap:14px;color:var(--hrs-muted);font-size:12px;line-height:1.6}
+.public-site .hrs-voice-lines{display:grid;gap:11px;margin:30px 0 36px}
+.public-site .hrs-voice-lines span{height:7px;width:100%;background:var(--hrs-light);border-radius:3px}
+.public-site .hrs-voice-lines span:nth-child(2){width:90%}.public-site .hrs-voice-lines span:nth-child(3){width:68%}
+.public-site .hrs-voice-space .hrs-voice-person p{font-size:12px;line-height:1.65;color:var(--hrs-muted);margin:0}
+.public-site .hrs-voice-placeholder-label{font-size:10px;line-height:1.7;color:var(--hrs-muted);border-top:1px solid var(--hrs-line);padding-top:16px;margin:22px 0 0}
+.public-site .hrs-voices-more{display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:32px}
+.public-site .hrs-voices-more p{margin:0;font-size:13px;color:var(--hrs-muted);text-align:center}
+.public-site .hrs-voices-more .hrs-button{cursor:pointer}
+.public-site .hrs-voices-disclosure{font-size:12px;line-height:1.9;color:var(--hrs-muted);max-width:740px;margin:36px 0 0}
+.public-site .hrs-content-page>section.hrs-voices-cta{background:var(--hrs-light);margin:0;padding-block:54px}
+.public-site .hrs-voices-cta>.hrs-wrap{display:flex;align-items:center;justify-content:space-between;gap:42px}
+.public-site .hrs-voices-cta h2{max-width:600px;margin:0 0 14px}
+.public-site .hrs-voices-cta p:not(.hrs-kicker){color:var(--hrs-navy);font-size:15px;margin:0}
+.public-site .hrs-voices-cta .hrs-button{flex-shrink:0}
+@media(max-width:1023px){.public-site .hrs-voices .hrs-voices-intro{gap:36px;grid-template-columns:1fr 1fr}.public-site .hrs-voices-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.public-site .hrs-voices-preview{padding:24px}.public-site .hrs-voice-card{padding:24px}}
+@media(max-width:700px){.public-site .hrs-voices>section.hrs-wrap{padding-inline:0}.public-site .hrs-voices .hrs-voices-intro{grid-template-columns:1fr;gap:28px}.public-site .hrs-voices-intro>div>p:last-child{font-size:16px}.public-site .hrs-voices-preview{padding:22px}.public-site .hrs-voices-preview h2{font-size:23px!important}.public-site .hrs-voices-collection-heading{display:block;padding-bottom:20px;margin-bottom:22px}.public-site .hrs-voices-collection-heading>p{margin-top:8px}.public-site .hrs-voices-grid{grid-template-columns:1fr;gap:18px}.public-site .hrs-voice-card{padding:24px}.public-site .hrs-voices-cta>.hrs-wrap{display:block}.public-site .hrs-content-page>section.hrs-voices-cta{padding:38px 0}.public-site .hrs-voices-cta .hrs-button{width:100%;margin-top:24px}.public-site .hrs-voices-more .hrs-button{width:100%}.public-site .hrs-voices-disclosure{margin-top:28px}}

@@ -3,7 +3,7 @@ import { ShieldCheck } from 'lucide-react';
 
 const FCRARights = () => {
   return (
-    <div className="pt-32 pb-24 bg-surface min-h-screen">
+    <div className="hrs-legal-page pt-32 pb-24 bg-surface min-h-screen">
       <div className="max-w-4xl mx-auto px-6 bg-white p-12 md:p-16 rounded-3xl shadow-[0_10px_40px_rgba(0,45,91,0.05)] border border-gray-100">
         <div className="flex items-center gap-4 mb-8 pb-8 border-b border-gray-100">
             <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
@@ -24,7 +24,7 @@ const FCRARights = () => {
              <li><strong>Access to your file is limited.</strong> A consumer reporting agency may provide information about you only to people with a valid need, usually to consider an application with a creditor, insurer, employer, landlord, or other business.</li>
              <li><strong>You may limit "prescreened" offers of credit and insurance you get based on information in your credit report.</strong> Unsolicited "prescreened" offers for credit and insurance must include a toll-free phone number you can call if you choose to remove your name and address from the lists these offers are based on.</li>
           </ul>
-          <p className="mt-8 italic text-sm">For more information, including information about additional rights, go to www.consumerfinance.gov/learnmore or write to: Consumer Financial Protection Bureau, 1700 G Street N.W., Washington, DC 20552.</p>
+          <p className="mt-8 italic text-sm">For more information, including information about additional rights, go to <a href="https://www.consumerfinance.gov/learnmore/" target="_blank" rel="noopener noreferrer" className="underline">www.consumerfinance.gov/learnmore</a> or write to: Consumer Financial Protection Bureau, 1700 G Street N.W., Washington, DC 20552.</p>
         </div>
       </div>
     </div>

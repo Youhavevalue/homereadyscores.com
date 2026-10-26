@@ -1,28 +1,33 @@
 // POST /api/enroll
-// Full enrollment flow: GHL contact + Supabase client + Clover customer + charge setup fee + create subscription
-// Called from the Get Started page when the prospect submits with a credit card
-// Body: {
-//   firstName, lastName, email, phone, goal, plan ('single'|'couple'), billingZip,
-//   creditReportAgreement (bool), source (clv_ card token from Clover iframe)
-// }
+// Manual launch: save an enrollment request for staff review, without billing.
+// The previous automated flow is retained below, disabled by the release mode.
 
 import { createClient } from '@supabase/supabase-js';
 import { randomUUID } from 'crypto';
+import { AUTOMATED_BILLING_ENABLED } from '../shared/billing-mode.js';
+import { createProductionCardRuntime } from './_lib/production-card-runtime.js';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
+  process.env.SUPABASE_SERVICE_ROLE_KEY,
+  { db: { schema: 'home_ready' } }
 );
 
 const CLOVER_SCL_BASE = 'https://scl-sandbox.dev.clover.com';
 const CLOVER_API_BASE = 'https://apisandbox.dev.clover.com';
 
 const PLANS = {
-  single: { setupFee: 184.99, monthly: 114.00, name: 'Single Enrollment' },
-  couple: { setupFee: 304.99, monthly: 190.00, name: 'Couple Enrollment' },
+  single: { setupFee: 189.99, monthly: 100.00, name: 'Single Enrollment' },
+  couple: { setupFee: 379.99, monthly: 160.00, name: 'Couple Enrollment' },
 };
 
 export default async function handler(req, res) {
+  if (!AUTOMATED_BILLING_ENABLED) return createProductionCardRuntime({db:supabase}).enroll(req,res);
+  return handleAutomatedEnrollment(req, res);
+}
+
+// Retained for later review; unreachable during the manual-launch release.
+async function handleAutomatedEnrollment(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }

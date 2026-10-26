@@ -1,0 +1,9 @@
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs');
+const ref='12345678-1234-4234-8234-123456789abc';
+async function moduleUnderTest(){assert.ok(fs.existsSync(require('node:path').resolve(__dirname,'../src/lib/inquiry-receipt.js')),'receipt storage module is required');return import('../src/lib/inquiry-receipt.js');}
+const storage=()=>{const m=new Map();return{getItem:k=>m.get(k)||null,setItem:(k,v)=>m.set(k,v),removeItem:k=>m.delete(k),dump:()=>[...m.values()]};};
+test('saved confirmation survives reload with only reference and timestamp, never contact details',async()=>{const m=await moduleUnderTest(),s=storage();assert.equal(m.saveReceipt({requestId:ref,firstName:'PRIVATE',email:'private@example.invalid'},s,100),true);assert.deepEqual(m.readReceipt(s,101),{requestId:ref,savedAt:100});assert.doesNotMatch(s.dump().join(''),/PRIVATE|email|example.invalid/);});
+test('malformed, expired and future receipts do not create a success state',async()=>{const m=await moduleUnderTest();for(const payload of ['bad',JSON.stringify({requestId:'not-valid',savedAt:100}),JSON.stringify({requestId:ref,savedAt:0}),JSON.stringify({requestId:ref,savedAt:10000})]){assert.equal(m.readReceipt({getItem:()=>payload},100),null);}const s=storage();m.saveReceipt({requestId:ref},s,100);assert.equal(m.readReceipt(s,100+25*60*60*1000),null);});
+test('unavailable storage is recoverable without claiming persistence',async()=>{const m=await moduleUnderTest(),s={getItem(){throw Error('blocked');},setItem(){throw Error('blocked');}};assert.equal(m.saveReceipt({requestId:ref},s),false);assert.equal(m.readReceipt(s),null);});
+
+test('expired receipt is removed rather than retained past its availability window',async()=>{const m=await moduleUnderTest(),s=storage();m.saveReceipt({requestId:ref},s,100);assert.equal(m.readReceipt(s,100+25*60*60*1000),null);assert.deepEqual(s.dump(),[]);});

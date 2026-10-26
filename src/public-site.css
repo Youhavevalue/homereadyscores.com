@@ -1,0 +1,236 @@
+@font-face{font-family:'HRS Public Sans';src:url('/brand/c05/fonts/NotoSans-400.ttf') format('truetype');font-weight:400;font-display:swap}
+@font-face{font-family:'HRS Public Sans';src:url('/brand/c05/fonts/NotoSans-700.ttf') format('truetype');font-weight:700;font-display:swap}
+@font-face{font-family:'HRS Public Sans';src:url('/brand/c05/fonts/NotoSans-900.ttf') format('truetype');font-weight:900;font-display:swap}
+@font-face{font-family:'HRS Public Display';src:url('/brand/c05/fonts/NotoSansDisplay-700.ttf') format('truetype');font-weight:700;font-display:swap}
+@font-face{font-family:'HRS Public Display';src:url('/brand/c05/fonts/NotoSansDisplay-900.ttf') format('truetype');font-weight:900;font-display:swap}
+
+/* Familiar HomeReady surfaces; every rule is contained within the public site. */
+.public-site{--hrs-blue:#2562ff;--hrs-navy:#002d5b;--hrs-white:#fff;--hrs-light:#e9f2fe;--hrs-muted:#536779;--hrs-line:#d9e2ed;--hrs-shadow:0 20px 60px #002d5b0d;font-family:'HRS Public Sans','Noto Sans',sans-serif;color:var(--hrs-navy);background:var(--hrs-white);font-size:16px;line-height:1.7}
+.public-site *{box-sizing:border-box}
+.public-site h1,.public-site h2,.public-site h3,.public-site h4{font-family:'HRS Public Display','Noto Sans Display',sans-serif;font-weight:900;letter-spacing:-.04em}
+.public-site :focus-visible{outline:3px solid var(--hrs-blue);outline-offset:4px}
+.public-site a{touch-action:manipulation}
+.public-site p{overflow-wrap:break-word}
+.public-site .hrs-wrap{width:min(1280px,calc(100% - 96px));margin-inline:auto}
+.public-site .hrs-gradient-text{color:var(--hrs-blue);background:linear-gradient(110deg,var(--hrs-navy),var(--hrs-blue) 65%);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.public-site .hrs-kicker{font-size:11px!important;font-weight:900!important;letter-spacing:.16em!important;text-transform:uppercase;color:var(--hrs-blue);margin:0 0 18px!important;line-height:1.7!important}
+.public-site .hrs-button,.public-site .auth-button{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:52px;padding:17px 28px;border:1px solid var(--hrs-blue);border-radius:12px;background:var(--hrs-blue);color:var(--hrs-white);font:900 12px/1.4 'HRS Public Sans',sans-serif;letter-spacing:.09em;text-transform:uppercase;text-decoration:none;box-shadow:0 10px 30px #2562ff26;transform:none;transition:background .2s,box-shadow .2s}
+.public-site .hrs-button:hover,.public-site .auth-button:hover{background:#174de0;color:var(--hrs-white);box-shadow:0 14px 35px #2562ff38;transform:none}
+.public-site .hrs-button-outline,.public-site .secondary-button{background:var(--hrs-white);color:var(--hrs-navy);border:1px solid var(--hrs-line);border-radius:12px;box-shadow:none;min-height:52px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:900}
+.public-site .hrs-button-outline:hover,.public-site .secondary-button:hover{background:var(--hrs-light);color:var(--hrs-navy);border-color:var(--hrs-navy);box-shadow:none}
+.public-site .hrs-text-link{display:inline-flex;align-items:center;gap:10px;color:var(--hrs-navy);text-decoration:underline;text-underline-offset:5px;font-size:13px;font-weight:700;min-height:44px}
+.public-site .hrs-text-link:hover{color:var(--hrs-blue)}
+.public-site .hrs-actions{display:flex;align-items:center;flex-wrap:wrap;gap:16px;margin-top:32px}
+.public-site .hrs-small{font-size:12px!important;line-height:1.8!important;color:var(--hrs-muted)}
+.public-site .hrs-visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* Keep the corrected eight destinations and accessible mobile drawer. */
+.public-site .hrs-header{height:100px;position:fixed;top:0;left:0;right:0;z-index:100;background:#ffffffd9;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid #ffffff99}
+.public-site .hrs-header-inner{display:flex;align-items:center;justify-content:space-between;gap:28px;height:100%}
+.public-site .hrs-brand{display:block;flex-shrink:0;padding-block:8px}
+.public-site .hrs-desktop-nav{display:flex;align-items:center;gap:18px;font-size:10px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;line-height:1.5}
+.public-site .hrs-desktop-nav>a{color:var(--hrs-navy);text-decoration:none;white-space:nowrap;min-height:44px;display:inline-flex;align-items:center;position:relative}
+.public-site .hrs-desktop-nav>a:hover,.public-site .hrs-desktop-nav>[aria-current=page]{color:var(--hrs-blue)}
+.public-site .hrs-desktop-nav>[aria-current=page]:not(.hrs-button):after{content:'';position:absolute;bottom:3px;left:0;right:0;height:2px;background:var(--hrs-blue);border-radius:2px}
+.public-site .hrs-desktop-nav .hrs-button{font-size:10px;letter-spacing:.05em;padding:13px 17px;color:var(--hrs-white);min-height:46px}
+.public-site .hrs-mobile-toggle{display:none;background:var(--hrs-light);border:0;border-radius:12px;height:46px;width:46px;align-items:center;justify-content:center;color:var(--hrs-navy);flex-shrink:0}
+.public-site .hrs-skip{position:fixed;left:12px;top:-80px;z-index:200;padding:12px 20px;background:var(--hrs-white);color:var(--hrs-navy);border:2px solid var(--hrs-blue);border-radius:12px}
+.public-site .hrs-skip:focus{top:10px}
+.public-site .hrs-mobile-overlay{position:fixed;inset:0;z-index:120}
+.public-site .hrs-mobile-backdrop{position:absolute;inset:0;border:0;background:#002d5b88;width:100%;height:100%;backdrop-filter:blur(5px)}
+.public-site .hrs-mobile-panel{position:absolute;right:12px;top:12px;bottom:12px;width:min(380px,calc(100% - 24px));max-height:calc(100dvh - 24px);background:#fffffff5;border:1px solid var(--hrs-white);border-radius:28px;padding:28px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;box-shadow:0 30px 80px #002d5b33}
+.public-site .hrs-mobile-panel>div{display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:900;margin-bottom:18px;gap:12px}
+.public-site .hrs-mobile-panel button{background:var(--hrs-light);color:var(--hrs-navy);border:0;border-radius:12px;min-width:44px;min-height:44px;display:grid;place-items:center}
+.public-site .hrs-mobile-panel>a{display:flex;align-items:center;justify-content:space-between;padding:13px 0;min-height:48px;text-decoration:none;font-size:16px;font-weight:700;color:var(--hrs-navy);border-bottom:1px solid var(--hrs-line);gap:12px}
+.public-site .hrs-mobile-panel>a.hrs-button{color:var(--hrs-white);padding:16px 18px;margin:8px 0;border-bottom:0;font-size:12px}
+
+/* The pre-Legacy composition: mesh hero, strong type and a glass topic card. */
+.public-site .hrs-home{padding-top:100px;background-color:var(--hrs-white);background-image:radial-gradient(at 0% 0%,#2562ff26 0,transparent 42%),radial-gradient(at 100% 100%,#2562ff14 0,transparent 48%)}
+.public-site .hrs-home h2{font-size:48px;line-height:1.13;margin:0 0 24px}
+.public-site .hrs-home h3{font-size:24px;line-height:1.3;margin:0 0 18px}
+.public-site .hrs-home p{margin:0 0 22px}
+.public-site .hrs-home section{padding:0}
+.public-site .hrs-familiar-hero{position:relative;overflow:hidden;isolation:isolate}
+.public-site .hrs-familiar-hero:before{content:'';position:absolute;top:0;bottom:0;right:-12%;width:50%;background:#002d5b08;transform:skewX(-12deg);z-index:-1}
+.public-site .hrs-familiar-hero-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:70px;align-items:center;min-height:760px;padding-block:70px 110px}
+.public-site .hrs-pill{display:inline-flex;align-items:center;gap:9px;border-radius:50px;background:#2562ff12;color:var(--hrs-navy);padding:9px 16px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.09em;margin-bottom:30px!important}
+.public-site .hrs-pill svg{color:var(--hrs-blue);flex-shrink:0}
+.public-site .hrs-familiar-hero h1{font-size:clamp(64px,6.2vw,90px)!important;line-height:.98!important;letter-spacing:-.055em;color:var(--hrs-navy);margin:0 0 30px}
+.public-site .hrs-familiar-hero-copy>p:not(.hrs-pill){max-width:590px;font-size:18px;line-height:1.85;color:var(--hrs-muted)}
+.public-site .hrs-familiar-hero-copy .hrs-hero-note{font-size:12px!important;line-height:1.8;margin:30px 0 0;max-width:480px}
+.public-site .hrs-familiar-visual{position:relative;min-width:0;margin-right:24px}
+.public-site .hrs-goals-card{position:relative;background:#ffffffcc;backdrop-filter:blur(20px);border:1px solid var(--hrs-white);border-radius:56px;padding:46px 40px 100px;box-shadow:0 50px 100px #002d5b26}
+.public-site .hrs-goals-card h2{font-size:29px;line-height:1.2;margin-bottom:30px;letter-spacing:-.035em}
+.public-site .hrs-topic-list{display:grid;grid-template-columns:1fr 1fr;gap:14px 12px;padding:0;list-style:none;margin:0}
+.public-site .hrs-topic-list li{display:flex;gap:10px;align-items:center;min-width:0;padding:12px 10px;background:#f8f9fa99;border:1px solid #002d5b08;border-radius:15px;font-size:12px;font-weight:700;line-height:1.6}
+.public-site .hrs-topic-list svg{flex-shrink:0;color:var(--hrs-blue)}
+.public-site .hrs-goals-card>p{font-size:13px;color:var(--hrs-muted);padding-top:28px;margin:28px 0 0;border-top:1px solid var(--hrs-line)}
+.public-site .hrs-next-step-badge{display:flex;align-items:center;gap:20px;position:absolute;bottom:-46px;right:-26px;padding:25px 30px;border-radius:25px;background:var(--hrs-navy);color:var(--hrs-white);border:1px solid #ffffff1a;box-shadow:0 20px 50px #002d5b33;text-decoration:none;font-size:18px;line-height:1.25;font-weight:900}
+.public-site .hrs-next-step-badge small{display:block;text-transform:uppercase;font-size:10px;letter-spacing:.12em;color:var(--hrs-light);margin-bottom:7px}
+.public-site .hrs-next-step-badge>span:last-child>svg{display:inline-block;vertical-align:middle;margin-left:5px}
+.public-site .hrs-next-step-icon{height:56px;width:56px;background:var(--hrs-blue);border-radius:16px;display:grid;place-items:center}
+.public-site .hrs-home .hrs-goals-band{padding-block:50px;background:#ffffff99;border-block:1px solid #002d5b08;text-align:center}
+.public-site .hrs-goals-band h2{font-size:26px;margin-bottom:12px}
+.public-site .hrs-goals-band p{max-width:740px;margin:0 auto 12px;color:var(--hrs-muted)}
+.public-site .hrs-goals-band .hrs-small{margin-bottom:0}
+.public-site .hrs-home .hrs-section{padding-block:110px}
+.public-site .hrs-section-heading{max-width:760px;text-align:center;margin:0 auto 60px}
+.public-site .hrs-section-heading>p:not(.hrs-kicker){color:var(--hrs-muted);font-size:18px}
+.public-site .hrs-service-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.public-site .hrs-familiar-card{padding:34px 28px;background:var(--hrs-white);border:1px solid #002d5b0a;border-radius:36px;box-shadow:var(--hrs-shadow);min-width:0;display:flex;flex-direction:column}
+.public-site .hrs-card-icon{height:72px;width:72px;border-radius:22px;background:#2562ff0d;display:grid;place-items:center;color:var(--hrs-blue);margin-bottom:32px}
+.public-site .hrs-familiar-card>p:not(.hrs-editorial-meta){font-size:15px;line-height:1.85;color:var(--hrs-muted);flex:1}
+.public-site .hrs-familiar-card>.hrs-text-link{align-self:flex-start;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;text-decoration:none;color:var(--hrs-blue)}
+.public-site .hrs-home-plans{background:#ffffff80}
+.public-site .hrs-pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;max-width:1000px;margin:0 auto}
+.public-site .hrs-price-card{background:var(--hrs-white);border:1px solid var(--hrs-line);padding:44px;border-radius:36px;box-shadow:var(--hrs-shadow);display:flex;flex-direction:column;min-width:0}
+.public-site .hrs-price-card>.hrs-kicker{font-size:13px!important}
+.public-site .hrs-price-card h3{font-size:20px;min-height:52px;letter-spacing:-.02em;color:var(--hrs-muted)}
+.public-site .hrs-price{display:flex;align-items:baseline;flex-wrap:wrap;gap:10px;margin:8px 0 10px}
+.public-site .hrs-price strong{font-size:54px;font-weight:900;letter-spacing:-.055em;line-height:1.2;color:var(--hrs-navy)}
+.public-site .hrs-price>span{font-size:14px;color:var(--hrs-muted)}
+.public-site .hrs-monthly{font-size:14px;color:var(--hrs-muted);line-height:1.9}
+.public-site .hrs-monthly strong{color:var(--hrs-navy)}
+.public-site .hrs-check-list{padding:26px 0 0;list-style:none;margin:6px 0 30px;display:grid;gap:16px;font-size:14px;border-top:1px solid var(--hrs-line);flex:1}
+.public-site .hrs-check-list li{display:flex;gap:12px;align-items:flex-start}
+.public-site .hrs-check-list svg{flex-shrink:0;color:var(--hrs-blue);margin-top:3px}
+.public-site .hrs-price-card .hrs-button{width:100%;margin:0 0 18px}
+.public-site .hrs-price-card .hrs-small{margin-bottom:0}
+.public-site .hrs-pricing-note{text-align:center;max-width:720px;margin:30px auto 0!important;color:var(--hrs-muted);font-size:13px}
+.public-site .hrs-pricing-note a{color:var(--hrs-navy);text-decoration:underline}
+.public-site .hrs-articles-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;margin-bottom:48px}
+.public-site .hrs-articles-heading h2{margin-bottom:0}
+.public-site .hrs-home-article-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:30px}
+.public-site .hrs-home-article-grid h3 a{color:var(--hrs-navy);text-decoration:none}
+.public-site .hrs-home-article-grid h3 a:hover{text-decoration:underline}
+.public-site .hrs-editorial-meta{font-size:12px!important;color:var(--hrs-muted);line-height:1.7}
+.public-site .hrs-home .hrs-home-contact{padding-top:0}
+.public-site .hrs-journey-card{background:var(--hrs-navy);border-radius:64px;padding:80px;display:grid;grid-template-columns:1.4fr 1fr;gap:70px;align-items:center;position:relative;overflow:hidden;box-shadow:0 40px 100px #002d5b26}
+.public-site .hrs-journey-card:before{content:'';position:absolute;inset:0;background:radial-gradient(at 100% 0,#2562ff44 0,transparent 55%);pointer-events:none}
+.public-site .hrs-journey-card>div{position:relative;min-width:0}
+.public-site .hrs-journey-card h2{font-size:48px;color:var(--hrs-white);line-height:1.12}
+.public-site .hrs-journey-card h2 span{color:#99b7ff}
+.public-site .hrs-journey-card .hrs-kicker{color:#bcd1ff}
+.public-site .hrs-journey-card p{color:var(--hrs-light);font-size:17px;line-height:1.85}
+.public-site .hrs-journey-card .hrs-small{color:var(--hrs-light);margin-bottom:0}
+.public-site .hrs-journey-actions{display:flex;flex-direction:column;align-items:flex-start;gap:20px}
+.public-site .hrs-journey-actions>.hrs-button{min-width:245px;padding-block:22px}
+.public-site .hrs-journey-actions>p{font-size:12px;margin-bottom:0}
+.public-site .hrs-consultation-link{color:var(--hrs-white);font-size:13px;font-weight:700;min-height:44px;display:inline-flex;align-items:center;gap:8px;text-decoration:underline;text-underline-offset:5px}
+.public-site .hrs-home [id]{scroll-margin-top:120px}
+
+/* Shared public pages retain their content, forms and response states. */
+.public-site .hrs-content-page{padding-top:160px;padding-bottom:80px;background-color:var(--hrs-white);background-image:radial-gradient(at 0 0,#2562ff12 0,transparent 50%);min-height:70vh}
+.public-site .hrs-content-page>section{padding-block:0;margin-bottom:64px}
+.public-site .hrs-content-page h1{font-size:54px!important;line-height:1.1!important;max-width:850px;margin-bottom:28px}
+.public-site .hrs-content-page h2{font-size:28px!important;line-height:1.3}
+.public-site .hrs-content-page .text-center h1{margin-inline:auto}
+.public-site .hrs-content-page .rounded-3xl,.public-site .hrs-content-page .rounded-\[32px\]{border-radius:28px}
+.public-site .hrs-content-page .text-xl{font-size:18px}
+.public-site .hrs-content-page .text-gray-500,.public-site .hrs-content-page .text-gray-600{color:var(--hrs-muted)}
+.public-site .hrs-content-page .text-blue-100\/60{color:var(--hrs-light)}
+.public-site .hrs-process-intro>p:not(.hrs-kicker){font-size:18px;line-height:1.9;color:var(--hrs-muted);max-width:780px;margin:24px 0 0}
+.public-site .hrs-resource-links{display:grid;margin-top:28px}
+.public-site .hrs-resource-links a{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:20px 0;border-bottom:1px solid var(--hrs-line);font-size:15px;font-weight:700;color:var(--hrs-navy);text-decoration:none}
+.public-site .hrs-resource-links a:hover{text-decoration:underline}
+.public-site .hrs-tools-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;margin:44px 0}
+.public-site .hrs-tool-card{display:flex;flex-direction:column;min-width:0;padding:36px;border:1px solid var(--hrs-line);border-radius:32px;background:var(--hrs-white);box-shadow:var(--hrs-shadow)}
+.public-site .hrs-tool-card>.hrs-kicker{font-size:10px!important;margin-bottom:18px!important}
+.public-site .hrs-tool-card h2{font-size:26px!important;margin:0 0 18px}
+.public-site .hrs-tool-card>p:not(.hrs-kicker){font-size:16px;line-height:1.85;color:var(--hrs-muted);flex:1;margin:0 0 18px}
+.public-site .hrs-tool-card>.hrs-text-link{align-self:flex-start}
+.public-site .hrs-editorial-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;margin:44px 0;text-align:left}
+.public-site .hrs-editorial-card{border:1px solid var(--hrs-line);border-radius:32px;background:var(--hrs-white);overflow:hidden;box-shadow:var(--hrs-shadow);min-width:0}
+.public-site .hrs-editorial-art{height:180px;background:linear-gradient(135deg,var(--hrs-navy),var(--hrs-blue));color:var(--hrs-white);display:flex;justify-content:space-between;align-items:flex-end;padding:28px}
+.public-site .hrs-editorial-art span{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+.public-site .hrs-editorial-art strong{font:900 56px/1 'HRS Public Display',sans-serif;color:#ffffff80}
+.public-site .hrs-editorial-body{padding:28px}
+.public-site .hrs-editorial-body h2{font-size:25px!important;margin:16px 0}
+.public-site .hrs-editorial-body h2 a{color:var(--hrs-navy);text-decoration:none}
+.public-site .hrs-editorial-body h2 a:hover{text-decoration:underline}
+.public-site .hrs-editorial-body>p{font-size:16px;line-height:1.8;color:var(--hrs-muted)}
+.public-site .hrs-editorial-detail{max-width:820px!important}
+.public-site .hrs-editorial-detail h1{margin:24px 0;font-size:48px!important;line-height:1.12}
+.public-site .hrs-editorial-detail section{margin:40px 0;padding:0}
+.public-site .hrs-editorial-detail section p{font-size:17px;line-height:1.95;margin:16px 0;color:var(--hrs-muted)}
+.public-site .hrs-editorial-deck{font-size:21px;line-height:1.7;color:var(--hrs-muted)}
+.public-site .hrs-editorial-detail .hrs-kicker{margin-top:32px!important}
+.public-site .hrs-editorial-sources{border-top:1px solid var(--hrs-line);padding-top:28px!important}
+.public-site .hrs-editorial-sources ul{padding-left:20px;line-height:2}
+.public-site .hrs-editorial-detail a{color:var(--hrs-blue);text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
+.public-site .hrs-editorial-detail .hrs-button{color:var(--hrs-white);text-decoration:none;margin-top:28px}
+.public-site .hrs-editorial-list{padding-left:24px;color:var(--hrs-muted);font-size:17px;line-height:1.9}
+.public-site .hrs-editorial-list li{margin:8px 0}
+.public-site .hrs-legal-page{padding-top:150px;background:linear-gradient(135deg,#e9f2fe99,var(--hrs-white));padding-bottom:80px}
+.public-site .hrs-legal-page>article,.public-site .hrs-legal-page>div{border-radius:32px;box-shadow:var(--hrs-shadow);color:var(--hrs-navy)}
+.public-site .hrs-legal-page h1{line-height:1.2!important}
+.public-site .hrs-legal-page h2{font-size:22px!important;line-height:1.4!important}
+.public-site .hrs-legal-page a{overflow-wrap:anywhere}
+.public-site .signup-page{padding-top:150px;background:linear-gradient(140deg,#e9f2fe99,var(--hrs-white));padding-bottom:80px}
+.public-site .signup-form-panel{border-radius:28px;box-shadow:var(--hrs-shadow);border:1px solid #002d5b0a}
+.public-site .signup-page h1{font-family:'HRS Public Display',sans-serif;color:var(--hrs-navy);font-weight:900}
+.public-site .signup-page .auth-button,.public-site .signup-page .secondary-button{min-height:48px;font-size:14px;font-weight:700;letter-spacing:0;text-transform:none;box-shadow:none;padding:12px 20px;transform:none}
+.public-site .signup-page .input-field{font-family:'HRS Public Sans',sans-serif;font-size:16px;border-radius:12px;line-height:1.5}
+.public-site .signup-page .input-field:focus-visible{outline:3px solid var(--hrs-blue);outline-offset:2px}
+.public-site .receipt-page{padding-top:150px!important;padding-bottom:80px;min-height:70vh}
+.public-site .receipt-page h1{font-size:42px!important;line-height:1.2!important;outline:none}
+.public-site .receipt-page .secondary-button{font-size:13px;letter-spacing:0;text-transform:none}
+
+/* Familiar generous navy footer, retaining all current destinations and notices. */
+.public-site .hrs-footer{position:relative;overflow:hidden;padding-block:100px 40px;background:var(--hrs-navy);color:var(--hrs-light)}
+.public-site .hrs-footer:before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(at 100% 0,#2562ff22 0,transparent 50%)}
+.public-site .hrs-footer>.hrs-wrap{position:relative}
+.public-site .hrs-footer-grid{display:grid;grid-template-columns:1.3fr .8fr .95fr 1.2fr;gap:50px}
+.public-site .hrs-footer-grid>*{min-width:0}
+.public-site .hrs-footer-grid>div>p{font-size:14px;line-height:1.9;color:#c5d7ea;margin:28px 0}
+.public-site .hrs-footer-grid>div:first-child>p{font-size:18px;max-width:290px;font-style:italic}
+.public-site .hrs-footer h2{font-family:'HRS Public Sans',sans-serif;font-size:10px!important;font-weight:900;line-height:1.5!important;letter-spacing:.2em;text-transform:uppercase;color:#a8c1ff;margin:0 0 26px}
+.public-site .hrs-footer-grid>div>a:not(:first-child){display:block;margin:10px 0;font-size:12px;font-weight:700;color:var(--hrs-light);text-decoration:none;min-height:32px;line-height:1.8;overflow-wrap:anywhere}
+.public-site .hrs-footer-grid>div>a:hover{text-decoration:underline}
+.public-site .hrs-footer-grid .hrs-footer-email{overflow-wrap:anywhere;text-decoration:underline!important}
+.public-site .hrs-footer-notice{font-size:12px;color:#c5d7ea;line-height:1.9;padding-top:32px;border-top:1px solid #ffffff1f;margin:48px 0 0}
+.public-site .hrs-footer-notice a{color:var(--hrs-white);text-decoration:underline}
+.public-site .hrs-footer-bottom{display:flex;justify-content:space-between;gap:24px;margin-top:30px;font-size:11px;color:#c5d7ea}
+
+@media(max-width:1279px){
+ .public-site .hrs-desktop-nav{display:none}.public-site .hrs-mobile-toggle{display:flex}
+ .public-site .hrs-familiar-hero-grid{gap:44px;grid-template-columns:1fr 1fr}
+ .public-site .hrs-familiar-hero h1{font-size:68px!important}.public-site .hrs-familiar-hero-copy>p:not(.hrs-pill){font-size:16px}
+ .public-site .hrs-goals-card{padding:36px 28px 96px;border-radius:40px}.public-site .hrs-goals-card h2{font-size:27px}
+ .public-site .hrs-topic-list{grid-template-columns:1fr}.public-site .hrs-topic-list li{padding:9px 12px}
+ .public-site .hrs-service-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}.public-site .hrs-familiar-card{padding:36px}
+ .public-site .hrs-journey-card{padding:60px;gap:40px}.public-site .hrs-journey-card h2{font-size:42px}
+ .public-site .hrs-footer-grid{gap:30px}
+}
+@media(max-width:1023px){
+ .public-site .hrs-wrap{width:calc(100% - 64px)}.public-site .hrs-header{height:92px}.public-site .hrs-home{padding-top:92px}
+ .public-site .hrs-familiar-hero-grid{min-height:0;gap:40px;padding-block:60px 100px}.public-site .hrs-familiar-hero h1{font-size:60px!important}
+ .public-site .hrs-familiar-visual{margin-right:12px}.public-site .hrs-goals-card{padding:32px 24px 92px}.public-site .hrs-goals-card h2{font-size:24px}
+ .public-site .hrs-next-step-badge{right:-12px;padding:20px;gap:14px;font-size:16px}.public-site .hrs-next-step-icon{height:48px;width:48px}
+ .public-site .hrs-home .hrs-section{padding-block:80px}.public-site .hrs-home h2{font-size:40px}
+ .public-site .hrs-pricing-grid{gap:24px}.public-site .hrs-price-card{padding:32px}.public-site .hrs-price strong{font-size:46px}
+ .public-site .hrs-home-article-grid,.public-site .hrs-editorial-grid{grid-template-columns:1fr;gap:24px}.public-site .hrs-home-article-grid .hrs-familiar-card{display:grid;grid-template-columns:80px 1fr;column-gap:26px}.public-site .hrs-home-article-grid .hrs-card-icon{grid-row:1/5}.public-site .hrs-home-article-grid .hrs-familiar-card>*:not(.hrs-card-icon){grid-column:2}
+ .public-site .hrs-journey-card{padding:48px;grid-template-columns:1fr;gap:30px}.public-site .hrs-journey-card h2{max-width:650px}.public-site .hrs-journey-actions{max-width:550px}
+ .public-site .hrs-footer-grid{grid-template-columns:1fr 1fr;gap:48px}
+ .public-site .hrs-content-page h1{font-size:46px!important}.public-site .hrs-editorial-detail h1{font-size:43px!important}
+}
+@media(max-width:700px){
+ .public-site .hrs-wrap{width:calc(100% - 40px)}.public-site .hrs-header{height:88px}.public-site .hrs-header-inner{gap:12px}.public-site .hrs-header .hrs-wrap{width:calc(100% - 32px)}.public-site .hrs-brand img{width:200px!important}.public-site .hrs-home{padding-top:88px}
+ .public-site .hrs-familiar-hero-grid{display:block;padding-block:45px 65px}.public-site .hrs-familiar-hero:before{display:none}
+ .public-site .hrs-familiar-hero h1{font-size:clamp(48px,12vw,68px)!important;line-height:1.01!important;margin-bottom:26px}.public-site .hrs-pill{font-size:9px;letter-spacing:.05em;padding:9px 12px;gap:6px;margin-bottom:26px!important}
+ .public-site .hrs-familiar-hero-copy>p:not(.hrs-pill){font-size:16px;line-height:1.8}.public-site .hrs-familiar-hero-copy .hrs-hero-note{font-size:12px!important;margin-top:24px}
+ .public-site .hrs-familiar-visual{display:none}.public-site .hrs-actions{gap:12px;margin-top:28px}.public-site .hrs-actions .hrs-button{width:100%}
+ .public-site .hrs-button,.public-site .auth-button{font-size:11px;padding:17px 22px}.public-site .hrs-home .hrs-goals-band{padding:40px 0}.public-site .hrs-goals-band h2{font-size:25px!important}.public-site .hrs-goals-band p{font-size:15px}
+ .public-site .hrs-home .hrs-section{padding-block:64px}.public-site .hrs-home h2{font-size:36px!important;line-height:1.12!important}.public-site .hrs-home h3{font-size:25px}.public-site .hrs-section-heading{margin-bottom:34px}.public-site .hrs-section-heading>p:not(.hrs-kicker){font-size:16px}.public-site .hrs-kicker{font-size:10px!important}
+ .public-site .hrs-service-grid{grid-template-columns:1fr;gap:22px}.public-site .hrs-familiar-card{padding:32px;border-radius:32px}.public-site .hrs-card-icon{height:68px;width:68px;margin-bottom:26px}.public-site .hrs-familiar-card>p:not(.hrs-editorial-meta){font-size:16px}
+ .public-site .hrs-pricing-grid{grid-template-columns:1fr;gap:24px}.public-site .hrs-price-card{padding:30px;border-radius:32px}.public-site .hrs-price-card h3{font-size:20px;min-height:0}.public-site .hrs-price strong{font-size:48px}.public-site .hrs-pricing-note{text-align:left;font-size:13px}.public-site .hrs-check-list{font-size:14px}
+ .public-site .hrs-articles-heading{display:block;margin-bottom:34px}.public-site .hrs-articles-heading>.hrs-text-link{margin-top:15px}.public-site .hrs-home-article-grid .hrs-familiar-card{display:flex}.public-site .hrs-home-article-grid h3{font-size:25px}
+ .public-site .hrs-home .hrs-home-contact{padding-top:0}.public-site .hrs-journey-card{padding:38px 28px;border-radius:36px;gap:28px}.public-site .hrs-journey-card h2{font-size:38px!important}.public-site .hrs-journey-card p{font-size:16px}.public-site .hrs-journey-actions{align-items:stretch}.public-site .hrs-journey-actions>.hrs-button{min-width:0;width:100%}.public-site .hrs-journey-actions>p{font-size:12px}.public-site .hrs-consultation-link{font-size:13px}
+ .public-site .hrs-content-page{padding-top:130px;padding-bottom:48px}.public-site .hrs-content-page>section{padding-inline:20px;margin-bottom:42px}.public-site .hrs-content-page>section.hrs-wrap{padding-inline:0}.public-site .hrs-content-page h1{font-size:36px!important;line-height:1.13!important}.public-site .hrs-content-page h2{font-size:26px!important}.public-site .hrs-content-page .text-xl{font-size:16px}.public-site .hrs-content-page button.px-8{padding-inline:22px}.public-site .hrs-content-page .px-8.pb-6{padding-inline:22px}
+ .public-site .hrs-process-intro>p:not(.hrs-kicker){font-size:16px}.public-site .hrs-tools-grid{grid-template-columns:1fr;gap:22px;margin-block:32px}.public-site .hrs-tool-card{padding:28px}.public-site .hrs-tool-card h2{font-size:25px!important}.public-site .hrs-editorial-body{padding:26px}.public-site .hrs-editorial-detail h1{font-size:35px!important}.public-site .hrs-editorial-deck{font-size:19px}.public-site .hrs-editorial-detail section p,.public-site .hrs-editorial-list{font-size:16px}
+ .public-site .hrs-legal-page{padding-top:126px;padding-bottom:48px;padding-inline:16px}.public-site .hrs-legal-page>article,.public-site .hrs-legal-page>div{padding:28px 22px;border-radius:24px}.public-site .hrs-legal-page h1{font-size:28px!important;line-height:1.2!important}.public-site .hrs-legal-page h2{font-size:21px!important}
+ .public-site .signup-page{padding-top:125px}.public-site .signup-form-panel{border-radius:22px}.public-site .signup-page h1{font-size:30px!important;line-height:1.2!important}.public-site .signup-page .auth-button{padding:12px 18px}.public-site .receipt-page{padding-top:130px!important;padding-inline:20px}.public-site .receipt-page h1{font-size:34px!important;line-height:1.2!important}.public-site .receipt-page .flex-wrap{flex-direction:column}.public-site .receipt-page .auth-button,.public-site .receipt-page .secondary-button{width:100%}
+ .public-site .hrs-footer{padding-block:60px 30px}.public-site .hrs-footer-grid{grid-template-columns:1fr 1fr;gap:36px 20px}.public-site .hrs-footer-grid>div:first-child,.public-site .hrs-footer-grid>div:last-child{grid-column:1/-1}.public-site .hrs-footer-grid>div:first-child>p{margin-bottom:0}.public-site .hrs-footer h2{margin-bottom:18px}.public-site .hrs-footer-grid>div>a:not(:first-child){min-height:36px;font-size:12px;margin:6px 0}.public-site .hrs-footer-bottom{flex-direction:column;gap:10px}.public-site .hrs-footer-notice{margin-top:32px}
+}
+@media(max-width:360px){.public-site .hrs-wrap{width:calc(100% - 32px)}.public-site .hrs-brand img{width:180px!important}.public-site .hrs-familiar-hero h1{font-size:47px!important}.public-site .hrs-pill{font-size:8px}.public-site .hrs-familiar-card,.public-site .hrs-price-card{padding:26px}.public-site .hrs-price strong{font-size:42px}.public-site .hrs-journey-card{padding:32px 24px}.public-site .hrs-journey-card h2{font-size:34px!important}.public-site .hrs-mobile-panel{padding:24px}}
+@media(prefers-reduced-motion:reduce){.public-site *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}

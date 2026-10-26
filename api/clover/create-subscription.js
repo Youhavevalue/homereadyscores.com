@@ -2,10 +2,13 @@
 // Subscribes a customer to a plan for recurring billing
 // Body: { planId, customerId, amount (optional override in cents), startDate (optional ISO), endDate (optional ISO) }
 
+import { requireAutomatedBilling } from '../_lib/billing-mode.js';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+  if (!requireAutomatedBilling(res)) return;
 
   const { planId, customerId, amount, startDate, endDate } = req.body;
 

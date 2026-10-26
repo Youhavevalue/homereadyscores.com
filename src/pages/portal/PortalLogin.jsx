@@ -1,20 +1,22 @@
+import BrandLogo from '../../components/BrandLogo';
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 
 const PortalLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberDevice, setRememberDevice] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, isAuthenticated, loading: sessionLoading } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    const result = await login(email, password);
+    const result = await login(email, password, rememberDevice);
     setLoading(false);
     if (result.success) {
       navigate('/admin');
@@ -23,22 +25,23 @@ const PortalLogin = () => {
     }
   };
 
+  if (sessionLoading) return <div style={styles.container}><p role="status" style={{ color: '#cbd5e1' }}>Checking your sign-in...</p></div>;
+  if (isAuthenticated) return <Navigate to="/admin" replace />;
+
   return (
     <div style={styles.container}>
       <div style={styles.backdrop} />
       <div style={styles.card}>
         <div style={styles.logoSection}>
-          <div style={styles.logoIcon}>
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-          </div>
-          <h1 style={styles.title}>Home Ready Scores</h1>
-          <p style={styles.subtitle}>Team Portal</p>
+          <BrandLogo width={220} style={{ margin: '0 auto 20px' }} />
+          <h1 className="sr-only">Home Ready Scores</h1>
+          <p style={styles.subtitle}>Staff workspace</p>
+          <h2 style={styles.heading}>Welcome back</h2>
+          <p style={styles.description}>Sign in to manage enrollments and see how your website is performing.</p>
         </div>
 
         {error && (
-          <div style={styles.errorBox}>
+          <div role="alert" style={styles.errorBox}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
             <span>{error}</span>
           </div>
@@ -46,22 +49,24 @@ const PortalLogin = () => {
 
         <form onSubmit={handleSubmit} style={styles.form}>
           <div style={styles.inputGroup}>
-            <label style={styles.label}>Email Address</label>
+            <label htmlFor="login-email" style={styles.label}>Email Address</label>
             <input
               id="login-email"
+              autoComplete="username"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@homereadyscores.com"
+              placeholder="Your work email"
               style={styles.input}
               required
             />
           </div>
 
           <div style={styles.inputGroup}>
-            <label style={styles.label}>Password</label>
+            <label htmlFor="login-password" style={styles.label}>Password</label>
             <input
               id="login-password"
+              autoComplete="current-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -70,6 +75,11 @@ const PortalLogin = () => {
               required
             />
           </div>
+
+          <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, color: '#52617a', fontSize: '0.8rem', cursor: 'pointer' }}>
+            <input type="checkbox" name="rememberDevice" checked={rememberDevice} onChange={e => setRememberDevice(e.target.checked)} style={{ marginTop: 3, accentColor: '#6366f1' }} />
+            <span>Keep me signed in for 30 days<br /><small style={{ color: '#657187' }}>Use only on your own device. Signing out ends access.</small></span>
+          </label>
 
           <button
             id="login-submit"
@@ -89,146 +99,32 @@ const PortalLogin = () => {
           </button>
         </form>
 
-        <p style={styles.footerText}>
-          Authorized personnel only. All access is logged.
-        </p>
+        <details style={styles.help}>
+          <summary>Which account do I use?</summary>
+          <p>Use your HomeReady Scores staff email and website password.</p>
+        </details>
+        <p style={styles.footerText}>Private access for your team.<br /><Link to="/" style={{ color: '#526d9a', display: 'inline-block', marginTop: 12 }}>← Return to HomeReady Scores</Link></p>
       </div>
     </div>
   );
 };
 
 const styles = {
-  container: {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: 'linear-gradient(135deg, #0f0f23 0%, #1a1a3e 30%, #0d2137 60%, #0a0a1a 100%)',
-    position: 'relative',
-    overflow: 'hidden',
-    padding: '20px',
-  },
-  backdrop: {
-    position: 'absolute',
-    inset: 0,
-    background: `radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
-                 radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.06) 0%, transparent 40%),
-                 radial-gradient(circle at 50% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 40%)`,
-    pointerEvents: 'none',
-  },
-  card: {
-    position: 'relative',
-    width: '100%',
-    maxWidth: '420px',
-    background: 'rgba(255, 255, 255, 0.03)',
-    backdropFilter: 'blur(40px)',
-    WebkitBackdropFilter: 'blur(40px)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
-    borderRadius: '24px',
-    padding: '48px 40px',
-    boxShadow: '0 25px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
-  },
-  logoSection: {
-    textAlign: 'center',
-    marginBottom: '36px',
-  },
-  logoIcon: {
-    width: '56px',
-    height: '56px',
-    borderRadius: '16px',
-    background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: '0 auto 16px',
-    color: '#fff',
-    boxShadow: '0 8px 25px rgba(59, 130, 246, 0.25)',
-  },
-  title: {
-    fontSize: '1.5rem',
-    fontWeight: '700',
-    color: '#fff',
-    margin: '0 0 4px',
-    letterSpacing: '-0.02em',
-  },
-  subtitle: {
-    fontSize: '0.875rem',
-    color: 'rgba(255, 255, 255, 0.45)',
-    margin: 0,
-    textTransform: 'uppercase',
-    letterSpacing: '0.15em',
-    fontWeight: '500',
-  },
-  errorBox: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '12px 16px',
-    background: 'rgba(239, 68, 68, 0.1)',
-    border: '1px solid rgba(239, 68, 68, 0.2)',
-    borderRadius: '12px',
-    color: '#fca5a5',
-    fontSize: '0.85rem',
-    marginBottom: '20px',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px',
-  },
-  inputGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '6px',
-  },
-  label: {
-    fontSize: '0.8rem',
-    fontWeight: '500',
-    color: 'rgba(255, 255, 255, 0.5)',
-    textTransform: 'uppercase',
-    letterSpacing: '0.08em',
-  },
-  input: {
-    padding: '14px 16px',
-    background: 'rgba(255, 255, 255, 0.04)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    borderRadius: '12px',
-    color: '#fff',
-    fontSize: '0.95rem',
-    outline: 'none',
-    transition: 'all 0.2s ease',
-  },
-  button: {
-    padding: '14px',
-    background: 'linear-gradient(135deg, #3b82f6, #6366f1)',
-    border: 'none',
-    borderRadius: '12px',
-    color: '#fff',
-    fontSize: '0.95rem',
-    fontWeight: '600',
-    marginTop: '8px',
-    transition: 'all 0.2s ease',
-    boxShadow: '0 4px 15px rgba(59, 130, 246, 0.3)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '8px',
-  },
-  spinner: {
-    width: '20px',
-    height: '20px',
-    border: '2px solid rgba(255,255,255,0.3)',
-    borderTopColor: '#fff',
-    borderRadius: '50%',
-    animation: 'spin 0.6s linear infinite',
-  },
-  footerText: {
-    textAlign: 'center',
-    fontSize: '0.75rem',
-    color: 'rgba(255, 255, 255, 0.2)',
-    marginTop: '24px',
-    margin: '24px 0 0',
-  },
+  container: { minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f6f8fc', position: 'relative', padding: '24px 16px', color:'#263449' },
+  backdrop: { position:'absolute', inset:0, background:'radial-gradient(ellipse at 50% 0%, #eaf0ff 0%, transparent 65%)', pointerEvents:'none' },
+  card: { position:'relative', width:'100%', maxWidth:440, background:'#fff', border:'1px solid #e3e9f2', borderRadius:18, padding:'clamp(24px, 6vw, 40px)', boxShadow:'0 12px 48px rgba(33,55,97,.045)' },
+  logoSection: { textAlign:'center', marginBottom:30 },
+  subtitle: { fontSize:10, color:'#657187', margin:'24px 0 10px', textTransform:'uppercase', letterSpacing:'.14em', fontWeight:600 },
+  heading: { fontSize:27, lineHeight:1.3, color:'#233149', fontWeight:650, letterSpacing:'-.035em', margin:'0 0 10px' },
+  description: { fontSize:13, lineHeight:1.8, color:'#657187', margin:0 },
+  errorBox: { display:'flex', alignItems:'center', gap:8, padding:'12px 14px', background:'#fff5f4', border:'1px solid #f5d5d0', borderRadius:9, color:'#a44237', fontSize:13, marginBottom:20 },
+  form: { display:'flex', flexDirection:'column', gap:20 },
+  inputGroup: { display:'flex', flexDirection:'column', gap:7 },
+  label: { fontSize:12, fontWeight:550, color:'#52617a' },
+  input: { padding:'12px 14px', minHeight:46, width:'100%', boxSizing:'border-box', background:'#fff', border:'1px solid #dce3ee', borderRadius:8, color:'#263449', fontSize:16, transition:'border-color .15s' },
+  button: { padding:14, minHeight:48, background:'#2562ff', border:0, borderRadius:8, color:'#fff', fontSize:14, fontWeight:600, marginTop:4, display:'flex', alignItems:'center', justifyContent:'center', gap:8 },
+  spinner: { width:20, height:20, border:'2px solid rgba(255,255,255,.3)', borderTopColor:'#fff', borderRadius:'50%', animation:'spin .6s linear infinite' },
+  help: { marginTop:24, paddingTop:20, borderTop:'1px solid #edf0f5', fontSize:12, color:'#657187', lineHeight:1.8, cursor:'pointer' },
+  footerText: { textAlign:'center', fontSize:11, color:'#657187', margin:'24px 0 0', lineHeight:1.8 },
 };
-
 export default PortalLogin;

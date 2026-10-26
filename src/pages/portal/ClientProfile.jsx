@@ -1,3 +1,4 @@
+import BrandLogo from '../../components/BrandLogo';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -72,7 +73,7 @@ const ClientProfile = () => {
       {/* Header */}
       <header style={s.header}>
         <div style={s.headerLeft}>
-          <div style={s.logoMark}>HRS</div>
+          <BrandLogo reverse width={180} />
           <span style={s.headerTitle}>Client Portal</span>
         </div>
         <nav style={s.nav}>

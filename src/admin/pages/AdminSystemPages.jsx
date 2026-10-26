@@ -1,5 +1,6 @@
 import AdminSimplePage, { AdminPlaceholderTable } from './AdminSimplePage';
 import { AdminCard } from '../components/AdminCard';
+import AdminReports from './AdminReports';
 
 export function ContractsPage() {
   return (
@@ -90,32 +91,8 @@ export function UsersPage() {
   );
 }
 
-const REPORTS = [
-  ['Closing ratio', 'Conversion from prospect to funded client.'],
-  ['Note ratio', 'Counselor notes per active account.'],
-  ['Affiliate referral report', 'Partner attribution.'],
-  ['Broker referral report', 'Broker pipeline.'],
-  ['Broker creation report', 'New broker onboarding.'],
-];
-
 export function ReportsPage() {
-  return (
-    <AdminSimplePage title="Reports" subtitle="Operational and partner analytics.">
-      <div className="grid gap-4 md:grid-cols-2">
-        {REPORTS.map(([title, desc]) => (
-          <AdminCard key={title} title={title}>
-            <p className="text-sm text-slate-600">{desc}</p>
-            <button
-              type="button"
-              className="mt-3 rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-semibold text-white"
-            >
-              Run report
-            </button>
-          </AdminCard>
-        ))}
-      </div>
-    </AdminSimplePage>
-  );
+  return <AdminReports />;
 }
 
 export function CommunicationPage() {

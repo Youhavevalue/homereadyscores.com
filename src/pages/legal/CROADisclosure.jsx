@@ -3,7 +3,7 @@ import { ShieldCheck } from 'lucide-react';
 
 const CROADisclosure = () => {
   return (
-    <div className="pt-32 pb-24 bg-surface min-h-screen">
+    <div className="hrs-legal-page pt-32 pb-24 bg-surface min-h-screen">
       <div className="max-w-4xl mx-auto px-6 bg-white p-12 md:p-16 rounded-3xl shadow-[0_10px_40px_rgba(0,45,91,0.05)] border border-gray-100">
         <div className="flex items-center gap-4 mb-8 pb-8 border-b border-gray-100">
             <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">

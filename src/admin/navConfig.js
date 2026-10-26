@@ -1,99 +1,32 @@
-import {
-  LayoutDashboard,
-  GraduationCap,
-  Users,
-  UserPlus,
-  Handshake,
-  Building2,
-  HelpCircle,
-  Headphones,
-  Calendar,
-  Globe,
-  Shield,
-  Mail,
-  Plug,
-  FileText,
-  BarChart3,
-  Settings,
-  Link2,
-  ScrollText,
-} from 'lucide-react';
-
-/**
- * Sidebar navigation — mirrors LegacyCredits-style module map.
- * `badge` is optional (e.g. open tickets).
- */
+import { Inbox, Users, UserPlus, GraduationCap, Headphones, FileText, BarChart3, CircleHelp } from 'lucide-react';
 export const adminNavGroups = [
-  {
-    id: 'overview',
-    label: 'Overview',
-    items: [
-      { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
-      { to: '/admin/training', label: 'Training', icon: GraduationCap },
-    ],
-  },
-  {
-    id: 'people',
-    label: 'People & partners',
-    items: [
-      { to: '/admin/clients', label: 'Clients', icon: Users },
-      { to: '/admin/prospects', label: 'Prospects', icon: UserPlus },
-      { to: '/admin/affiliates', label: 'Affiliates', icon: Handshake },
-      { to: '/admin/brokers', label: 'Brokers', icon: Building2 },
-    ],
-  },
-  {
-    id: 'operations',
-    label: 'Operations',
-    items: [
-      { to: '/admin/faq', label: 'FAQ', icon: HelpCircle },
-      { to: '/admin/help-desk', label: 'Help Desk', icon: Headphones, badgeKey: 'openTickets' },
-      { to: '/admin/appointments', label: 'Appointments', icon: Calendar },
-    ],
-  },
-  {
-    id: 'content',
-    label: 'Content & letters',
-    items: [
-      { to: '/admin/cms', label: 'Web CMS', icon: Globe },
-      { to: '/admin/letters', label: 'Letter system', icon: ScrollText },
-    ],
-  },
-  {
-    id: 'system',
-    label: 'System',
-    items: [
-      { to: '/admin/system', label: 'System admin', icon: Shield },
-      { to: '/admin/autoresponders', label: 'Autoresponders', icon: Mail },
-      { to: '/admin/api', label: 'API', icon: Plug },
-    ],
-  },
+  { id: 'workspace', label: 'Workspace', items: [
+    { to: '/admin', label: 'Enrollments', icon: Inbox, end: true },
+    { to: '/admin/reports', label: 'Analytics', icon: BarChart3 },
+    { to: '/admin/credit-funnel', label: 'Credit-help requests', icon: Inbox },
+    { to: '/admin/clients', label: 'Clients', icon: Users },
+    { to: '/admin/prospects', label: 'Prospects', icon: UserPlus },
+  ] },
+  { id: 'manage', label: 'Manage', items: [
+    { to: '/admin/contracts', label: 'Agreements', icon: FileText },
+    { to: '/admin/help-desk', label: 'Team help desk', icon: Headphones },
+    { to: '/admin/training', label: 'Training', icon: GraduationCap },
+  ] },
+  { id: 'guidance', label: 'Getting oriented', items: [
+    { to: '/admin/guide', label: 'System guide', icon: CircleHelp },
+  ] },
 ];
-
-/** Flat list for search / quick jump */
 export const adminQuickLinks = [
-  { to: '/admin/training', label: 'Training' },
+  { to: '/admin', label: 'Enrollments' },
+  { to: '/admin/reports', label: 'Analytics and reports' },
+  { to: '/admin/credit-funnel', label: 'Credit-help requests' },
   { to: '/admin/clients', label: 'All clients' },
-  { to: '/admin/clients/new', label: 'Add client' },
-  { to: '/admin/clients/joint', label: 'Add joint client' },
-  { to: '/admin/prospects/new', label: 'Add prospect' },
-  { to: '/admin/affiliates/new', label: 'Add affiliate' },
-  { to: '/admin/brokers/new', label: 'Add broker' },
-  { to: '/admin/help-desk', label: 'Open tickets' },
-  { to: '/admin/settings', label: 'System settings' },
-  { to: '/admin/reports', label: 'Reports' },
-  { to: '/admin/communication', label: 'Communication' },
+  { to: '/admin/clients/new', label: 'Add pending client' },
+  { to: '/admin/clients/joint', label: 'Add pending joint clients' },
+  { to: '/admin/prospects', label: 'Prospects' },
+  { to: '/admin/help-desk', label: 'Team help desk' },
+  { to: '/admin/training', label: 'Training' },
+  { to: '/admin/contracts', label: 'Agreements' },
+  { to: '/admin/guide', label: 'Login, email and system guide' },
 ];
-
-/** Sub-nav for /admin/system hub */
-export const adminHubLinks = [
-  { to: '/admin/contracts', label: 'Contracts', icon: FileText },
-  { to: '/admin/invoices', label: 'Invoices', icon: FileText },
-  { to: '/admin/settings', label: 'System settings', icon: Settings },
-  { to: '/admin/system-emails', label: 'System emails', icon: Mail },
-  { to: '/admin/users', label: 'Users', icon: Users },
-  { to: '/admin/reports', label: 'Reports', icon: BarChart3 },
-  { to: '/admin/communication', label: 'Communication', icon: Headphones },
-  { to: '/admin/letter-menu', label: 'Letter menu', icon: ScrollText },
-  { to: '/admin/hotlinks', label: 'Hotlinks', icon: Link2 },
-];
+export const adminHubLinks = [];

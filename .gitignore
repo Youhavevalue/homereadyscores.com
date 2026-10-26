@@ -1,26 +1,24 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
+# Credentials and machine-specific settings
+.env*
+!.env.example
 *.local
+.vercel/
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# Dependencies and generated output
+node_modules
+dist/
+dist-ssr/
+*.log
+
+# Local QA databases, fictional account credentials, evidence and scratch data
+review-runtime/
+preview-runtime/
+review-access.json
+evidence/
+
+# Editors and operating-system files
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-.vercel
-.env*.local
+.idea/
+.vscode/
+*.swp
+*.swo

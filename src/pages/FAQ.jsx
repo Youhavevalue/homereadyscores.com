@@ -1,56 +1,38 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, MessageCircleQuestion } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const faqs = [
-  {
-    question: "How exactly does credit repair work?",
-    answer: "We use federal consumer protection laws, like the Fair Credit Reporting Act (FCRA), to challenge inaccurate, outdated, and unverifiable negative items on your credit report. If the credit bureaus cannot verify the item with the original creditor, they are legally required to remove it from your profile."
-  },
-  {
-    question: "How long does it take to see results?",
-    answer: "Most of our clients start seeing real changes to their credit profile in as little as 45 days. However, everyone's credit situation is uniquely different. While some files clean up quickly, more complex issues may take a few rounds of disputes to fully resolve."
-  },
-  {
-    question: "What types of negative items can be removed?",
-    answer: "We commonly assist with challenging and removing late payments, collections, charge-offs, bankruptcies, foreclosures, hard inquiries, and medical debt. If an item is unfair, inaccurate, or cannot be verified, we can dispute it on your behalf."
-  },
-  {
-    question: "Can you guarantee that my score will go up?",
-    answer: "It is illegal for any reputable credit company to guarantee a specific score increase or a specific timeline. What we do provide is a proven track record of success and our commitment to a relentless, legally-sound dispute process. We guarantee our effort to fight for the best possible outcome for your financial future."
-  },
-  {
-    question: "Do I need to do anything while you work on my credit?",
-    answer: "Yes, teamwork is required! We need you to maintain an active credit monitoring subscription so we can track the changes being made. We also strongly advise you to avoid applying for new credit, keep your revolving credit card balances low, and continue to pay all your current bills on time."
-  },
-  {
-    question: "When will I be ready to apply for a mortgage?",
-    answer: "Your exact timeline depends on your starting score, your debt-to-income ratio, and the severity of the negative items on your report. Our entire program is optimized specifically to get you 'Home Ready'. We provide a detailed client portal so you can track your progress and know exactly when you're in the right position to talk to a lender."
-  }
+  { question: "How do I get started?", answer: "Select Get Started Now, enter your contact details and credit goal, and choose Single or Couple enrollment. Review the pricing, enter your card and billing details, and select Save enrollment and card. Keep the enrollment reference shown after your request is saved. You will not be charged when you submit the form." },
+  { question: "How long does it take to see results?", answer: "Timing depends on the information involved and the review process. We do not promise a particular change or timeline." },
+  { question: "Which enrollment plan should I choose?", answer: "Single enrollment is for one person: $189.99 initially, then $100.00 per month. Couple enrollment is for you and your spouse or partner: $379.99 initially, then $160.00 per month. Monthly pricing starts 30 days after signup." },
+  { question: "Can you guarantee that my score will go up?", answer: "Every credit profile is different, so we can’t promise a specific score increase or outcome. Our focus is helping you understand your credit report and address information that may be inaccurate or incomplete. Your results also depend on your credit history and ongoing payment habits. We’ll explain your options and next steps clearly." },
+  { question: "What happens after I complete the enrollment form?", answer: "Keep the enrollment reference shown after a successful save. Your confirmation records receipt of your enrollment details; it does not confirm a payment, sign a service agreement or activate a subscription. Do not send card details or sensitive documents by ordinary email." },
+  { question: "Does enrollment mean I qualify for a mortgage?", answer: "No. Mortgage qualification is separate from HomeReady Scores enrollment and is determined through your lender's process. Ask your lender about your specific application." },
 ];
 
 const FAQ = () => {
   const [openIndex, setOpenIndex] = useState(0);
 
   return (
-    <div className="pt-32 pb-24 bg-surface min-h-screen">
+    <div className="hrs-content-page pt-32 pb-24 bg-surface min-h-screen">
       <section className="max-w-4xl mx-auto px-6 mb-24">
         <div className="text-center animate-slide-up mb-16">
           <div className="inline-block bg-primary/10 text-primary px-4 py-2 rounded-full font-black text-[10px] uppercase tracking-widest mb-6 border border-primary/20">
-            Expert Answers
+            Common Questions
           </div>
           <h1 className="text-5xl md:text-6xl font-black mb-8 leading-tight text-navy">
             Common Questions About <span className="text-primary italic">Credit Repair.</span>
           </h1>
           <p className="text-xl text-gray-600 mb-0 max-w-2xl mx-auto leading-relaxed font-medium">
-            Everything you need to know about getting your credit profile ready for your new home.
+            Understand the enrollment steps, plan prices and what your confirmation means.
           </p>
         </div>
 
         <div className="space-y-4">
           {faqs.map((faq, i) => (
-            <motion.div
+            <Motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
@@ -59,6 +41,8 @@ const FAQ = () => {
             >
               <button
                 onClick={() => setOpenIndex(openIndex === i ? -1 : i)}
+                aria-expanded={openIndex === i}
+                aria-controls={`faq-answer-${i}`}
                 className="w-full text-left px-8 py-6 flex items-center justify-between gap-6"
               >
                 <h3 className={`text-xl font-bold transition-colors ${openIndex === i ? 'text-primary' : 'text-navy'}`}>
@@ -73,7 +57,8 @@ const FAQ = () => {
               </button>
               <AnimatePresence>
                 {openIndex === i && (
-                  <motion.div
+                  <Motion.div
+                    id={`faq-answer-${i}`}
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
@@ -82,10 +67,10 @@ const FAQ = () => {
                     <div className="px-8 pb-6 pt-2 text-gray-600 font-medium leading-relaxed border-t border-gray-50">
                       {faq.answer}
                     </div>
-                  </motion.div>
+                  </Motion.div>
                 )}
               </AnimatePresence>
-            </motion.div>
+            </Motion.div>
           ))}
         </div>
       </section>
@@ -98,12 +83,12 @@ const FAQ = () => {
           <div className="w-16 h-16 bg-white/10 rounded-3xl flex items-center justify-center backdrop-blur-md mb-6 border border-white/10 relative z-10">
             <MessageCircleQuestion size={32} className="text-primary" />
           </div>
-          <h2 className="text-3xl md:text-4xl font-black mb-4 relative z-10 text-white">Still have questions?</h2>
+          <h2 className="text-3xl md:text-4xl font-black mb-4 relative z-10 text-white">Ready to get started?</h2>
           <p className="text-blue-100/60 text-base md:text-lg mb-8 max-w-xl relative z-10">
-            Our credit specialists are ready to review your situation and explain exactly how we can help you get the keys to your new home.
+            Choose your enrollment plan and take the first step toward your credit goals.
           </p>
           <Link to="/get-started" className="auth-button min-w-[240px] relative z-10">
-            Get Started Today
+            Get Started Now
           </Link>
         </div>
       </section>

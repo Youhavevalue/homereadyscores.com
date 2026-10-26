@@ -1,0 +1,4 @@
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),esbuild=require('esbuild');
+const file=require('node:path').resolve(__dirname,'../src/admin/navConfig.js');
+function config(){const out={};const c={module:{exports:out},exports:out,require(n){if(n==='lucide-react')return new Proxy({}, {get:(_,k)=>String(k)});throw Error(n);}};vm.runInNewContext(esbuild.transformSync(fs.readFileSync(file,'utf8'),{format:'cjs',loader:'js'}).code,c);return c.module.exports;}
+test('staff navigation puts active workflows first and includes a system guide',()=>{const c=config();const items=c.adminNavGroups.flatMap(g=>g.items);assert.ok(items.some(x=>x.to==='/admin/guide'));assert.ok(items.some(x=>x.to==='/admin/reports'&&x.label==='Analytics'));assert.ok(!items.some(x=>/deferred|unavailable/i.test(x.label)));assert.equal(new Set(items.map(x=>x.to)).size,items.length);});

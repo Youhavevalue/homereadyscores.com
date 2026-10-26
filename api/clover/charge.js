@@ -4,10 +4,13 @@
 
 import { randomUUID } from 'crypto';
 
+import { requireAutomatedBilling } from '../_lib/billing-mode.js';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+  if (!requireAutomatedBilling(res)) return;
 
   const { amount, currency = 'usd', source, description } = req.body;
 
